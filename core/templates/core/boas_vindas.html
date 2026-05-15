@@ -12,63 +12,17 @@
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
-
-    <style>
-        body {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .welcome-hero {
-            padding: 3rem 0 2rem;
-            text-align: center;
-        }
-
-        .welcome-hero img {
-            max-height: 200px;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-wrapper {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .form-wrapper iframe {
-            display: block;
-            width: 100%;
-            min-height: 640px;
-            border: none;
-        }
-
-        .confirm-section {
-            background: rgba(255, 255, 255, 0.03);
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1.5rem 2rem;
-            text-align: center;
-        }
-
-        .btn-confirm {
-            padding: 0.7rem 2.5rem;
-            font-size: 1rem;
-            font-weight: 600;
-            border-radius: 8px;
-        }
-    </style>
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}"
 </head>
 
 <body>
-    <div class="container" style="max-width: 800px;">
+    <div class="container welcome-container">
 
         <!-- Hero -->
         <div class="welcome-hero">
-            <img src="{% static 'images/logo.png' %}" alt="Artefact" onerror="this.style.display='none'">
-            <h1 class="fw-bold mb-2" style="font-size: 2rem;">Welcome to the AE Knowledge Hub! 🎉</h1>
-            <p class="text-white-50 mb-0" style="font-size: 1.05rem;">
+            <img src="{% static 'images/logo.png' %}" alt="Artefact" class="welcome-logo" onerror="this.style.display='none'">
+            <h1 class="fw-bold mb-2 welcome-title">Welcome to the AE Knowledge Hub! 🎉</h1>
+            <p class="text-white-50 mb-0 welcome-subtitle">
                 Before accessing the dashboard, we need to know a little more about you.<br>
                 Please fill in the skills form below &mdash; it takes less than 5 minutes.
             </p>

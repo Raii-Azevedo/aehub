@@ -244,6 +244,214 @@ pre {
 }
 
 /* ============================================
+   RESPONSIVE UTILITIES
+============================================ */
+@media (max-width: 767.98px) {
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .d-flex.justify-content-between.align-items-center > button,
+    .d-flex.justify-content-between.align-items-center > div {
+        width: 100%;
+    }
+    
+    .d-flex.gap-2 {
+        gap: 0.5rem !important;
+    }
+    
+    .d-flex.gap-2 input,
+    .d-flex.gap-2 button {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .d-flex.gap-2 .btn {
+        white-space: nowrap;
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .d-flex.justify-content-between.align-items-center > div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .d-flex.justify-content-between.align-items-center button {
+        width: 100%;
+    }
+}
+
+/* ============================================
+   WELCOME PAGE (BOAS VINDAS)
+============================================ */
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.welcome-container {
+    max-width: 800px;
+}
+
+.welcome-hero {
+    padding: 3rem 0 2rem;
+    text-align: center;
+}
+
+.welcome-logo {
+    max-height: 200px;
+    margin-bottom: 1.5rem;
+}
+
+.welcome-title {
+    font-size: 2rem;
+}
+
+.welcome-subtitle {
+    font-size: 1.05rem;
+}
+
+.form-wrapper {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.form-wrapper iframe {
+    display: block;
+    width: 100%;
+    min-height: 640px;
+    border: none;
+}
+
+.confirm-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1.5rem 2rem;
+    text-align: center;
+}
+
+.btn-confirm {
+    padding: 0.7rem 2.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+@media (max-width: 767.98px) {
+    .welcome-hero {
+        padding: 2rem 0 1.5rem;
+    }
+    
+    .welcome-logo {
+        max-height: 150px;
+        margin-bottom: 1rem;
+    }
+    
+    .welcome-title {
+        font-size: 1.5rem;
+    }
+    
+    .welcome-subtitle {
+        font-size: 0.95rem;
+    }
+    
+    .form-wrapper iframe {
+        min-height: 500px;
+    }
+    
+    .confirm-section {
+        padding: 1.2rem 1.5rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .welcome-hero {
+        padding: 1.5rem 0 1rem;
+    }
+    
+    .welcome-logo {
+        max-height: 120px;
+        margin-bottom: 0.8rem;
+    }
+    
+    .welcome-title {
+        font-size: 1.25rem;
+    }
+    
+    .welcome-subtitle {
+        font-size: 0.85rem;
+    }
+    
+    .form-wrapper iframe {
+        min-height: 400px;
+    }
+    
+    .confirm-section {
+        padding: 1rem 1rem;
+    }
+    
+    .btn-confirm {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.9rem;
+        width: 100%;
+    }
+}
+
+/* ============================================
+   NAVBAR RESPONSIVE
+============================================ */
+.navbar-logo {
+    height: 80px;
+    transition: height 0.2s ease;
+}
+
+@media (max-width: 767.98px) {
+    .navbar-logo {
+        height: 60px;
+    }
+}
+
+/* ============================================
+   LOGIN PAGE RESPONSIVE
+============================================ */
+.login-logo {
+    height: 280px;
+    max-height: 50vw;
+}
+
+@media (max-width: 767.98px) {
+    .login-logo {
+        height: 200px;
+    }
+    
+    .card-body {
+        padding: 2rem 1rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .login-logo {
+        height: 150px;
+    }
+    
+    .card {
+        margin: 0 0.5rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem 1rem !important;
+    }
+}
+
+/* ============================================
    PROFILES PAGE
 ============================================ */
 .profiles-page {
@@ -283,6 +491,14 @@ pre {
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.08);
     transform: rotate(20deg);
+}
+
+@media (max-width: 767.98px) {
+    .profiles-hero::after {
+        inset: auto -80px -80px auto;
+        width: 240px;
+        height: 240px;
+    }
 }
 
 .profiles-label {
@@ -429,16 +645,62 @@ pre {
     }
 }
 
-@media (max-width: 575.98px) {
-    .profiles-hero {
-        padding: 2.1rem 1rem;
-        border-radius: 18px;
-    }
-
+@media (max-width: 767.98px) {
     .profiles-grid {
         grid-template-columns: 1fr;
     }
+    .profiles-hero {
+        padding: 2rem 1rem;
+        border-radius: 16px;
+    }
+    .profiles-hero h1 {
+        font-size: clamp(1.5rem, 3.5vw, 2rem);
+    }
+    .profiles-actions {
+        flex-direction: column;
+    }
+    .profiles-page .cta-button {
+        width: 100%;
+    }
+}
 
+@media (max-width: 575.98px) {
+    .profiles-hero {
+        padding: 1.5rem 0.75rem;
+        border-radius: 12px;
+    }
+    
+    .profiles-hero h1 {
+        font-size: clamp(1.3rem, 3vw, 1.8rem);
+        margin-bottom: 0.6rem;
+    }
+    
+    .profiles-hero p {
+        font-size: 0.9rem;
+    }
+    
+    .profiles-label {
+        font-size: 0.65rem;
+        padding: 0.25rem 0.6rem;
+    }
+    
+    .profile-card {
+        padding: 0.8rem;
+    }
+    
+    .profile-emoji {
+        font-size: 1.2rem;
+        margin-bottom: 0.3rem;
+    }
+    
+    .profile-card h3 {
+        font-size: 0.9rem;
+    }
+    
+    .profile-card p {
+        font-size: 0.8rem;
+    }
+    
     .profiles-page .cta-button {
         width: 100%;
     }

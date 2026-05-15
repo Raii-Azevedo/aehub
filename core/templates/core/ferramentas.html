@@ -12,7 +12,7 @@
 
 <!-- Search Form -->
 <div class="mb-4">
-    <form method="GET" class="d-flex">
+    <form method="GET" class="d-flex flex-wrap gap-2">
         <input type="text" name="q" class="form-control me-2" placeholder="Search tools..." value="{{ query }}">
         <button type="submit" class="btn btn-outline-light">
             <i class="bi bi-search"></i> Search
@@ -28,7 +28,7 @@
 <!-- Lista de ferramentas -->
 <div class="row">
     {% for ferramenta in ferramentas %}
-    <div class="col-md-4 mb-4">
+    <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
         <div class="card h-100">
             <div class="card-body">
                 <h5 class="card-title">{{ ferramenta.nome }}</h5>
