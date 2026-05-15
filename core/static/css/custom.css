@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Sora:wght@400;600;700&display=swap');
+
 /* static/css/custom.css */
 
 /* ============================================
@@ -239,4 +241,203 @@ pre {
 
 ::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================
+   PROFILES PAGE
+============================================ */
+.profiles-page {
+    --bg-deep: #061726;
+    --bg-mid: #0d2b44;
+    --ink: #0f1f2f;
+    --ink-soft: #516275;
+    --card: #ffffff;
+    --accent: #ff8a00;
+    --accent-2: #ffd166;
+    --line: #d9e2ec;
+    max-width: 1120px;
+    margin: 0 auto;
+    font-family: "Space Grotesk", "Segoe UI", sans-serif;
+    color: var(--ink);
+}
+
+.profiles-hero {
+    border-radius: 24px;
+    padding: 3rem 1.5rem;
+    background:
+        radial-gradient(circle at 15% 25%, rgba(255, 209, 102, 0.22), transparent 32%),
+        radial-gradient(circle at 82% 70%, rgba(255, 138, 0, 0.25), transparent 36%),
+        linear-gradient(140deg, var(--bg-deep), var(--bg-mid));
+    color: #f8fbff;
+    position: relative;
+    overflow: hidden;
+}
+
+.profiles-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -120px -120px auto;
+    width: 360px;
+    height: 360px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    transform: rotate(20deg);
+}
+
+.profiles-label {
+    display: inline-flex;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.76rem;
+    background: rgba(255, 255, 255, 0.15);
+    margin-bottom: 0.9rem;
+}
+
+.profiles-hero h1 {
+    font-family: "Sora", "Segoe UI", sans-serif;
+    font-size: clamp(1.9rem, 4.2vw, 3rem);
+    margin-bottom: 0.9rem;
+    line-height: 1.15;
+    max-width: 760px;
+}
+
+.profiles-hero p {
+    max-width: 700px;
+    margin: 0;
+    color: rgba(245, 250, 255, 0.9);
+    font-size: 1.02rem;
+}
+
+.profiles-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem;
+    margin-top: 1.5rem;
+}
+
+.cta-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    border-radius: 12px;
+    padding: 0.85rem 1.25rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.cta-primary {
+    background: linear-gradient(110deg, var(--accent), var(--accent-2));
+    color: #07131f;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
+}
+
+.cta-secondary {
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    color: #f8fbff;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+}
+
+.profiles-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.9rem;
+    margin-top: 1.5rem;
+}
+
+.profile-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1.1rem;
+    color: var(--ink);
+    text-decoration: none;
+    box-shadow: 0 12px 24px rgba(6, 23, 38, 0.08);
+    transform: translateY(8px);
+    opacity: 0;
+    animation: cardReveal 0.45s ease forwards;
+}
+
+.profile-card:nth-child(2) { animation-delay: 0.08s; }
+.profile-card:nth-child(3) { animation-delay: 0.16s; }
+.profile-card:nth-child(4) { animation-delay: 0.24s; }
+
+.profile-card:hover {
+    border-color: #b5c7d8;
+    box-shadow: 0 16px 28px rgba(6, 23, 38, 0.14);
+    transform: translateY(-3px);
+}
+
+.profile-emoji {
+    font-size: 1.5rem;
+    margin-bottom: 0.45rem;
+    display: block;
+}
+
+.profile-card h3 {
+    margin: 0;
+    font-size: 1.02rem;
+    font-family: "Sora", "Segoe UI", sans-serif;
+}
+
+.profile-card p {
+    margin: 0.5rem 0 0;
+    color: var(--ink-soft);
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.profiles-notes {
+    margin-top: 1.4rem;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 1rem 1.1rem;
+    background: #ffffff;
+}
+
+.profiles-notes h2 {
+    margin: 0 0 0.65rem;
+    font-family: "Sora", "Segoe UI", sans-serif;
+    font-size: 1.02rem;
+}
+
+.profiles-notes ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    color: var(--ink-soft);
+}
+
+@keyframes cardReveal {
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@media (max-width: 991.98px) {
+    .profiles-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 575.98px) {
+    .profiles-hero {
+        padding: 2.1rem 1rem;
+        border-radius: 18px;
+    }
+
+    .profiles-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .cta-button {
+        width: 100%;
+    }
 }
