@@ -247,14 +247,15 @@ pre {
    PROFILES PAGE
 ============================================ */
 .profiles-page {
-    --bg-deep: #061726;
-    --bg-mid: #0d2b44;
-    --ink: #0f1f2f;
-    --ink-soft: #516275;
-    --card: #ffffff;
-    --accent: #ff8a00;
-    --accent-2: #ffd166;
-    --line: #d9e2ec;
+    --bg-deep: #0f0c29;
+    --bg-mid: #302b63;
+    --bg-soft: #24243e;
+    --ink: #ffffff;
+    --ink-soft: rgba(255, 255, 255, 0.8);
+    --card: rgba(255, 255, 255, 0.08);
+    --accent: #667eea;
+    --accent-2: #764ba2;
+    --line: rgba(255, 255, 255, 0.14);
     max-width: 1120px;
     margin: 0 auto;
     font-family: "Space Grotesk", "Segoe UI", sans-serif;
@@ -265,9 +266,9 @@ pre {
     border-radius: 24px;
     padding: 3rem 1.5rem;
     background:
-        radial-gradient(circle at 15% 25%, rgba(255, 209, 102, 0.22), transparent 32%),
-        radial-gradient(circle at 82% 70%, rgba(255, 138, 0, 0.25), transparent 36%),
-        linear-gradient(140deg, var(--bg-deep), var(--bg-mid));
+        radial-gradient(circle at 15% 25%, rgba(102, 126, 234, 0.34), transparent 32%),
+        radial-gradient(circle at 82% 70%, rgba(118, 75, 162, 0.32), transparent 36%),
+        linear-gradient(140deg, var(--bg-deep), var(--bg-mid), var(--bg-soft));
     color: #f8fbff;
     position: relative;
     overflow: hidden;
@@ -317,7 +318,7 @@ pre {
     margin-top: 1.5rem;
 }
 
-.cta-button {
+.profiles-page .cta-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -329,19 +330,19 @@ pre {
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
-.cta-primary {
+.profiles-page .cta-primary {
     background: linear-gradient(110deg, var(--accent), var(--accent-2));
-    color: #07131f;
+    color: #ffffff;
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
 }
 
-.cta-secondary {
-    border: 1px solid rgba(255, 255, 255, 0.45);
+.profiles-page .cta-secondary {
+    border: 1px solid rgba(255, 255, 255, 0.3);
     color: #f8fbff;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.1);
 }
 
-.cta-button:hover {
+.profiles-page .cta-button:hover {
     transform: translateY(-2px);
 }
 
@@ -355,11 +356,12 @@ pre {
 .profile-card {
     background: var(--card);
     border: 1px solid var(--line);
+    backdrop-filter: blur(10px);
     border-radius: 16px;
     padding: 1.1rem;
     color: var(--ink);
     text-decoration: none;
-    box-shadow: 0 12px 24px rgba(6, 23, 38, 0.08);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
     transform: translateY(8px);
     opacity: 0;
     animation: cardReveal 0.45s ease forwards;
@@ -370,8 +372,8 @@ pre {
 .profile-card:nth-child(4) { animation-delay: 0.24s; }
 
 .profile-card:hover {
-    border-color: #b5c7d8;
-    box-shadow: 0 16px 28px rgba(6, 23, 38, 0.14);
+    border-color: rgba(255, 255, 255, 0.26);
+    box-shadow: 0 16px 28px rgba(0, 0, 0, 0.32);
     transform: translateY(-3px);
 }
 
@@ -399,7 +401,7 @@ pre {
     border: 1px solid var(--line);
     border-radius: 16px;
     padding: 1rem 1.1rem;
-    background: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .profiles-notes h2 {
@@ -437,7 +439,7 @@ pre {
         grid-template-columns: 1fr;
     }
 
-    .cta-button {
+    .profiles-page .cta-button {
         width: 100%;
     }
 }
