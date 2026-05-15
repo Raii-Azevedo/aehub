@@ -1,0 +1,74 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Django stuff:
+*.log
+*.pot
+*.pyc
+*.pyo
+*.db
+*.sqlite3
+media/
+staticfiles/
+.env
+.env.*
+*.env
+
+# VS Code
+.vscode/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# MacOS
+.DS_Store
+
+# Heroku/Railway/Deploy
+Procfile
+runtime.txt
+
+# Node modules (if any JS tooling)
+node_modules/
+
+# System files
+Thumbs.db
+
+# Coverage reports
+htmlcov/
+.coverage
+.tox/
+.coverage.*
+.cache
+
+# Pytest
+.pytest_cache/
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+
+# Migrations (optional, if you want to ignore generated migrations)
+# core/migrations/

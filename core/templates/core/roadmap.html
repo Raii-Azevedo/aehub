@@ -1,0 +1,337 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">🚀 Implementation Roadmap</h1>
+    {% if user_role == 'admin' %}
+    <div>
+        <button class="btn btn-gradient" onclick="abrirModalNovaEntrega()">
+            <i class="bi bi-plus-lg"></i> New Delivery
+        </button>
+        <button class="btn btn-outline-light ms-2" onclick="habilitarEdicao()">
+            <i class="bi bi-pencil"></i> Edit Progress
+        </button>
+    </div>
+    {% endif %}
+</div>
+<p class="text-white-50">Strategy and timeline to transform tacit knowledge into structured digital assets.</p>
+
+<div class="row">
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent border-light">
+                <h5 class="mb-0">📂 Knowledge Pillars</h5>
+            </div>
+            <div class="card-body" id="pilares-container">
+                {% for progresso in progressos %}
+                <div class="mb-3" id="pilar-{{ progresso.id }}">
+                    <div class="d-flex justify-content-between">
+                        <span>{{ progresso.pilar }}</span>
+                        <span class="progresso-valor">{{ progresso.progresso }}%</span>
+                        {% if user_role == 'admin' and edit_mode %}
+                        <button class="btn btn-sm btn-outline-light" onclick="editarProgresso({{ progresso.id }}, {{ progresso.progresso }})">
+                            ✏️
+                        </button>
+                        {% endif %}
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-gradient" style="width: {{ progresso.progresso }}%"></div>
+                    </div>
+                    <small class="text-white-50">🎯 Goal: {{ progresso.meta }}</small>
+                </div>
+                {% empty %}
+                <p class="text-white-50">No pillars registered.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-transparent border-light">
+                <h5 class="mb-0">📅 Schedule Phases</h5>
+            </div>
+            <div class="card-body">
+                {% for fase in fases %}
+                <div class="border-bottom border-light pb-2 mb-2" id="fase-{{ fase.id }}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <strong>{{ fase.fase }}</strong>
+                        {% if user_role == 'admin' %}
+                        <select class="form-select form-select-sm w-auto status-select" data-id="{{ fase.id }}" 
+                                onchange="atualizarStatusFase(this, {{ fase.id }})">
+                            <option value="✅ Concluído" {% if fase.status == "✅ Concluído" %}selected{% endif %}>✅ Completed</option>
+                            <option value="🔄 Em andamento" {% if fase.status == "🔄 Em andamento" %}selected{% endif %}>🔄 In progress</option>
+                            <option value="📝 Planejada" {% if fase.status == "📝 Planejada" %}selected{% endif %}>📝 Planned</option>
+                            <option value="🚀 Iniciada" {% if fase.status == "🚀 Iniciada" %}selected{% endif %}>🚀 Started</option>
+                            <option value="📅 Agendada" {% if fase.status == "📅 Agendada" %}selected{% endif %}>📅 Scheduled</option>
+                        </select>
+                        {% else %}
+                        <span class="badge-custom">{{ fase.status }}</span>
+                        {% endif %}
+                    </div>
+                    <small class="text-white-50">📅 {{ fase.data_prevista }}</small>
+                    <p class="small text-white-50 mt-1">{{ fase.entregas }}</p>
+                </div>
+                {% empty %}
+                <p class="text-white-50">No phases registered.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0">📋 Upcoming Deliveries</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover">
+                <thead>
+                    <tr>
+                        <th>Delivery</th>
+                        <th>Responsible</th>
+                        <th><i class="bi bi-calendar-event"></i> Deadline</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        {% if user.role == 'admin' %}
+                        <th>Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody id="entregas-tbody">
+                    {% for entrega in entregas %}
+                    <tr id="entrega-{{ entrega.id }}">
+                        <td>{{ entrega.titulo }}</td>
+                        <td>{{ entrega.responsavel }}</td>
+                        <td>
+                            <i class="bi bi-calendar-event"></i>
+                            <span class="ms-1">
+                                {% if entrega.prazo %}
+                                    {{ entrega.prazo|date:"d/m/Y" }}
+                                {% else %}
+                                    <span class="text-warning">No date</span>
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            {% if entrega.prioridade == "Alta" or entrega.prioridade == "High" %}
+                            <span class="badge bg-danger">{{ entrega.prioridade }}</span>
+                            {% elif entrega.prioridade == "Média" or entrega.prioridade == "Medium" %}
+                            <span class="badge bg-warning">{{ entrega.prioridade }}</span>
+                            {% else %}
+                            <span class="badge bg-secondary">{{ entrega.prioridade }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if user_role == 'admin' %}
+                            <select class="form-select form-select-sm status-entrega" data-id="{{ entrega.id }}"
+                                    onchange="atualizarStatusEntrega(this, {{ entrega.id }})">
+                                <option value="pendente" {% if entrega.status == "pendente" %}selected{% endif %}>⏳ Pending</option>
+                                <option value="em_andamento" {% if entrega.status == "em_andamento" %}selected{% endif %}>🔄 In progress</option>
+                                <option value="concluido" {% if entrega.status == "concluido" %}selected{% endif %}>✅ Completed</option>
+                            </select>
+                            {% else %}
+                                {% if entrega.status == "pendente" %}
+                                <span class="badge bg-secondary">⏳ Pending</span>
+                                {% elif entrega.status == "em_andamento" %}
+                                <span class="badge bg-info">🔄 In progress</span>
+                                {% else %}
+                                <span class="badge bg-success">✅ Completed</span>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        {% if user_role == 'admin' %}
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger" onclick="excluirEntrega({{ entrega.id }})">
+                                🗑️
+                            </button>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{% if user_role == 'admin' %}6{% else %}5{% endif %}" class="text-center">
+                            No deliveries registered.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: new delivery -->
+<div class="modal fade" id="modalNovaEntrega" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">New Delivery</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'roadmap_entrega_nova' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Delivery Title</label>
+                        <input type="text" name="titulo" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Responsible</label>
+                        <input type="text" name="responsavel" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><i class="bi bi-calendar-event"></i> Delivery Date</label>
+                        <input type="date" name="prazo" class="form-control form-control-lg" style="font-size: 1.1rem; padding: 0.75rem; cursor: pointer;" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select">
+                            <option value="pendente">&#x23F3; Pending</option>
+                            <option value="em_andamento">&#x1F504; In progress</option>
+                            <option value="concluido">&#x2705; Completed</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Priority</label>
+                        <select name="prioridade" class="form-select">
+                            <option>High</option>
+                            <option>Medium</option>
+                            <option>Low</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-gradient">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: edit progress -->
+<div class="modal fade" id="modalEditarProgresso" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Progress</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="formEditarProgresso" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="edit_progresso_id">
+                    <div class="mb-3">
+                        <label class="form-label">Progress (%)</label>
+                        <input type="number" name="progresso" id="edit_progresso_valor" class="form-control" min="0" max="100">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-gradient">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function abrirModalNovaEntrega() {
+    new bootstrap.Modal(document.getElementById('modalNovaEntrega')).show();
+}
+
+function habilitarEdicao() {
+    // Show/hide edit buttons
+    const edit_buttons = document.querySelectorAll('button[onclick*="editarProgresso"]');
+    edit_buttons.forEach(btn => {
+        btn.style.display = btn.style.display === 'none' ? 'inline-block' : 'none';
+    });
+}
+
+function editarProgresso(id, valorAtual) {
+    document.getElementById('edit_progresso_id').value = id;
+    document.getElementById('edit_progresso_valor').value = valorAtual;
+    document.getElementById('formEditarProgresso').action = `/roadmap/progresso/editar/${id}/`;
+    new bootstrap.Modal(document.getElementById('modalEditarProgresso')).show();
+}
+
+function atualizarStatusFase(select, id) {
+    const status = select.value;
+    fetch(`/roadmap/fase/atualizar/${id}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: status })
+    }).then(response => {
+        if (response.ok) location.reload();
+    });
+}
+
+function atualizarStatusEntrega(select, id) {
+    const status = select.value;
+    fetch(`/roadmap/entrega/status/${id}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: status })
+    }).then(response => {
+        if (response.ok) location.reload();
+    });
+}
+
+function excluirEntrega(id) {
+    if (confirm('Are you sure you want to delete this delivery?')) {
+        fetch(`/roadmap/entrega/excluir/${id}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        }).then(response => {
+            if (response.ok) location.reload();
+        });
+    }
+}
+</script>
+
+<style>
+/* Estilo customizado para input de data */
+input[type="date"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: #212529;
+    color: #fff;
+    border: 2px solid #495057;
+    border-radius: 0.375rem;
+    padding: 0.75rem 1rem;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+input[type="date"]:hover {
+    border-color: #ffc107;
+}
+
+input[type="date"]:focus {
+    outline: none;
+    border-color: #ffc107;
+    box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    border-radius: 4px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffc107' stroke-width='2'%3E%3Crect x='3' y='4' width='18' height='18' rx='2'%3E%3C/rect%3E%3Cline x1='9' y1='9' x2='15' y2='9'%3E%3C/line%3E%3Cline x1='9' y1='15' x2='15' y2='15'%3E%3C/line%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1.5rem;
+    padding: 0.5rem;
+    margin-right: 0.5rem;
+}
+</style>
+{% endblock %}

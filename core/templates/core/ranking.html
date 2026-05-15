@@ -1,0 +1,161 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<h1 class="mb-4">🏆 Gamification Ranking</h1>
+<p class="text-white-50 mb-4">Recognizing who contributes most to the team's growth.</p>
+
+<!-- AE of the Month -->
+{% if ae_mes %}
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card bg-gradient text-white text-center">
+            <div class="card-body py-4">
+                <div class="d-flex align-items-center justify-content-center">
+                    <div class="me-4">
+                        {% if ae_mes.avatar %}
+                        <img src="{{ ae_mes.avatar }}" class="rounded-circle" width="80" height="80">
+                        {% else %}
+                        <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+                            <i class="bi bi-person-circle" style="font-size: 3rem; color: #667eea;"></i>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="text-start">
+                        <h2 class="mb-0">🏆 AE of the Month</h2>
+                        <h3 class="mb-2">{{ ae_mes.nome }}</h3>
+                        <p class="mb-0">&#x2B50; {{ ae_mes.pontuacao }} points | &#x1F4DA; {{ ae_mes.total_contribuicoes }} contributions</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Ranking -->
+<div class="card">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0">📊 Score Ranking</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th style="width: 80px;">Position</th>
+                        <th>User</th>
+                        <th>Role</th>
+                        <th>Points</th>
+                        <th>Contributions</th>
+                        <th>Details</th>
+                    </thead>
+                <tbody>
+                    {% for item in ranking %}
+                    <tr>
+                        <td class="text-center">
+                            {% if forloop.counter == 1 %}
+                            <span class="display-6">🥇</span>
+                            {% elif forloop.counter == 2 %}
+                            <span class="display-6">🥈</span>
+                            {% elif forloop.counter == 3 %}
+                            <span class="display-6">🥉</span>
+                            {% else %}
+                            <span class="badge-custom">{{ forloop.counter }}º</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if item.avatar %}
+                                <img src="{{ item.avatar }}" class="rounded-circle me-2" width="40" height="40">
+                                {% else %}
+                                <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                    <i class="bi bi-person"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <strong>{{ item.nome }}</strong><br>
+                                    <small class="text-white-50">{{ item.email }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% if item.role == 'admin' %}
+                            <span class="badge bg-danger">Admin</span>
+                            {% elif item.role == 'user' %}
+                            <span class="badge bg-warning">User</span>
+                            {% else %}
+                            <span class="badge bg-secondary">Viewer</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="fw-bold fs-5">{{ item.pontuacao }}</span>
+                            <div class="progress mt-1" style="height: 5px;">
+                                <div class="progress-bar bg-gradient" style="width: {{ item.percentual }}%"></div>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="badge-custom">{{ item.total_contribuicoes }} contributions</span>
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-light" onclick="mostrarDetalhes({{ forloop.counter0 }})">
+                                &#x1F4CA; Details
+                            </button>
+                        </td>
+                    </tr>
+                    <!-- Linha de detalhes (oculta) -->
+                    <tr id="detalhes-{{ forloop.counter0 }}" style="display: none;">
+                        <td colspan="6" class="bg-dark">
+                            <div class="p-3">
+                                <div class="row text-center">
+                                    <div class="col">
+                                        <div class="badge-custom d-block mb-2">&#x1F4DA; Cases</div>
+                                        <span class="fs-4">{{ item.detalhes.casos }}</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="badge-custom d-block mb-2">&#x1F3A5; Videos</div>
+                                        <span class="fs-4">{{ item.detalhes.videos }}</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="badge-custom d-block mb-2">&#x1F4D6; Materials</div>
+                                        <span class="fs-4">{{ item.detalhes.materiais }}</span>
+                                    </div>
+                                    <div class="col">
+                                        <div class="badge-custom d-block mb-2">&#x1F6E0;&#xFE0F; Tools</div>
+                                        <span class="fs-4">{{ item.detalhes.ferramentas }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center">No contributors yet. Be the first!</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+function mostrarDetalhes(index) {
+    const detalhesRow = document.getElementById(`detalhes-${index}`);
+    if (detalhesRow.style.display === 'none') {
+        detalhesRow.style.display = 'table-row';
+    } else {
+        detalhesRow.style.display = 'none';
+    }
+}
+</script>
+
+<style>
+.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+.progress-bar {
+    transition: width 0.5s ease;
+}
+</style>
+{% endblock %}

@@ -1,0 +1,471 @@
+# English translations for AE Knowledge Hub
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+# --- base.html ---
+msgid "Casos"
+msgstr "Cases"
+
+msgid "Materiais"
+msgstr "Materials"
+
+msgid "Vídeos"
+msgstr "Videos"
+
+msgid "Ferramentas"
+msgstr "Tools"
+
+msgid "Sair"
+msgstr "Logout"
+
+# --- dashboard.html ---
+msgid "Bem-vindo(a) de volta,"
+msgstr "Welcome back,"
+
+msgid "Casos de Uso"
+msgstr "Use Cases"
+
+msgid "Ver todos"
+msgstr "View all"
+
+msgid "Pílulas"
+msgstr "Knowledge Pills"
+
+msgid "Últimos Casos"
+msgstr "Latest Cases"
+
+msgid "Nenhum caso cadastrado ainda."
+msgstr "No cases registered yet."
+
+msgid "Ver todos os casos"
+msgstr "View all cases"
+
+msgid "Top Contribuidores"
+msgstr "Top Contributors"
+
+msgid "casos"
+msgstr "cases"
+
+msgid "Nenhum contribuidor ainda."
+msgstr "No contributors yet."
+
+msgid "Ver ranking completo"
+msgstr "View full ranking"
+
+# --- login.html ---
+msgid "Repositório de Inteligência em Analytics Engineering"
+msgstr "Analytics Engineering Intelligence Repository"
+
+msgid "Entrar com Google Artefact"
+msgstr "Sign in with Google Artefact"
+
+msgid "Use a conta Google corporativa já autorizada no hub."
+msgstr "Use the corporate Google account already authorized in the hub."
+
+msgid "Login Google ainda não configurado no ambiente."
+msgstr "Google login not yet configured in the environment."
+
+msgid "Email corporativo"
+msgstr "Corporate Email"
+
+msgid "Entrar manualmente (dev)"
+msgstr "Login manually (dev)"
+
+msgid "🔒 Apenas contas Google corporativas autorizadas"
+msgstr "🔒 Only authorized corporate Google accounts"
+
+# --- boas_vindas.html ---
+msgid "Bem-vindo(a) ao AE · Artefact"
+msgstr "Welcome to AE · Artefact"
+
+msgid "Bem-vindo(a) ao AE Knowledge Hub! 🎉"
+msgstr "Welcome to the AE Knowledge Hub! 🎉"
+
+msgid "Antes de acessar o dashboard, precisamos conhecer um pouco mais sobre você."
+msgstr "Before accessing the dashboard, we need to know a little more about you."
+
+msgid "Preencha o formulário de skills abaixo — leva menos de 5 minutos."
+msgstr "Please fill in the skills form below — it takes less than 5 minutes."
+
+msgid "Formulário de Skills AE"
+msgstr "AE Skills Form"
+
+msgid "Carregando…"
+msgstr "Loading…"
+
+msgid "Depois de enviar o formulário acima, clique no botão para liberar seu acesso."
+msgstr "After submitting the form above, click the button to unlock your access."
+
+msgid "Já preenchi — ir para o Dashboard"
+msgstr "I\'ve filled it in — go to Dashboard"
+
+msgid "Dúvidas? Fale com o time AE da Artefact."
+msgstr "Questions? Reach out to the Artefact AE team."
+
+# --- casos.html ---
+msgid "Novo Caso"
+msgstr "New Case"
+
+msgid "Buscar casos..."
+msgstr "Search cases..."
+
+msgid "Buscar"
+msgstr "Search"
+
+msgid "Limpar"
+msgstr "Clear"
+
+msgid "Resultados"
+msgstr "Results"
+
+msgid "Detalhe"
+msgstr "Details"
+
+msgid "Tem certeza que deseja excluir este caso?"
+msgstr "Are you sure you want to delete this case?"
+
+msgid "Título"
+msgstr "Title"
+
+msgid "Contexto"
+msgstr "Context"
+
+msgid "Tecnologia"
+msgstr "Technology"
+
+msgid "Descrição"
+msgstr "Description"
+
+msgid "separadas por vírgula"
+msgstr "comma separated"
+
+msgid "Cancelar"
+msgstr "Cancel"
+
+msgid "Salvar"
+msgstr "Save"
+
+msgid "Editar Caso"
+msgstr "Edit Case"
+
+msgid "Autor"
+msgstr "Author"
+
+msgid "Email do Autor"
+msgstr "Author Email"
+
+msgid "Data de Criação"
+msgstr "Creation Date"
+
+msgid "Fechar"
+msgstr "Close"
+
+# --- materiais.html ---
+msgid "Materiais de Referência"
+msgstr "Reference Materials"
+
+msgid "Novo Material"
+msgstr "New Material"
+
+msgid "Livros, cursos, artigos e ferramentas essenciais."
+msgstr "Essential books, courses, articles and tools."
+
+msgid "Buscar materiais..."
+msgstr "Search materials..."
+
+msgid "Acessar"
+msgstr "Access"
+
+msgid "Tem certeza que deseja excluir este material?"
+msgstr "Are you sure you want to delete this material?"
+
+msgid "Nenhum material cadastrado ainda."
+msgstr "No materials registered yet."
+
+msgid "Tipo"
+msgstr "Type"
+
+msgid "URL (opcional)"
+msgstr "URL (optional)"
+
+msgid "Tópicos"
+msgstr "Topics"
+
+msgid "separados por vírgula"
+msgstr "comma separated"
+
+msgid "Editar Material"
+msgstr "Edit Material"
+
+# --- videos.html ---
+msgid "Pílulas de Conhecimento"
+msgstr "Knowledge Pills"
+
+msgid "Nova Pílula"
+msgstr "New Pill"
+
+msgid "Vídeos curtos com cases práticos."
+msgstr "Short videos with practical cases."
+
+msgid "Buscar vídeos..."
+msgstr "Search videos..."
+
+msgid "Assistir"
+msgstr "Watch"
+
+msgid "Tem certeza que deseja excluir este vídeo?"
+msgstr "Are you sure you want to delete this video?"
+
+msgid "Nenhum vídeo cadastrado ainda."
+msgstr "No videos registered yet."
+
+msgid "Título do Vídeo"
+msgstr "Video Title"
+
+msgid "Tema"
+msgstr "Theme"
+
+msgid "Nível"
+msgstr "Level"
+
+msgid "Duração (ex: 8:32)"
+msgstr "Duration (e.g.: 8:32)"
+
+msgid "min:seg"
+msgstr "min:sec"
+
+msgid "Link do Vídeo"
+msgstr "Video Link"
+
+msgid "Duração"
+msgstr "Duration"
+
+msgid "Iniciante"
+msgstr "Beginner"
+
+msgid "Intermediário"
+msgstr "Intermediate"
+
+msgid "Avançado"
+msgstr "Advanced"
+
+msgid "Editar Vídeo"
+msgstr "Edit Video"
+
+# --- ferramentas.html ---
+msgid "Stack de Ferramentas"
+msgstr "Tools Stack"
+
+msgid "Nova Ferramenta"
+msgstr "New Tool"
+
+msgid "Ferramentas homologadas para Analytics Engineering."
+msgstr "Approved tools for Analytics Engineering."
+
+msgid "Buscar ferramentas..."
+msgstr "Search tools..."
+
+msgid "Documentação"
+msgstr "Documentation"
+
+msgid "Tem certeza que deseja excluir esta ferramenta?"
+msgstr "Are you sure you want to delete this tool?"
+
+msgid "Nenhuma ferramenta cadastrada ainda."
+msgstr "No tools registered yet."
+
+msgid "Nome da Ferramenta"
+msgstr "Tool Name"
+
+msgid "Categoria"
+msgstr "Category"
+
+msgid "Versão"
+msgstr "Version"
+
+msgid "Link da Documentação"
+msgstr "Documentation Link"
+
+msgid "Selecione"
+msgstr "Select"
+
+msgid "Modelagem"
+msgstr "Modeling"
+
+msgid "Visualização"
+msgstr "Visualization"
+
+msgid "Utilitários"
+msgstr "Utilities"
+
+msgid "Editar Ferramenta"
+msgstr "Edit Tool"
+
+# --- ranking.html ---
+msgid "Ranking de Gamificação"
+msgstr "Gamification Ranking"
+
+msgid "Reconhecendo quem mais contribui para o crescimento do time."
+msgstr "Recognizing those who contribute most to team growth."
+
+msgid "AE do Mês"
+msgstr "AE of the Month"
+
+msgid "pontos"
+msgstr "points"
+
+msgid "contribuições"
+msgstr "contributions"
+
+msgid "Ranking de Pontuação"
+msgstr "Score Ranking"
+
+msgid "Posição"
+msgstr "Position"
+
+msgid "Usuário"
+msgstr "User"
+
+msgid "Role"
+msgstr "Role"
+
+msgid "Pontos"
+msgstr "Points"
+
+msgid "Contribuições"
+msgstr "Contributions"
+
+msgid "Detalhes"
+msgstr "Details"
+
+msgid "Nenhum contribuidor ainda. Seja o primeiro!"
+msgstr "No contributors yet. Be the first!"
+
+# --- roadmap.html ---
+msgid "Roadmap de Implementação"
+msgstr "Implementation Roadmap"
+
+msgid "Nova Entrega"
+msgstr "New Delivery"
+
+msgid "Editar Progresso"
+msgstr "Edit Progress"
+
+msgid "Estratégia e cronograma para transformar o conhecimento tácito em ativos digitais estruturados."
+msgstr "Strategy and schedule to transform tacit knowledge into structured digital assets."
+
+msgid "Pilares do Conhecimento"
+msgstr "Knowledge Pillars"
+
+msgid "Meta"
+msgstr "Goal"
+
+msgid "Nenhum pilar cadastrado."
+msgstr "No pillars registered."
+
+msgid "Fases do Cronograma"
+msgstr "Schedule Phases"
+
+msgid "Nenhuma fase cadastrada."
+msgstr "No phases registered."
+
+msgid "Próximas Entregas"
+msgstr "Upcoming Deliveries"
+
+msgid "Entrega"
+msgstr "Delivery"
+
+msgid "Responsável"
+msgstr "Responsible"
+
+msgid "Prazo"
+msgstr "Deadline"
+
+msgid "Prioridade"
+msgstr "Priority"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Ações"
+msgstr "Actions"
+
+msgid "Sem data"
+msgstr "No date"
+
+msgid "Nenhuma entrega cadastrada."
+msgstr "No deliveries registered."
+
+msgid "Título da Entrega"
+msgstr "Delivery Title"
+
+msgid "Data de Entrega"
+msgstr "Delivery Date"
+
+msgid "Pendente"
+msgstr "Pending"
+
+msgid "Em andamento"
+msgstr "In progress"
+
+msgid "Concluído"
+msgstr "Completed"
+
+msgid "Alta"
+msgstr "High"
+
+msgid "Média"
+msgstr "Medium"
+
+msgid "Baixa"
+msgstr "Low"
+
+msgid "Progresso (%)"
+msgstr "Progress (%)"
+
+# --- admin_usuarios.html ---
+msgid "Gerenciamento de Usuários"
+msgstr "User Management"
+
+msgid "Novo Usuário"
+msgstr "New User"
+
+msgid "Apenas emails do domínio"
+msgstr "Only emails from the domain"
+
+msgid "são permitidos."
+msgstr "are allowed."
+
+msgid "Por padrão, novos usuários são criados como"
+msgstr "By default, new users are created as"
+
+msgid "Email"
+msgstr "Email"
+
+msgid "Nome"
+msgstr "Name"
+
+msgid "Adicionado por"
+msgstr "Added by"
+
+msgid "Data"
+msgstr "Date"
+
+msgid "Nenhum usuário cadastrado."
+msgstr "No users registered."
+
+msgid "O email será completo: nome.sobrenome@artefact.com"
+msgstr "The email will be complete: name.surname@artefact.com"
+
+msgid "Nome completo"
+msgstr "Full name"
+
+msgid "Adicionar"
+msgstr "Add"
+
+msgid "Editar Usuário"
+msgstr "Edit User"
