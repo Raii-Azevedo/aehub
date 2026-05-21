@@ -5,16 +5,16 @@
 
 <!-- ===== HERO ===== -->
 <div class="text-center mb-5">
-  <h1 class="fw-bold mb-2">🧭 Perfis de Analytics Engineer</h1>
+  <h1 class="fw-bold mb-2">🧭 Analytics Engineer Profiles</h1>
   <p class="text-white-50" style="max-width:620px;margin:0 auto;">
-    Não existe um jeito certo de ser AE. A partir de entrevistas com AEs seniores da Artefact,
-    mapeamos 4 arquétipos de atuação. Descubra o seu e veja as ferramentas e hábitos ideais para o seu estilo.
+    There's no single right way to be an AE. Based on interviews with senior Analytics Engineers at Artefact,
+    we mapped 4 working archetypes. Find yours and discover the ideal tools and habits for your style.
   </p>
   <div class="mt-4 d-flex justify-content-center gap-3 flex-wrap">
     <button class="btn btn-gradient px-4" onclick="scrollToQuiz()">
-      ✨ Fazer o quiz (2 min)
+      ✨ Take the quiz (2 min)
     </button>
-    <a href="#todos-perfis" class="btn btn-outline-light px-4">Ver todos os perfis</a>
+    <a href="#all-profiles" class="btn btn-outline-light px-4">Browse all profiles</a>
   </div>
 </div>
 
@@ -22,94 +22,94 @@
 <div id="quizSection" class="card mb-5" style="border:1px solid rgba(255,255,255,0.12);">
   <div class="card-body p-4 p-md-5">
 
-    <!-- Intro do quiz -->
+    <!-- Quiz intro -->
     <div id="quizIntro" class="text-center">
       <div style="font-size:3rem;margin-bottom:1rem;">🎯</div>
-      <h3 class="fw-bold mb-2">Qual é o seu perfil de AE?</h3>
-      <p class="text-white-50 mb-4">5 perguntas rápidas sobre como você trabalha no dia a dia.</p>
-      <button class="btn btn-gradient px-5 py-2" onclick="startQuiz()">Começar quiz</button>
+      <h3 class="fw-bold mb-2">What's your AE profile?</h3>
+      <p class="text-white-50 mb-4">5 quick questions about how you work day-to-day.</p>
+      <button class="btn btn-gradient px-5 py-2" onclick="startQuiz()">Start quiz</button>
     </div>
 
-    <!-- Perguntas -->
+    <!-- Questions -->
     <div id="quizPlay" style="display:none;">
-      <!-- Progresso -->
+      <!-- Progress -->
       <div class="mb-4">
         <div class="d-flex justify-content-between mb-1">
-          <small class="text-white-50">Pergunta <span id="qNum">1</span> de 5</small>
+          <small class="text-white-50">Question <span id="qNum">1</span> of 5</small>
           <small class="text-white-50" id="qProgressLabel">20%</small>
         </div>
         <div class="progress" style="height:6px;background:rgba(255,255,255,0.1);">
           <div id="qProgressBar" class="progress-bar" role="progressbar" style="width:20%;background:linear-gradient(90deg,#6366f1,#a855f7);"></div>
         </div>
       </div>
-      <!-- Enunciado -->
+      <!-- Question text -->
       <h4 id="qText" class="mb-4 fw-semibold" style="min-height:60px;"></h4>
-      <!-- Opções -->
+      <!-- Options -->
       <div id="qOptions" class="d-grid gap-3" style="max-width:680px;margin:0 auto;"></div>
     </div>
 
-    <!-- Resultado -->
+    <!-- Result -->
     <div id="quizResult" style="display:none;" class="text-center">
       <div id="resultEmoji" style="font-size:4rem;margin-bottom:0.5rem;"></div>
-      <p class="text-white-50 mb-1">Seu perfil é:</p>
+      <p class="text-white-50 mb-1">Your profile is:</p>
       <h2 id="resultName" class="fw-bold mb-2" style="color:#a78bfa;"></h2>
       <p id="resultTagline" class="fst-italic text-white-50 mb-4"></p>
       <div class="d-flex justify-content-center gap-3 flex-wrap">
-        <button class="btn btn-gradient px-4" id="resultDetailBtn">Ver meu perfil completo</button>
-        <button class="btn btn-outline-light px-4" onclick="resetQuiz()">Refazer o quiz</button>
+        <button class="btn btn-gradient px-4" id="resultDetailBtn">See my full profile</button>
+        <button class="btn btn-outline-light px-4" onclick="resetQuiz()">Retake the quiz</button>
       </div>
       <hr class="my-4" style="border-color:rgba(255,255,255,0.1);">
-      <p class="text-white-50 small">Quer explorar os outros perfis? Role a página abaixo ↓</p>
+      <p class="text-white-50 small">Want to explore the other profiles? Scroll down ↓</p>
     </div>
 
   </div>
 </div>
 
-<!-- ===== TODOS OS PERFIS ===== -->
-<h2 id="todos-perfis" class="fw-bold mb-1 mt-2">Todos os Perfis</h2>
-<p class="text-white-50 mb-4">Clique em qualquer perfil para ver a descrição completa, ferramentas sugeridas e dicas de onboarding.</p>
+<!-- ===== ALL PROFILES ===== -->
+<h2 id="all-profiles" class="fw-bold mb-1 mt-2">All Profiles</h2>
+<p class="text-white-50 mb-4">Click any profile to see the full description, suggested tools, and onboarding tips.</p>
 
 <div class="row g-4 mb-5">
 
-  <!-- Arquiteto -->
+  <!-- The Architect -->
   <div class="col-lg-6">
-    <div class="card h-100 profile-card-item" onclick="openProfile('arquiteto')" style="cursor:pointer;border:1px solid rgba(99,102,241,0.35);transition:all .2s;">
+    <div class="card h-100 profile-card-item" onclick="openProfile('architect')" style="cursor:pointer;border:1px solid rgba(99,102,241,0.35);transition:all .2s;">
       <div class="card-body p-4">
         <div class="d-flex align-items-center mb-3">
           <span style="font-size:2.2rem;margin-right:0.75rem;">🏛️</span>
           <div>
-            <h4 class="mb-0 fw-bold">O Arquiteto</h4>
-            <small class="text-white-50">Metódico · Estruturado · Planejador</small>
+            <h4 class="mb-0 fw-bold">The Architect</h4>
+            <small class="text-white-50">Methodical · Structured · Planner</small>
           </div>
           <span class="ms-auto badge" style="background:rgba(99,102,241,0.2);color:#a5b4fc;border:1px solid rgba(99,102,241,0.4);">Maria Vitória, Brenda</span>
         </div>
-        <p class="text-white-50 mb-3">"Se não tá no board, não existe."</p>
+        <p class="text-white-50 mb-3">"If it's not on the board, it doesn't exist."</p>
         <div class="d-flex flex-wrap gap-2 mb-3">
           <span class="badge-custom">Jira</span>
           <span class="badge-custom">ClickUp</span>
-          <span class="badge-custom">Google Agenda</span>
+          <span class="badge-custom">Google Calendar</span>
           <span class="badge-custom">Pomodoro</span>
         </div>
         <div class="text-end">
-          <small style="color:#a78bfa;">Ver perfil completo →</small>
+          <small style="color:#a78bfa;">View full profile →</small>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Fazacontecer -->
+  <!-- The Go-Getter -->
   <div class="col-lg-6">
-    <div class="card h-100 profile-card-item" onclick="openProfile('fazacontecer')" style="cursor:pointer;border:1px solid rgba(239,68,68,0.35);transition:all .2s;">
+    <div class="card h-100 profile-card-item" onclick="openProfile('gogetter')" style="cursor:pointer;border:1px solid rgba(239,68,68,0.35);transition:all .2s;">
       <div class="card-body p-4">
         <div class="d-flex align-items-center mb-3">
           <span style="font-size:2.2rem;margin-right:0.75rem;">🔥</span>
           <div>
-            <h4 class="mb-0 fw-bold">O Fazacontecer</h4>
-            <small class="text-white-50">Pragmático · Ágil · Focado em valor</small>
+            <h4 class="mb-0 fw-bold">The Go-Getter</h4>
+            <small class="text-white-50">Pragmatic · Agile · Value-driven</small>
           </div>
           <span class="ms-auto badge" style="background:rgba(239,68,68,0.15);color:#fca5a5;border:1px solid rgba(239,68,68,0.35);">Rodrigo, Vinicius</span>
         </div>
-        <p class="text-white-50 mb-3">"Foco em entregar valor, não em ferramenta."</p>
+        <p class="text-white-50 mb-3">"Focus on delivering value, not on the tool."</p>
         <div class="d-flex flex-wrap gap-2 mb-3">
           <span class="badge-custom">Trello</span>
           <span class="badge-custom">OneNote</span>
@@ -117,51 +117,51 @@
           <span class="badge-custom">Miro</span>
         </div>
         <div class="text-end">
-          <small style="color:#f87171;">Ver perfil completo →</small>
+          <small style="color:#f87171;">View full profile →</small>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Descomplicadora -->
+  <!-- The Simplifier -->
   <div class="col-lg-6">
-    <div class="card h-100 profile-card-item" onclick="openProfile('descomplicadora')" style="cursor:pointer;border:1px solid rgba(16,185,129,0.35);transition:all .2s;">
+    <div class="card h-100 profile-card-item" onclick="openProfile('simplifier')" style="cursor:pointer;border:1px solid rgba(16,185,129,0.35);transition:all .2s;">
       <div class="card-body p-4">
         <div class="d-flex align-items-center mb-3">
           <span style="font-size:2.2rem;margin-right:0.75rem;">🧘</span>
           <div>
-            <h4 class="mb-0 fw-bold">A Descomplicadora</h4>
-            <small class="text-white-50">Adaptável · Colaborativa · Sem frescura</small>
+            <h4 class="mb-0 fw-bold">The Simplifier</h4>
+            <small class="text-white-50">Adaptable · Collaborative · No-fuss</small>
           </div>
           <span class="ms-auto badge" style="background:rgba(16,185,129,0.15);color:#6ee7b7;border:1px solid rgba(16,185,129,0.35);">Marina, Gabriella, Thais</span>
         </div>
-        <p class="text-white-50 mb-3">"Papel, Excel, cabeça — o importante é não sofrer sozinha."</p>
+        <p class="text-white-50 mb-3">"Paper, Excel, brain — just don't struggle alone."</p>
         <div class="d-flex flex-wrap gap-2 mb-3">
           <span class="badge-custom">Excel</span>
           <span class="badge-custom">Google Docs</span>
           <span class="badge-custom">Google Keep</span>
-          <span class="badge-custom">Papel</span>
+          <span class="badge-custom">Paper</span>
         </div>
         <div class="text-end">
-          <small style="color:#34d399;">Ver perfil completo →</small>
+          <small style="color:#34d399;">View full profile →</small>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Sistemática -->
+  <!-- The Systematic -->
   <div class="col-lg-6">
-    <div class="card h-100 profile-card-item" onclick="openProfile('sistematica')" style="cursor:pointer;border:1px solid rgba(245,158,11,0.35);transition:all .2s;">
+    <div class="card h-100 profile-card-item" onclick="openProfile('systematic')" style="cursor:pointer;border:1px solid rgba(245,158,11,0.35);transition:all .2s;">
       <div class="card-body p-4">
         <div class="d-flex align-items-center mb-3">
           <span style="font-size:2.2rem;margin-right:0.75rem;">🧩</span>
           <div>
-            <h4 class="mb-0 fw-bold">A Sistemática</h4>
-            <small class="text-white-50">Analítica · Documentadora · Rastreável</small>
+            <h4 class="mb-0 fw-bold">The Systematic</h4>
+            <small class="text-white-50">Analytical · Documenter · Traceable</small>
           </div>
           <span class="ms-auto badge" style="background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.35);">Bianca</span>
         </div>
-        <p class="text-white-50 mb-3">"Externalizo tudo, diagramo para pensar, e documento para não ter dúvida."</p>
+        <p class="text-white-50 mb-3">"I externalize everything, diagram to think, and document so there's no doubt."</p>
         <div class="d-flex flex-wrap gap-2 mb-3">
           <span class="badge-custom">Excalidraw</span>
           <span class="badge-custom">Mermaid</span>
@@ -169,7 +169,7 @@
           <span class="badge-custom">Notion</span>
         </div>
         <div class="text-end">
-          <small style="color:#fbbf24;">Ver perfil completo →</small>
+          <small style="color:#fbbf24;">View full profile →</small>
         </div>
       </div>
     </div>
@@ -178,7 +178,7 @@
 </div><!-- /row -->
 
 
-<!-- ===== MODAL DE PERFIL ===== -->
+<!-- ===== PROFILE MODAL ===== -->
 <div class="modal fade" id="profileModal" tabindex="-1">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content" style="background:#1a1a2e;border:1px solid rgba(255,255,255,0.12);">
@@ -191,37 +191,37 @@
         <!-- Tabs -->
         <ul class="nav nav-pills mb-4 gap-2" id="profileTabs">
           <li class="nav-item">
-            <button class="nav-link active" onclick="showTab('sobre')">📋 Sobre o Perfil</button>
+            <button class="nav-link active" onclick="showTab('about')">📋 About</button>
           </li>
           <li class="nav-item">
-            <button class="nav-link" onclick="showTab('ferramentas')">🛠️ Ferramentas</button>
+            <button class="nav-link" onclick="showTab('tools')">🛠️ Tools</button>
           </li>
           <li class="nav-item">
-            <button class="nav-link" onclick="showTab('habitos')">⚡ Hábitos & Riscos</button>
+            <button class="nav-link" onclick="showTab('habits')">⚡ Habits & Risks</button>
           </li>
           <li class="nav-item">
-            <button class="nav-link" onclick="showTab('onboarding')">🚀 Dicas de Onboarding</button>
+            <button class="nav-link" onclick="showTab('onboarding')">🚀 Onboarding Tips</button>
           </li>
         </ul>
 
-        <!-- Tab: Sobre -->
-        <div id="tab-sobre" class="profile-tab">
-          <div id="sobreContent"></div>
+        <!-- Tab: About -->
+        <div id="tab-about" class="profile-tab">
+          <div id="aboutContent"></div>
         </div>
 
-        <!-- Tab: Ferramentas -->
-        <div id="tab-ferramentas" class="profile-tab" style="display:none;">
-          <h5 class="fw-bold mb-1">Ferramentas ideais para este perfil</h5>
+        <!-- Tab: Tools -->
+        <div id="tab-tools" class="profile-tab" style="display:none;">
+          <h5 class="fw-bold mb-1">Ideal tools for this profile</h5>
           <p class="text-white-50 small mb-4">
-            Ferramentas que AEs com este perfil mais utilizam e recomendam.
-            As que estão cadastradas no Hub aparecem com link direto.
+            Tools that AEs with this profile use and recommend most.
+            Those already registered in the Hub appear with a direct link.
           </p>
-          <div id="ferramentasContent" class="row g-3"></div>
+          <div id="toolsContent" class="row g-3"></div>
         </div>
 
-        <!-- Tab: Hábitos -->
-        <div id="tab-habitos" class="profile-tab" style="display:none;">
-          <div id="habitosContent"></div>
+        <!-- Tab: Habits -->
+        <div id="tab-habits" class="profile-tab" style="display:none;">
+          <div id="habitsContent"></div>
         </div>
 
         <!-- Tab: Onboarding -->
@@ -234,228 +234,226 @@
   </div>
 </div>
 
-
-
 {% endblock %}
 
 
 {% block extra_js %}
 <script>
-// ─── Dados do banco (Django context) ───────────────────────────────
-const ferramentasDB   = {{ ferramentas_db|safe }};
-const toolsFallback   = {{ perfis_tools_fallback|safe }};
+// ─── DB data (Django context) ──────────────────────────────────────
+const ferramentasDB = {{ ferramentas_db|safe }};
+const toolsFallback = {{ perfis_tools_fallback|safe }};
 
-// ─── Dados dos perfis ──────────────────────────────────────────────
+// ─── Profile data ──────────────────────────────────────────────────
 const PROFILES = {
-  arquiteto: {
+  architect: {
     emoji: '🏛️',
-    nome: 'O Arquiteto',
-    tagline: '"Se não tá no board, não existe."',
+    nome: 'The Architect',
+    tagline: '"If it\'s not on the board, it doesn\'t exist."',
     cor: '#6366f1',
     corSuave: 'rgba(99,102,241,0.15)',
     representantes: 'Maria Vitória, Brenda',
     descricao: `
-      <p>O Arquiteto é o perfil mais estruturado e metódico. Ele precisa de visibilidade total das tarefas para se sentir no controle — se não está no board, não existe como prioridade.</p>
-      <p class="text-white-50">Planeja a semana com antecedência (geralmente na segunda-feira), define um prazo pessoal menor que o prazo oficial do projeto como margem de segurança, e prioriza sempre consultando stakeholders, usuários e tempo de espera.</p>
+      <p>The Architect is the most structured and methodical profile. They need full visibility over tasks to feel in control — if it's not on the board, it doesn't exist as a priority.</p>
+      <p class="text-white-50">They plan the week in advance (usually on Monday), set a personal deadline shorter than the official project deadline as a safety buffer, and always prioritize by consulting stakeholders, users, and waiting times.</p>
       <div class="row mt-4 g-3">
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(99,102,241,0.1);border-radius:10px;border:1px solid rgba(99,102,241,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">📋</div>
-            <div class="fw-semibold small">Planejamento</div>
-            <div class="text-white-50 small">Semanal, toda segunda</div>
+            <div class="fw-semibold small">Planning</div>
+            <div class="text-white-50 small">Weekly, every Monday</div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(99,102,241,0.1);border-radius:10px;border:1px solid rgba(99,102,241,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">🎯</div>
-            <div class="fw-semibold small">Priorização</div>
-            <div class="text-white-50 small">Stakeholder + urgência</div>
+            <div class="fw-semibold small">Prioritization</div>
+            <div class="text-white-50 small">Stakeholder + urgency</div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(99,102,241,0.1);border-radius:10px;border:1px solid rgba(99,102,241,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">🛡️</div>
-            <div class="fw-semibold small">Gordura</div>
-            <div class="text-white-50 small">Prazo pessoal &lt; projeto</div>
+            <div class="fw-semibold small">Buffer</div>
+            <div class="text-white-50 small">Personal deadline &lt; project</div>
           </div>
         </div>
       </div>
     `,
     habitos: [
-      'Monta o board de tarefas toda segunda-feira antes de começar o dia',
-      'Define um prazo pessoal sempre menor que o prazo oficial do projeto',
-      'Usa Pomodoro como ritual para manter foco em blocos de trabalho',
-      'Prioriza consultando stakeholders e tempo de espera dos itens',
-      'Pede ajuda abertamente quando sobrecarregado',
+      'Builds the task board every Monday before starting the day',
+      'Sets a personal deadline always shorter than the official project deadline',
+      'Uses Pomodoro as a ritual to maintain focus in work blocks',
+      'Prioritizes by consulting stakeholders and item waiting times',
+      'Openly asks for help when overloaded',
     ],
     riscos: [
-      'Tendência a trabalhar mais horas para compensar quando está sobrecarregado',
-      'Auto-cobrança elevada — importante cultivar auto-compaixão',
+      'Tendency to work extra hours to compensate when overloaded',
+      'High self-demands — important to cultivate self-compassion',
     ],
     onboarding: [
-      { titulo: 'Configure seu board nos primeiros dias', desc: 'Monte seu Jira ou ClickUp antes de pegar as primeiras tarefas. Visibilidade é seu superpoder.' },
-      { titulo: 'Entenda os OKRs e prioridades do time', desc: 'Antes de qualquer entrega, alinhe com o manager quais são os critérios de priorização do time.' },
-      { titulo: 'Estabeleça seus rituais desde cedo', desc: 'Defina o horário da sua revisão semanal e bloqueie no calendário. Consistência é o que faz este perfil funcionar.' },
-      { titulo: 'Negocie prazos com margem', desc: 'Sempre entregue ao cliente um prazo maior que o seu prazo interno. Isso protege a qualidade sem gerar promessas vazias.' },
+      { titulo: 'Set up your board in the first days', desc: 'Build your Jira or ClickUp before picking up the first tasks. Visibility is your superpower.' },
+      { titulo: 'Understand the team\'s OKRs and priorities', desc: 'Before any delivery, align with your manager on the team\'s prioritization criteria.' },
+      { titulo: 'Establish your rituals early', desc: 'Set your weekly review time and block it in the calendar. Consistency is what makes this profile work.' },
+      { titulo: 'Negotiate deadlines with a buffer', desc: 'Always give the client a deadline larger than your internal one. This protects quality without making empty promises.' },
     ],
   },
 
-  fazacontecer: {
+  gogetter: {
     emoji: '🔥',
-    nome: 'O Fazacontecer',
-    tagline: '"Foco em entregar valor, não em ferramenta."',
+    nome: 'The Go-Getter',
+    tagline: '"Focus on delivering value, not on the tool."',
     cor: '#ef4444',
     corSuave: 'rgba(239,68,68,0.12)',
     representantes: 'Rodrigo, Vinicius',
     descricao: `
-      <p>O Fazacontecer é pragmático e flexível. Não se prende a métodos ou ferramentas — o que importa é entregar valor. Usa o mínimo de overhead possível para não perder velocidade.</p>
-      <p class="text-white-50">Em situações de crise, consegue priorizar rapidamente identificando o que é crítico × o que é rápido. Não absorve o que não é seu e aprendeu a escalar problemas sem hesitar.</p>
+      <p>The Go-Getter is pragmatic and flexible. Not attached to methods or tools — what matters is delivering value. They use the minimum overhead possible to avoid losing speed.</p>
+      <p class="text-white-50">In crisis situations, they can prioritize quickly by identifying what is critical vs. what is fast. They don't absorb what isn't theirs and have learned to escalate problems without hesitation.</p>
       <div class="row mt-4 g-3">
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(239,68,68,0.1);border-radius:10px;border:1px solid rgba(239,68,68,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">⚡</div>
-            <div class="fw-semibold small">Velocidade</div>
-            <div class="text-white-50 small">Mínimo overhead</div>
+            <div class="fw-semibold small">Speed</div>
+            <div class="text-white-50 small">Minimum overhead</div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(239,68,68,0.1);border-radius:10px;border:1px solid rgba(239,68,68,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">🎯</div>
-            <div class="fw-semibold small">Priorização</div>
-            <div class="text-white-50 small">Crítico × rápido</div>
+            <div class="fw-semibold small">Prioritization</div>
+            <div class="text-white-50 small">Critical × quick wins</div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(239,68,68,0.1);border-radius:10px;border:1px solid rgba(239,68,68,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">🛡️</div>
-            <div class="fw-semibold small">Gordura</div>
-            <div class="text-white-50 small">"Fator cagaço" de 1 dia</div>
+            <div class="fw-semibold small">Buffer</div>
+            <div class="text-white-50 small">+1 day "just-in-case"</div>
           </div>
         </div>
       </div>
     `,
     habitos: [
-      'Usa ferramentas só quando realmente ajudam — sem apego a método',
-      'Adiciona 1 dia de margem ("fator cagaço") em toda estimativa',
-      'Prioriza por criticidade: o que trava mais gente vem primeiro',
-      'Escala problemas rapidamente — não absorve o que não é seu',
-      'Aprendeu a dizer "não" estrategicamente para proteger entregas',
+      'Uses tools only when they genuinely help — no attachment to any method',
+      'Adds 1 day of buffer ("just-in-case factor") to every estimate',
+      'Prioritizes by criticality: what blocks the most people comes first',
+      'Escalates problems quickly — doesn\'t absorb what isn\'t theirs',
+      'Has learned to say "no" strategically to protect deliveries',
     ],
     riscos: [
-      '"Sincericídio" com clientes — ser direto demais pode queimar relacionamentos',
-      'Pode parecer desorganizado para quem está acostumado com processos rígidos',
+      'Can be too blunt with clients — being too direct can damage relationships',
+      'May look disorganized to those used to rigid processes',
     ],
     onboarding: [
-      { titulo: 'Mapeie a cultura de comunicação do time', desc: 'Antes de ser direto demais com um cliente ou colega, entenda o nível de formalidade esperado no contexto.' },
-      { titulo: 'Use 1 ferramenta simples de tracking', desc: 'Mesmo sem apego a processo, um Trello ou lista simples ajuda a não deixar nada cair. Mínimo que funciona.' },
-      { titulo: 'Entenda quem são os stakeholders críticos', desc: 'Seu superpoder é entregar — mas primeiro descubra o que gera mais impacto para quem importa.' },
-      { titulo: 'Documente as decisões chave', desc: 'Não precisa ser um wiki — um comentário no Slack ou Notion já protege você de revisitar decisões no futuro.' },
+      { titulo: 'Map the team\'s communication culture', desc: 'Before being too direct with a client or colleague, understand the expected level of formality in that context.' },
+      { titulo: 'Use one simple tracking tool', desc: 'Even without attachment to process, a Trello board or simple list helps nothing slip through the cracks.' },
+      { titulo: 'Identify the critical stakeholders', desc: 'Your superpower is delivery — but first find out what generates the most impact for the right people.' },
+      { titulo: 'Document key decisions', desc: 'It doesn\'t have to be a wiki — a Slack message or a Notion comment already protects you from revisiting decisions later.' },
     ],
   },
 
-  descomplicadora: {
+  simplifier: {
     emoji: '🧘',
-    nome: 'A Descomplicadora',
-    tagline: '"Papel, Excel, cabeça — o importante é não sofrer sozinha."',
+    nome: 'The Simplifier',
+    tagline: '"Paper, Excel, brain — just don\'t struggle alone."',
     cor: '#10b981',
     corSuave: 'rgba(16,185,129,0.12)',
     representantes: 'Marina, Gabriella, Thais',
     descricao: `
-      <p>A Descomplicadora não tem apego a método ou ferramenta — usa o que funciona para o contexto, sem complicar. Pode ser um papel, pode ser o Excel, pode ser a cabeça mesmo. O que importa é resolver.</p>
-      <p class="text-white-50">Pede ajuda abertamente, não sofre sozinha, e tem uma visão muito realista sobre estimativas (sem inflar artificialmente). É o perfil mais colaborativo e menos propenso à síndrome do impostor sobre o método.</p>
+      <p>The Simplifier has no attachment to method or tool — uses whatever works for the context, without overcomplicating. Could be paper, could be Excel, could just be thinking it through. What matters is solving it.</p>
+      <p class="text-white-50">Asks for help openly, doesn't suffer alone, and has a very realistic view on estimates (no artificial inflation). The most collaborative profile and least prone to imposter syndrome about method.</p>
       <div class="row mt-4 g-3">
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(16,185,129,0.1);border-radius:10px;border:1px solid rgba(16,185,129,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">🤝</div>
-            <div class="fw-semibold small">Colaboração</div>
-            <div class="text-white-50 small">Pede ajuda sem vergonha</div>
+            <div class="fw-semibold small">Collaboration</div>
+            <div class="text-white-50 small">Asks for help freely</div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(16,185,129,0.1);border-radius:10px;border:1px solid rgba(16,185,129,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">🎯</div>
-            <div class="fw-semibold small">Priorização</div>
-            <div class="text-white-50 small">Difícil primeiro ou delega</div>
+            <div class="fw-semibold small">Prioritization</div>
+            <div class="text-white-50 small">Hardest first or delegate</div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(16,185,129,0.1);border-radius:10px;border:1px solid rgba(16,185,129,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">📏</div>
-            <div class="fw-semibold small">Estimativa</div>
-            <div class="text-white-50 small">Realista, sem inflar</div>
+            <div class="fw-semibold small">Estimates</div>
+            <div class="text-white-50 small">Realistic, no inflation</div>
           </div>
         </div>
       </div>
     `,
     habitos: [
-      'Adapta a ferramenta ao contexto — não impõe um método rígido',
-      'Anota tudo que precisa lembrar, de qualquer forma que funcione',
-      'Pede ajuda ao time ativamente, sem considerar fraqueza',
-      'Divide tarefas grandes para enxergar o tamanho real',
-      'Estimativas realistas — não infla, mas não promete o impossível',
+      'Adapts the tool to the context — doesn\'t impose a rigid method',
+      'Notes down everything that needs remembering, in whatever form works',
+      'Actively asks the team for help, without seeing it as weakness',
+      'Breaks large tasks into parts to see their real size',
+      'Realistic estimates — no inflation, but no impossible promises either',
     ],
     riscos: [
-      'Pode parecer "bagunçada" para perfis mais estruturados',
-      'Em cenários de muito volume, pode precisar de mais estrutura para não perder itens',
+      'Can seem "messy" to more structured profiles',
+      'In high-volume scenarios, may need more structure to avoid losing items',
     ],
     onboarding: [
-      { titulo: 'Conheça o time logo de cara', desc: 'Seu superpoder é colaborar. Quanto antes souber com quem pode contar, melhor. Marque cafés e 1:1s na primeira semana.' },
-      { titulo: 'Não deixe ninguém te vender método', desc: 'Use a ferramenta que funcionar pra você. Se papel resolve, usa papel. Não precisa de aprovação para ser produtiva.' },
-      { titulo: 'Mapeie quem escalar em situações difíceis', desc: 'Identifique o manager e os colegas-chave para situações de sobrecarga. Saber pedir socorro rápido é um diferencial.' },
-      { titulo: 'Crie um ritual mínimo de revisão', desc: 'Mesmo sem board, uma lista semanal simples (Google Docs, papel) evita que tarefas importantes fiquem esquecidas.' },
+      { titulo: 'Meet the team right away', desc: 'Your superpower is collaboration. The sooner you know who you can count on, the better. Book coffees and 1:1s in the first week.' },
+      { titulo: 'Don\'t let anyone sell you a method', desc: 'Use whatever tool works for you. If paper solves it, use paper. You don\'t need approval to be productive.' },
+      { titulo: 'Map who to escalate to in difficult situations', desc: 'Identify your manager and key colleagues for overload situations. Knowing how to call for help quickly is a differentiator.' },
+      { titulo: 'Create a minimal review ritual', desc: 'Even without a board, a simple weekly list (Google Docs, paper) prevents important tasks from being forgotten.' },
     ],
   },
 
-  sistematica: {
+  systematic: {
     emoji: '🧩',
-    nome: 'A Sistemática',
-    tagline: '"Externalizo tudo, diagramo para pensar, documento para não ter dúvida."',
+    nome: 'The Systematic',
+    tagline: '"I externalize everything, diagram to think, and document so there\'s no doubt."',
     cor: '#f59e0b',
     corSuave: 'rgba(245,158,11,0.12)',
     representantes: 'Bianca',
     descricao: `
-      <p>A Sistemática externaliza tudo. Diagrama antes de codar, rastreia cada iniciativa em planilha, usa IA como extensão cognitiva e nunca tem dúvida sobre o que entregou — porque está tudo documentado.</p>
-      <p class="text-white-50">Usa ferramentas visuais para pensar (Excalidraw, Mermaid) e IA para processar grandes volumes de informação (NotebookLM). Tem um ecossistema completo e conecta cada tarefa ao seu People Review — a famosa "planilha anti-impostor".</p>
+      <p>The Systematic externalizes everything. Diagrams before coding, tracks every initiative in a spreadsheet, uses AI as a cognitive extension, and never has doubt about what was delivered — because it's all documented.</p>
+      <p class="text-white-50">Uses visual thinking tools (Excalidraw, Mermaid) and AI to process large volumes of information (NotebookLM). Maintains a full ecosystem and connects every task to their People Review — the famous "anti-imposter spreadsheet."</p>
       <div class="row mt-4 g-3">
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(245,158,11,0.1);border-radius:10px;border:1px solid rgba(245,158,11,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">🗺️</div>
-            <div class="fw-semibold small">Pensamento</div>
-            <div class="text-white-50 small">Visual e diagramático</div>
+            <div class="fw-semibold small">Thinking</div>
+            <div class="text-white-50 small">Visual & diagrammatic</div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(245,158,11,0.1);border-radius:10px;border:1px solid rgba(245,158,11,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">🤖</div>
-            <div class="fw-semibold small">IA</div>
-            <div class="text-white-50 small">Extensão cognitiva</div>
+            <div class="fw-semibold small">AI</div>
+            <div class="text-white-50 small">Cognitive extension</div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(245,158,11,0.1);border-radius:10px;border:1px solid rgba(245,158,11,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">📊</div>
-            <div class="fw-semibold small">Rastreabilidade</div>
-            <div class="text-white-50 small">Planilha anti-impostor</div>
+            <div class="fw-semibold small">Traceability</div>
+            <div class="text-white-50 small">Anti-imposter spreadsheet</div>
           </div>
         </div>
       </div>
     `,
     habitos: [
-      'Diagrama o problema antes de começar a escrever código ou documentação',
-      'Mantém planilha de iniciativas conectando tarefas ao People Review',
-      'Usa IA (NotebookLM, Claude) para processar grandes volumes de info',
-      'Externaliza pensamentos para evitar sobrecarga cognitiva',
-      'Documenta decisões com rastreabilidade total — nada fica na cabeça',
+      'Diagrams the problem before starting to write code or documentation',
+      'Maintains an initiative spreadsheet connecting tasks to the People Review',
+      'Uses AI (NotebookLM, Claude) to process large volumes of information',
+      'Externalizes thoughts to avoid cognitive overload',
+      'Documents decisions with full traceability — nothing stays in their head',
     ],
     riscos: [
-      'Pode investir mais tempo em estrutura do que a situação exige em projetos curtos',
-      'O ecossistema completo pode intimidar quem está começando a trabalhar junto',
+      'May invest more time in structure than the situation requires in short projects',
+      'The full ecosystem can be intimidating to those just starting to work alongside',
     ],
     onboarding: [
-      { titulo: 'Crie sua planilha de iniciativas no primeiro dia', desc: 'Liste cada tarefa/projeto com contexto, impacto esperado e data. Isso vai te salvar no People Review.' },
-      { titulo: 'Mapeie o ecossistema com Excalidraw', desc: 'Na primeira semana, faça um diagrama do stack de dados do cliente/time. Te dá visão rápida e já comunica competência.' },
-      { titulo: 'Configure seu NotebookLM com documentação do projeto', desc: 'Jogue os docs do projeto no NotebookLM para processar rápido nas primeiras semanas. Acelera o ramp-up.' },
-      { titulo: 'Compartilhe seus diagramas com o time', desc: 'Seu jeito visual de pensar é um presente para o time. Apresente um diagrama de arquitetura cedo — vai criar conexão.' },
+      { titulo: 'Create your initiative spreadsheet on day one', desc: 'List every task/project with context, expected impact, and date. This will save you at People Review time.' },
+      { titulo: 'Map the ecosystem with Excalidraw', desc: 'In the first week, diagram the client/team data stack. It gives you fast overview and already communicates competence.' },
+      { titulo: 'Set up your NotebookLM with project documentation', desc: 'Feed project docs into NotebookLM to process quickly in the first weeks. It dramatically accelerates ramp-up.' },
+      { titulo: 'Share your diagrams with the team', desc: 'Your visual way of thinking is a gift to the team. Present an architecture diagram early — it creates connection.' },
     ],
   },
 };
@@ -463,54 +461,54 @@ const PROFILES = {
 // ─── Quiz ──────────────────────────────────────────────────────────
 const QUESTIONS = [
   {
-    text: 'Como você organiza sua semana de trabalho?',
+    text: 'How do you organize your work week?',
     options: [
-      { text: 'Monto um board ou calendário com todas as tarefas antes de começar', perfil: 'arquiteto' },
-      { text: 'Olho o que tem urgência e vou resolvendo no ritmo do dia', perfil: 'fazacontecer' },
-      { text: 'Anoto o que precisa ser feito, sem sistema rígido — o que funcionar', perfil: 'descomplicadora' },
-      { text: 'Tenho um sistema completo: planilhas, diagramas, rastreio tudo', perfil: 'sistematica' },
+      { text: 'I set up a board or calendar with all tasks before starting', perfil: 'architect' },
+      { text: 'I look at what\'s urgent and handle things as the day flows', perfil: 'gogetter' },
+      { text: 'I jot down what needs doing, no rigid system — whatever works', perfil: 'simplifier' },
+      { text: 'I have a full system: spreadsheets, diagrams, I track everything', perfil: 'systematic' },
     ]
   },
   {
-    text: 'Quando surgem muitas tarefas ao mesmo tempo, você:',
+    text: 'When many tasks come in at the same time, you:',
     options: [
-      { text: 'Priorizo por stakeholder, urgência e tempo de espera', perfil: 'arquiteto' },
-      { text: 'Identifico o que é crítico ou pode ser resolvido rapidamente', perfil: 'fazacontecer' },
-      { text: 'Peço ajuda ao time e divido para ver o tamanho real do problema', perfil: 'descomplicadora' },
-      { text: 'Uso uma planilha de impacto para decidir racionalmente', perfil: 'sistematica' },
+      { text: 'Prioritize by stakeholder, urgency, and waiting time', perfil: 'architect' },
+      { text: 'Identify what is critical or can be resolved quickly', perfil: 'gogetter' },
+      { text: 'Ask the team for help and divide to see the real scope', perfil: 'simplifier' },
+      { text: 'Use an impact spreadsheet to decide rationally', perfil: 'systematic' },
     ]
   },
   {
-    text: 'Qual é a sua relação com ferramentas de produtividade?',
+    text: 'What is your relationship with productivity tools?',
     options: [
-      { text: 'Tenho ferramentas fixas que uso toda semana, como rituais sagrados', perfil: 'arquiteto' },
-      { text: 'Uso o mínimo possível. Ferramenta não entrega projeto, eu entrego', perfil: 'fazacontecer' },
-      { text: 'Uso o que funciona no contexto. Às vezes papel mesmo resolve melhor', perfil: 'descomplicadora' },
-      { text: 'Tenho um ecossistema completo e uso IA para ampliar o que consigo processar', perfil: 'sistematica' },
+      { text: 'I have fixed tools I use every week, like sacred rituals', perfil: 'architect' },
+      { text: 'I use the minimum possible. Tools don\'t ship projects, I do', perfil: 'gogetter' },
+      { text: 'I use whatever fits the context. Sometimes paper works best', perfil: 'simplifier' },
+      { text: 'I have a full ecosystem and use AI to extend what I can process', perfil: 'systematic' },
     ]
   },
   {
-    text: 'Como você lida com sobrecarga de trabalho?',
+    text: 'How do you deal with work overload?',
     options: [
-      { text: 'Trabalho mais horas quando necessário, mas peço ajuda quando percebo', perfil: 'arquiteto' },
-      { text: 'Escalo, delego, não absorvo o que não é meu', perfil: 'fazacontecer' },
-      { text: 'Divido com o time e grito por socorro sem vergonha', perfil: 'descomplicadora' },
-      { text: 'Externalizo antes que vire problema — minha planilha já mostra quando estou no limite', perfil: 'sistematica' },
+      { text: 'I work extra hours when needed, but ask for help when I notice it', perfil: 'architect' },
+      { text: 'I escalate, delegate, don\'t absorb what isn\'t mine', perfil: 'gogetter' },
+      { text: 'I share it with the team and call for help without shame', perfil: 'simplifier' },
+      { text: 'I externalize before it becomes a problem — my spreadsheet shows when I\'m at the limit', perfil: 'systematic' },
     ]
   },
   {
-    text: 'Qual frase mais te representa no dia a dia?',
+    text: 'Which phrase best represents you day-to-day?',
     options: [
-      { text: '"Se não tá no board, não existe como tarefa"', perfil: 'arquiteto' },
-      { text: '"Foco em entregar valor, não importa qual ferramenta"', perfil: 'fazacontecer' },
-      { text: '"O importante é não complicar e não sofrer sozinha"', perfil: 'descomplicadora' },
-      { text: '"Externalizo tudo e documento para não ter dúvida do que entreguei"', perfil: 'sistematica' },
+      { text: '"If it\'s not on the board, it doesn\'t exist as a task"', perfil: 'architect' },
+      { text: '"Focus on delivering value, no matter what tool"', perfil: 'gogetter' },
+      { text: '"The important thing is to keep it simple and not struggle alone"', perfil: 'simplifier' },
+      { text: '"I externalize everything and document so there\'s no doubt about what I delivered"', perfil: 'systematic' },
     ]
   },
 ];
 
 let currentQ = 0;
-let scores = { arquiteto: 0, fazacontecer: 0, descomplicadora: 0, sistematica: 0 };
+let scores = { architect: 0, gogetter: 0, simplifier: 0, systematic: 0 };
 
 function scrollToQuiz() {
   document.getElementById('quizSection').scrollIntoView({ behavior: 'smooth' });
@@ -519,7 +517,7 @@ function scrollToQuiz() {
 
 function startQuiz() {
   currentQ = 0;
-  scores = { arquiteto: 0, fazacontecer: 0, descomplicadora: 0, sistematica: 0 };
+  scores = { architect: 0, gogetter: 0, simplifier: 0, systematic: 0 };
   document.getElementById('quizIntro').style.display = 'none';
   document.getElementById('quizResult').style.display = 'none';
   document.getElementById('quizPlay').style.display = 'block';
@@ -534,7 +532,7 @@ function renderQuestion() {
   document.getElementById('qProgressBar').style.width = pct + '%';
   document.getElementById('qText').textContent = q.text;
 
-  // Embaralha opções para evitar padrão previsível
+  // Shuffle options to avoid predictable pattern
   const shuffled = [...q.options].sort(() => Math.random() - 0.5);
 
   const container = document.getElementById('qOptions');
@@ -549,7 +547,6 @@ function renderQuestion() {
 }
 
 function chooseOption(perfil, btn) {
-  // Desabilita todos os botões momentaneamente
   document.querySelectorAll('.quiz-option-btn').forEach(b => b.disabled = true);
   btn.classList.add('selected');
   scores[perfil]++;
@@ -579,38 +576,33 @@ function resetQuiz() {
   document.getElementById('quizIntro').style.display = 'block';
 }
 
-// ─── Modal de perfil ───────────────────────────────────────────────
+// ─── Profile modal ─────────────────────────────────────────────────
 let currentProfile = null;
 
 function openProfile(key) {
   currentProfile = key;
   const p = PROFILES[key];
 
-  // Header do modal
   document.getElementById('profileModalTitle').innerHTML =
     `${p.emoji} ${p.nome} <small class="text-white-50 fw-normal fs-6 ms-2">${p.representantes}</small>`;
   document.getElementById('profileModalHeader').style.borderBottom = `2px solid ${p.cor}44`;
 
-  // Preenche conteúdos
-  document.getElementById('sobreContent').innerHTML = p.descricao;
+  document.getElementById('aboutContent').innerHTML = p.descricao;
 
-  renderFerramentas(key, p);
-  renderHabitos(p);
+  renderTools(key, p);
+  renderHabits(p);
   renderOnboarding(p);
 
-  showTab('sobre');
+  showTab('about');
   new bootstrap.Modal(document.getElementById('profileModal')).show();
 }
 
-function renderFerramentas(key, p) {
+function renderTools(key, p) {
   const fallback = toolsFallback[key] || [];
-
-  // Tenta encontrar matches no banco pelo nome
-  const container = document.getElementById('ferramentasContent');
+  const container = document.getElementById('toolsContent');
   container.innerHTML = '';
 
   fallback.forEach(tool => {
-    // Verifica se há match no banco (case insensitive, partial)
     const dbMatch = ferramentasDB.find(f =>
       f.nome && tool.nome && f.nome.toLowerCase().includes(tool.nome.toLowerCase().split(' ')[0].toLowerCase())
     );
@@ -624,35 +616,35 @@ function renderFerramentas(key, p) {
       <div class="tool-card">
         <div class="d-flex justify-content-between align-items-start mb-1">
           <div class="tool-name">${tool.nome}</div>
-          ${isInHub ? '<span class="tool-badge">✓ No Hub</span>' : ''}
+          ${isInHub ? '<span class="tool-badge">✓ In Hub</span>' : ''}
         </div>
         <div class="text-white-50 small mb-2">${dbMatch?.descricao || tool.descricao}</div>
         ${link ? `<a href="${link}" target="_blank" class="btn btn-sm btn-outline-light py-0 px-2" style="font-size:0.75rem;">
-          <i class="bi bi-arrow-up-right-circle"></i> ${isInHub ? 'Ver no Hub' : 'Acessar'}
+          <i class="bi bi-arrow-up-right-circle"></i> ${isInHub ? 'View in Hub' : 'Access'}
         </a>` : ''}
       </div>`;
     container.appendChild(col);
   });
 }
 
-function renderHabitos(p) {
-  let html = '<h5 class="fw-bold mb-3">⚡ Hábitos principais</h5>';
+function renderHabits(p) {
+  let html = '<h5 class="fw-bold mb-3">⚡ Key habits</h5>';
   p.habitos.forEach(h => {
     html += `<div class="habit-item">${h}</div>`;
   });
-  html += '<h5 class="fw-bold mb-3 mt-4">⚠️ Pontos de atenção</h5>';
+  html += '<h5 class="fw-bold mb-3 mt-4">⚠️ Watch-outs</h5>';
   p.riscos.forEach(r => {
     html += `<div class="risk-item text-white-50">${r}</div>`;
   });
-  document.getElementById('habitosContent').innerHTML = html;
+  document.getElementById('habitsContent').innerHTML = html;
 }
 
 function renderOnboarding(p) {
   let html = `
     <div class="mb-4 p-3" style="background:rgba(167,139,250,0.08);border-radius:10px;border:1px solid rgba(167,139,250,0.2);">
       <p class="mb-0 text-white-50 small">
-        💡 Estas dicas foram construídas a partir de entrevistas com AEs seniores da Artefact
-        que têm este perfil. São aprendizados reais de quem já passou pelo onboarding.
+        💡 These tips were built from interviews with senior Artefact AEs who share this profile.
+        They are real lessons from people who have already been through onboarding.
       </p>
     </div>`;
   p.onboarding.forEach((step, i) => {

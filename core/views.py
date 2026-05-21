@@ -44,40 +44,41 @@ def perfis_view(request):
     ferramentas_db = list(
         Ferramenta.objects.values('id', 'nome', 'categoria', 'descricao', 'nivel', 'documentacao_link')
     )
-    # Ferramentas ideais por perfil (fallback quando não há match no banco)
+    # Ideal tools per profile (fallback when no DB match is found)
     perfis_tools_fallback = {
-        'arquiteto': [
-            {'nome': 'Jira', 'descricao': 'Gestão de tarefas e sprints com board visual', 'link': 'https://www.atlassian.com/software/jira'},
-            {'nome': 'ClickUp', 'descricao': 'Planejamento semanal e rastreio de entregas', 'link': 'https://clickup.com'},
-            {'nome': 'Google Agenda', 'descricao': 'Bloqueio de tempo e rituais semanais', 'link': 'https://calendar.google.com'},
-            {'nome': 'Pomodoro (Forest/Focus)', 'descricao': 'Técnica de foco em blocos de tempo', 'link': 'https://pomofocus.io'},
-            {'nome': 'Notion', 'descricao': 'Documentação estruturada e wikis de projeto', 'link': 'https://notion.so'},
+        'architect': [
+            {'nome': 'Jira', 'descricao': 'Task and sprint management with visual board', 'link': 'https://www.atlassian.com/software/jira'},
+            {'nome': 'ClickUp', 'descricao': 'Weekly planning and delivery tracking', 'link': 'https://clickup.com'},
+            {'nome': 'Google Calendar', 'descricao': 'Time blocking and weekly rituals', 'link': 'https://calendar.google.com'},
+            {'nome': 'Pomodoro (Forest/Focus)', 'descricao': 'Focus technique in timed work blocks', 'link': 'https://pomofocus.io'},
+            {'nome': 'Notion', 'descricao': 'Structured documentation and project wikis', 'link': 'https://notion.so'},
         ],
-        'fazacontecer': [
-            {'nome': 'Trello', 'descricao': 'Kanban simples para rastrear o que está andando', 'link': 'https://trello.com'},
-            {'nome': 'OneNote', 'descricao': 'Anotações rápidas sem estrutura rígida', 'link': 'https://onenote.com'},
-            {'nome': 'Slack', 'descricao': 'Comunicação ágil e escalada rápida com o time', 'link': 'https://slack.com'},
-            {'nome': 'Miro', 'descricao': 'Mapa mental rápido em momentos de crise', 'link': 'https://miro.com'},
-            {'nome': 'Linear', 'descricao': 'Issue tracking minimalista para quem não gosta de overhead', 'link': 'https://linear.app'},
+        'gogetter': [
+            {'nome': 'Trello', 'descricao': 'Simple kanban board to track what is in progress', 'link': 'https://trello.com'},
+            {'nome': 'OneNote', 'descricao': 'Quick notes without rigid structure', 'link': 'https://onenote.com'},
+            {'nome': 'Slack', 'descricao': 'Agile communication and fast team escalation', 'link': 'https://slack.com'},
+            {'nome': 'Miro', 'descricao': 'Quick mind-mapping in crisis moments', 'link': 'https://miro.com'},
+            {'nome': 'Linear', 'descricao': 'Minimalist issue tracking for low-overhead workflows', 'link': 'https://linear.app'},
         ],
-        'descomplicadora': [
-            {'nome': 'Excel / Google Sheets', 'descricao': 'Listas e priorização simples sem complicação', 'link': 'https://sheets.google.com'},
-            {'nome': 'Google Docs', 'descricao': 'Documentação leve e colaborativa', 'link': 'https://docs.google.com'},
-            {'nome': 'Google Keep', 'descricao': 'Notas rápidas e lembretes visuais', 'link': 'https://keep.google.com'},
-            {'nome': 'Papel + Caneta', 'descricao': 'O clássico que nunca falha para quem pensa escrevendo', 'link': ''},
-            {'nome': 'Whatsapp/Slack', 'descricao': 'Pedir ajuda pro time sem cerimônia', 'link': 'https://slack.com'},
+        'simplifier': [
+            {'nome': 'Excel / Google Sheets', 'descricao': 'Simple lists and prioritization without complexity', 'link': 'https://sheets.google.com'},
+            {'nome': 'Google Docs', 'descricao': 'Lightweight and collaborative documentation', 'link': 'https://docs.google.com'},
+            {'nome': 'Google Keep', 'descricao': 'Quick notes and visual reminders', 'link': 'https://keep.google.com'},
+            {'nome': 'Paper + Pen', 'descricao': 'The classic that never fails for those who think by writing', 'link': ''},
+            {'nome': 'WhatsApp / Slack', 'descricao': 'Asking the team for help without ceremony', 'link': 'https://slack.com'},
         ],
-        'sistematica': [
-            {'nome': 'Excalidraw', 'descricao': 'Diagramas rápidos para externalizar o pensamento', 'link': 'https://excalidraw.com'},
-            {'nome': 'Mermaid', 'descricao': 'Diagramas em código — rastreáveis e versionáveis', 'link': 'https://mermaid.js.org'},
-            {'nome': 'NotebookLM', 'descricao': 'IA como extensão cognitiva para processar documentos', 'link': 'https://notebooklm.google.com'},
-            {'nome': 'Notion', 'descricao': 'Base de conhecimento pessoal e planilha de iniciativas', 'link': 'https://notion.so'},
-            {'nome': 'dbt', 'descricao': 'Documentação e rastreabilidade do dado na camada analítica', 'link': 'https://www.getdbt.com'},
+        'systematic': [
+            {'nome': 'Excalidraw', 'descricao': 'Quick diagrams to externalize thinking', 'link': 'https://excalidraw.com'},
+            {'nome': 'Mermaid', 'descricao': 'Diagrams as code — traceable and versionable', 'link': 'https://mermaid.js.org'},
+            {'nome': 'NotebookLM', 'descricao': 'AI as cognitive extension to process large documents', 'link': 'https://notebooklm.google.com'},
+            {'nome': 'Notion', 'descricao': 'Personal knowledge base and initiative spreadsheet', 'link': 'https://notion.so'},
+            {'nome': 'dbt', 'descricao': 'Documentation and traceability at the analytics layer', 'link': 'https://www.getdbt.com'},
         ],
     }
     return render(request, 'core/perfis.html', {
         'ferramentas_db': _json.dumps(ferramentas_db, default=str),
         'perfis_tools_fallback': _json.dumps(perfis_tools_fallback),
+        'user_role': get_user_role(request.user),
     })
 
 def get_user_role(user):
