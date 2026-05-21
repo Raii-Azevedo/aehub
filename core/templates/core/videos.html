@@ -4,9 +4,11 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="mb-0">&#x1F3A5; Knowledge Pills</h1>
+    {% if user_role != 'viewer' %}
     <button class="btn btn-gradient" data-bs-toggle="modal" data-bs-target="#modalVideo">
         <i class="bi bi-plus-lg"></i> New Pill
     </button>
+    {% endif %}
 </div>
 <p class="text-white-50 mb-4">Short videos with practical use cases.</p>
 
@@ -48,15 +50,13 @@
             </div>
             <div class="card-footer bg-transparent border-light d-flex justify-content-between align-items-center">
                 <small class="text-white-50">👤 {{ video.autor }}</small>
+                {% if user_role == 'admin' or user_role == 'user' and video.autor_email == user.email %}
                 <div>
-                    <button class="btn btn-sm btn-outline-light" onclick="editarVideo({{ video.id }})">
-                        ✏️
-                    </button>
-                    <a href="{% url 'video_excluir' video.id %}" class="btn btn-sm btn-outline-danger" 
-                       onclick="return confirm('Are you sure you want to delete this video?')">
-                        &#x1F5D1;&#xFE0F;
-                    </a>
+                    <button class="btn btn-sm btn-outline-light" onclick="editarVideo({{ video.id }})">✏️</button>
+                    <a href="{% url 'video_excluir' video.id %}" class="btn btn-sm btn-outline-danger"
+                       onclick="return confirm('Are you sure you want to delete this video?')">🗑️</a>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -67,6 +67,7 @@
     {% endfor %}
 </div>
 
+{% if user_role != 'viewer' %}
 <!-- Modal: new video -->
 <div class="modal fade" id="modalVideo" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -123,6 +124,8 @@
         </div>
     </div>
 </div>
+
+{% endif %}
 
 <!-- Modal: edit video -->
 <div class="modal fade" id="modalVideoEdit" tabindex="-1">

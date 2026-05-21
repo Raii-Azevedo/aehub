@@ -4,9 +4,11 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1 class="mb-0">&#x1F4DA; Reference Materials</h1>
+    {% if user_role != 'viewer' %}
     <button class="btn btn-gradient" data-bs-toggle="modal" data-bs-target="#modalMaterial">
         <i class="bi bi-plus-lg"></i> New Material
     </button>
+    {% endif %}
 </div>
 <p class="text-white-50 mb-4">Essential books, courses, articles and tools.</p>
 
@@ -47,15 +49,13 @@
             </div>
             <div class="card-footer bg-transparent border-light d-flex justify-content-between align-items-center">
                 <small class="text-white-50">👤 {{ material.autor }}</small>
+                {% if user_role == 'admin' or user_role == 'user' and material.autor_email == user.email %}
                 <div>
-                    <button class="btn btn-sm btn-outline-light" onclick="editarMaterial({{ material.id }})">
-                        ✏️
-                    </button>
-                    <a href="{% url 'material_excluir' material.id %}" class="btn btn-sm btn-outline-danger" 
-                       onclick="return confirm('Are you sure you want to delete this material?')">
-                        &#x1F5D1;&#xFE0F;
-                    </a>
+                    <button class="btn btn-sm btn-outline-light" onclick="editarMaterial({{ material.id }})">✏️</button>
+                    <a href="{% url 'material_excluir' material.id %}" class="btn btn-sm btn-outline-danger"
+                       onclick="return confirm('Are you sure you want to delete this material?')">🗑️</a>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -66,6 +66,7 @@
     {% endfor %}
 </div>
 
+{% if user_role != 'viewer' %}
 <!-- Modal: new material -->
 <div class="modal fade" id="modalMaterial" tabindex="-1">
     <div class="modal-dialog modal-lg">
@@ -122,6 +123,8 @@
         </div>
     </div>
 </div>
+
+{% endif %}
 
 <!-- Modal para editar material -->
 <div class="modal fade" id="modalMaterialEdit" tabindex="-1">
