@@ -430,6 +430,10 @@ def casos_lista(request):
 @login_required
 def caso_novo(request):
     """Criar novo caso de uso"""
+    if get_user_role(request.user) == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para adicionar itens.')
+        return redirect('casos_lista')
+
     if request.method == 'POST':
         agora = timezone.now()
         
@@ -464,7 +468,15 @@ def caso_novo(request):
 def caso_editar(request, id):
     """Editar caso de uso"""
     caso = get_object_or_404(CasoUso, id=id)
-    
+    role = get_user_role(request.user)
+
+    if role == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para editar itens.')
+        return redirect('casos_lista')
+    if role == 'user' and caso.autor_email != request.user.email:
+        messages.error(request, '🚫 Você só pode editar casos que você mesmo criou.')
+        return redirect('casos_lista')
+
     if request.method == 'POST':
         caso.titulo = request.POST.get('titulo')
         caso.contexto = request.POST.get('contexto')
@@ -485,6 +497,15 @@ def caso_editar(request, id):
 def caso_excluir(request, id):
     """Excluir caso de uso (soft delete)"""
     caso = get_object_or_404(CasoUso, id=id)
+    role = get_user_role(request.user)
+
+    if role == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para excluir itens.')
+        return redirect('casos_lista')
+    if role == 'user' and caso.autor_email != request.user.email:
+        messages.error(request, '🚫 Você só pode excluir casos que você mesmo criou.')
+        return redirect('casos_lista')
+
     caso.ativo = False
     caso.save()
     messages.success(request, '✅ Caso removido com sucesso!')
@@ -538,6 +559,10 @@ def materiais_lista(request):
 @login_required
 def material_novo(request):
     """Criar novo material"""
+    if get_user_role(request.user) == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para adicionar itens.')
+        return redirect('materiais_lista')
+
     if request.method == 'POST':
         material = Material.objects.create(
             titulo=request.POST.get('titulo'),
@@ -561,7 +586,15 @@ def material_novo(request):
 def material_editar(request, id):
     """Editar material"""
     material = get_object_or_404(Material, id=id)
-    
+    role = get_user_role(request.user)
+
+    if role == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para editar itens.')
+        return redirect('materiais_lista')
+    if role == 'user' and material.autor_email != request.user.email:
+        messages.error(request, '🚫 Você só pode editar materiais que você mesmo criou.')
+        return redirect('materiais_lista')
+
     if request.method == 'POST':
         material.titulo = request.POST.get('titulo')
         material.tipo = request.POST.get('tipo')
@@ -584,6 +617,15 @@ def material_editar(request, id):
 def material_excluir(request, id):
     """Excluir material"""
     material = get_object_or_404(Material, id=id)
+    role = get_user_role(request.user)
+
+    if role == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para excluir itens.')
+        return redirect('materiais_lista')
+    if role == 'user' and material.autor_email != request.user.email:
+        messages.error(request, '🚫 Você só pode excluir materiais que você mesmo criou.')
+        return redirect('materiais_lista')
+
     material.delete()
     messages.success(request, '✅ Material removido com sucesso!')
     return redirect('materiais_lista')
@@ -631,6 +673,10 @@ def videos_lista(request):
 @login_required
 def video_novo(request):
     """Criar novo vídeo"""
+    if get_user_role(request.user) == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para adicionar itens.')
+        return redirect('videos_lista')
+
     if request.method == 'POST':
         autor = request.POST.get('autor', request.user.get_full_name() or request.user.username)
         youtube_id = normalize_video_url(request.POST.get('youtube_id', ''))
@@ -657,7 +703,15 @@ def video_novo(request):
 def video_editar(request, id):
     """Editar vídeo"""
     video = get_object_or_404(Video, id=id)
-    
+    role = get_user_role(request.user)
+
+    if role == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para editar itens.')
+        return redirect('videos_lista')
+    if role == 'user' and video.autor_email != request.user.email:
+        messages.error(request, '🚫 Você só pode editar vídeos que você mesmo criou.')
+        return redirect('videos_lista')
+
     if request.method == 'POST':
         youtube_id = normalize_video_url(request.POST.get('youtube_id', ''))
         
@@ -680,6 +734,15 @@ def video_editar(request, id):
 def video_excluir(request, id):
     """Excluir vídeo"""
     video = get_object_or_404(Video, id=id)
+    role = get_user_role(request.user)
+
+    if role == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para excluir itens.')
+        return redirect('videos_lista')
+    if role == 'user' and video.autor_email != request.user.email:
+        messages.error(request, '🚫 Você só pode excluir vídeos que você mesmo criou.')
+        return redirect('videos_lista')
+
     video.delete()
     messages.success(request, '✅ Vídeo removido com sucesso!')
     return redirect('videos_lista')
@@ -730,6 +793,10 @@ def ferramentas_lista(request):
 @login_required
 def ferramenta_novo(request):
     """Criar nova ferramenta"""
+    if get_user_role(request.user) == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para adicionar itens.')
+        return redirect('ferramentas_lista')
+
     if request.method == 'POST':
         ferramenta = Ferramenta.objects.create(
             nome=request.POST.get('nome'),
@@ -754,7 +821,15 @@ def ferramenta_novo(request):
 def ferramenta_editar(request, id):
     """Editar ferramenta"""
     ferramenta = get_object_or_404(Ferramenta, id=id)
-    
+    role = get_user_role(request.user)
+
+    if role == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para editar itens.')
+        return redirect('ferramentas_lista')
+    if role == 'user' and ferramenta.autor_email != request.user.email:
+        messages.error(request, '🚫 Você só pode editar ferramentas que você mesmo criou.')
+        return redirect('ferramentas_lista')
+
     if request.method == 'POST':
         ferramenta.nome = request.POST.get('nome')
         ferramenta.categoria = request.POST.get('categoria')
@@ -778,6 +853,15 @@ def ferramenta_editar(request, id):
 def ferramenta_excluir(request, id):
     """Excluir ferramenta"""
     ferramenta = get_object_or_404(Ferramenta, id=id)
+    role = get_user_role(request.user)
+
+    if role == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para excluir itens.')
+        return redirect('ferramentas_lista')
+    if role == 'user' and ferramenta.autor_email != request.user.email:
+        messages.error(request, '🚫 Você só pode excluir ferramentas que você mesmo criou.')
+        return redirect('ferramentas_lista')
+
     ferramenta.delete()
     messages.success(request, '✅ Ferramenta removida com sucesso!')
     return redirect('ferramentas_lista')
@@ -1114,13 +1198,10 @@ def admin_usuario_excluir(request, email):
     
     # Não permitir excluir a si mesmo
     if usuario.email == request.user.email:
-        messages.error(request, 'Você não pode excluir seu próprio usuário')
+        messages.error(request, 'Você não pode excluir seu próprio usuário.')
         return redirect('admin_usuarios')
-    
-    # Opcional: não excluir o usuário Django, apenas remover permissão
-    # usuario.delete()
-    
-    # Melhor: apenas desativar em vez de excluir
+
+    usuario.delete()
     messages.success(request, f'✅ Usuário {email} removido com sucesso!')
     return redirect('admin_usuarios')
 
