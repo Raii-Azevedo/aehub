@@ -20,15 +20,19 @@ class BaseModel(models.Model):
 # ============================================
 class AllowedEmail(models.Model):
     email = models.EmailField(primary_key=True)
-    role = models.CharField(max_length=10)
+    role = models.CharField(max_length=10, default='viewer')
     added_by = models.CharField(max_length=255, blank=True, null=True)
+    # These columns exist in the DB (created by early migrations).
+    # Declaring them here lets the ORM populate them automatically on save.
+    data_criacao = models.DateTimeField(auto_now_add=True, null=True)
+    data_atualizacao = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'allowed_emails'
-        managed = False  # 🔥 ESSENCIAL
+        managed = False  # 🔥 ESSENCIAL — Django does not create/alter this table
 
     def __str__(self):
-        return f"{self.email} - {self.role}"
+        return f"{self.email} ({self.role})"
 
 
 # ============================================

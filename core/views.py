@@ -222,9 +222,11 @@ def _validate_allowed_email(email):
     email = email.lower().strip()
 
     try:
-        AllowedEmail.objects.get(email=email)
+        # Use iexact so capitalisation differences (e.g. User@Artefact.com vs
+        # user@artefact.com) never block a valid email.
+        AllowedEmail.objects.get(email__iexact=email)
     except AllowedEmail.DoesNotExist:
-        return False, 'Email não autorizado'
+        return False, 'Email not authorized. Ask an admin to add your email to the access list.'
 
     return True, None
 
