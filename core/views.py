@@ -107,7 +107,6 @@ def criar_admin_se_nao_existir():
             email='admin@artefact.com',
             defaults={
                 'role': 'admin',
-                'nome': 'Administrador',
                 'added_by': 'system'
             }
         )
