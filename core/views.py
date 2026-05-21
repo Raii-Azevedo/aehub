@@ -371,35 +371,39 @@ def dashboard(request):
 
 
 def _get_top_contribuidores():
-    top = (
-        CasoUso.objects
-        .filter(ativo=True)
-        .values('autor_email')
-        .annotate(total_casos=Count('id'))
-        .order_by('-total_casos')[:5]
-    )
+    try:
+        top = (
+            CasoUso.objects
+            .filter(ativo=True)
+            .values('autor_email')
+            .annotate(total_casos=Count('id'))
+            .order_by('-total_casos')[:5]
+        )
 
-    resultado = []
+        resultado = []
 
-    for item in top:
-        email = item['autor_email']
+        for item in top:
+            email = item['autor_email']
 
-        try:
-            allowed = AllowedEmail.objects.get(email=email)
-            nome = allowed.email  # ou campo nome se tiver
-            role = allowed.role
-        except AllowedEmail.DoesNotExist:
-            nome = email
-            role = 'viewer'
+            try:
+                allowed = AllowedEmail.objects.get(email=email)
+                nome = allowed.email
+                role = allowed.role
+            except AllowedEmail.DoesNotExist:
+                nome = email
+                role = 'viewer'
 
-        resultado.append({
-            'email': email,
-            'nome': nome,
-            'role': role,
-            'total_casos': item['total_casos']
-        })
+            resultado.append({
+                'email': email,
+                'nome': nome,
+                'role': role,
+                'total_casos': item['total_casos']
+            })
 
-    return resultado
+        return resultado
+    except Exception:
+        # Column may not exist yet (before migration 0007 runs)
+        return []
 
 # ================== CASOS DE USO ==================
 
@@ -1031,15 +1035,28 @@ def gamificacao_ranking(request):
     
     for user in usuarios:
         # Contar contribuições usando email (mais confiável)
-        casos = CasoUso.objects.filter(
-            autor_email=user.email,
-            ativo=True
+        try:
+            casos = CasoUso.objects.filter(
+                autor_email=user.email,
+                ativo=True
             ).count()
-        
-        # Usar email para filtrar contribuições
-        videos = Video.objects.filter(autor_email=user.email).count()
-        materiais = Material.objects.filter(autor_email=user.email).count()
-        ferramentas = Ferramenta.objects.filter(autor_email=user.email).count()
+        except Exception:
+            casos = 0
+
+        try:
+            videos = Video.objects.filter(autor_email=user.email).count()
+        except Exception:
+            videos = 0
+
+        try:
+            materiais = Material.objects.filter(autor_email=user.email).count()
+        except Exception:
+            materiais = 0
+
+        try:
+            ferramentas = Ferramenta.objects.filter(autor_email=user.email).count()
+        except Exception:
+            ferramentas = 0
         
         # Calcular pontuação
         pontos_casos = casos * 10
