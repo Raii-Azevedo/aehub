@@ -5,13 +5,13 @@ from .models import AllowedEmail
 
 @admin.register(AllowedEmail)
 class AllowedEmailAdmin(admin.ModelAdmin):
-    list_display = ('email', 'role', 'added_by', 'role_badge')
+    list_display = ('email', 'nome', 'role', 'added_by', 'role_badge')
     list_filter = ('role',)
     search_fields = ('email', 'added_by')
     ordering = ('email',)
 
     # Which fields appear in the add/change form
-    fields = ('email', 'role', 'added_by')
+    fields = ('email', 'nome', 'role', 'added_by')
 
     def role_badge(self, obj):
         colors = {

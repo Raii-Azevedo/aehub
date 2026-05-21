@@ -17,9 +17,14 @@ class BaseModel(models.Model):
 # EMAILS AUTORIZADOS
 # ============================================
 class AllowedEmail(models.Model):
+    # The real DB column order (from the error log):
+    # id, email, role, nome, added_by, avatar, data_criacao, data_atualizacao, user_id
     email = models.EmailField(primary_key=True)
     role = models.CharField(max_length=10, default='viewer')
+    nome = models.CharField(max_length=255, blank=True, default='')  # NOT NULL in DB
     added_by = models.CharField(max_length=255, blank=True, null=True)
+    # avatar is an ImageField in DB but we treat it as nullable text to avoid media deps
+    avatar = models.TextField(blank=True, null=True)
     data_criacao = models.DateTimeField(auto_now_add=True, null=True)
     data_atualizacao = models.DateTimeField(auto_now=True)
 
