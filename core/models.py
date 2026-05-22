@@ -7,7 +7,7 @@ from django.contrib.auth.models import User
 # ============================================
 class BaseModel(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True, null=True)
-    data_atualizacao = models.DateTimeField(auto_now=True)
+    data_atualizacao = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -26,7 +26,7 @@ class AllowedEmail(models.Model):
     # avatar is an ImageField in DB but we treat it as nullable text to avoid media deps
     avatar = models.TextField(blank=True, null=True)
     data_criacao = models.DateTimeField(auto_now_add=True, null=True)
-    data_atualizacao = models.DateTimeField(auto_now=True)
+    data_atualizacao = models.DateTimeField(auto_now=True, null=True, blank=True)
 
     class Meta:
         db_table = 'allowed_emails'
@@ -51,7 +51,7 @@ class CasoUso(models.Model):
     autor_id = models.IntegerField(null=True, blank=True)  # FK to auth_user (NOT NULL in DB — must supply)
     ativo = models.BooleanField()
     data_criacao = models.DateTimeField()
-    data_atualizacao = models.DateTimeField()
+    data_atualizacao = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = 'casos_uso'
@@ -192,7 +192,7 @@ class Video(models.Model):
     descricao = models.TextField(blank=True, null=True)
     tema = models.CharField(max_length=500)   # expanded from legacy varchar(20) via migration 0009
     nivel = models.CharField(max_length=100)  # expanded from legacy varchar(20) via migration 0009
-    duracao = models.CharField(max_length=20, blank=True, null=True)
+    duracao = models.TextField(blank=True, null=True)  # expanded from varchar(20) via migration 0011
     youtube_id = models.TextField(blank=True, null=True)
     thumbnail_url = models.TextField(blank=True, null=True)
     autor = models.CharField(max_length=255)

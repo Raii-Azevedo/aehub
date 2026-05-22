@@ -97,6 +97,11 @@ def normalize_video_url(url_or_id):
     return (url_or_id or '').strip()
 
 
+def normalize_video_author(author):
+    """Compatibiliza o autor com a coluna legado enquanto a migration não está aplicada."""
+    return (author or '').strip()[:20]
+
+
 def _get_favoritos_ids(user_email, content_type):
     """Returns list of bookmarked object_ids for the user. Returns [] if the table doesn't exist yet."""
     try:
@@ -777,7 +782,7 @@ def video_novo(request):
         return redirect('videos_lista')
 
     if request.method == 'POST':
-        autor = request.POST.get('autor', request.user.get_full_name() or request.user.username)
+        autor = normalize_video_author(request.POST.get('autor') or request.user.username)
         youtube_id = normalize_video_url(request.POST.get('youtube_id', ''))
         
         agora_video = timezone.now()
@@ -822,7 +827,7 @@ def video_editar(request, id):
         video.nivel = request.POST.get('nivel')
         video.duracao = request.POST.get('duracao', '')
         video.youtube_id = youtube_id
-        video.autor = request.POST.get('autor', video.autor)
+        video.autor = normalize_video_author(request.POST.get('autor', video.autor))
         video.data_atualizacao = timezone.now()
         video.save()
         messages.success(request, '✅ Video updated successfully!')
@@ -1621,27 +1626,27 @@ def _calcular_badges(casos, videos, materiais, ferramentas, snippets):
     total = casos + videos + materiais + ferramentas + snippets
 
     if casos >= 1:
-        badges.append({'icon': '📋', 'nome': 'Case Maker', 'desc': 'Registrou pelo menos 1 caso de uso'})
+        badges.append({'icon': '📋', 'nome': 'Case Maker', 'desc': 'Registered at least 1 use case'})
     if casos >= 5:
-        badges.append({'icon': '🧠', 'nome': 'Case Expert', 'desc': '5+ casos de uso registrados'})
+        badges.append({'icon': '🧠', 'nome': 'Case Expert', 'desc': '5+ use cases registered'})
     if casos >= 10:
-        badges.append({'icon': '🏛️', 'nome': 'Case Master', 'desc': '10+ casos de uso registrados'})
+        badges.append({'icon': '🏛️', 'nome': 'Case Master', 'desc': '10+ use cases registered'})
     if videos >= 1:
-        badges.append({'icon': '🎬', 'nome': 'Video Creator', 'desc': 'Publicou pelo menos 1 vídeo'})
+        badges.append({'icon': '🎬', 'nome': 'Video Creator', 'desc': 'Published at least 1 video'})
     if videos >= 5:
-        badges.append({'icon': '📹', 'nome': 'Content Pro', 'desc': '5+ vídeos publicados'})
+        badges.append({'icon': '📹', 'nome': 'Content Pro', 'desc': '5+ videos published'})
     if materiais >= 3:
-        badges.append({'icon': '📚', 'nome': 'Bibliophile', 'desc': '3+ materiais compartilhados'})
+        badges.append({'icon': '📚', 'nome': 'Bibliophile', 'desc': '3+ materials shared'})
     if ferramentas >= 2:
-        badges.append({'icon': '🔧', 'nome': 'Tool Guru', 'desc': '2+ ferramentas catalogadas'})
+        badges.append({'icon': '🔧', 'nome': 'Tool Guru', 'desc': '2+ tools cataloged'})
     if snippets >= 3:
-        badges.append({'icon': '💻', 'nome': 'Code Sharer', 'desc': '3+ snippets publicados'})
+        badges.append({'icon': '💻', 'nome': 'Code Sharer', 'desc': '3+ snippets published'})
     if total >= 10:
-        badges.append({'icon': '⭐', 'nome': 'Contributor', 'desc': '10+ contribuições no total'})
+        badges.append({'icon': '⭐', 'nome': 'Contributor', 'desc': '10+ total contributions'})
     if total >= 25:
-        badges.append({'icon': '🚀', 'nome': 'Power User', 'desc': '25+ contribuições no total'})
+        badges.append({'icon': '🚀', 'nome': 'Power User', 'desc': '25+ total contributions'})
     if total >= 50:
-        badges.append({'icon': '🏆', 'nome': 'AE Legend', 'desc': '50+ contribuições — lenda do time!'})
+        badges.append({'icon': '🏆', 'nome': 'AE Legend', 'desc': '50+ contributions - team legend!'})
 
     return badges
 
