@@ -651,15 +651,22 @@ def material_novo(request):
         return redirect('materiais_lista')
 
     if request.method == 'POST':
+        agora = timezone.now()
+        try:
+            allowed_mat = AllowedEmail.objects.get(email=request.user.email)
+            nome_autor_mat = allowed_mat.nome or request.user.email
+        except AllowedEmail.DoesNotExist:
+            nome_autor_mat = request.user.get_full_name() or request.user.email
         material = Material.objects.create(
             titulo=request.POST.get('titulo'),
             tipo=request.POST.get('tipo'),
             topicos=request.POST.get('topicos', ''),
             descricao=request.POST.get('descricao'),
             url=request.POST.get('url', ''),
-            autor=request.user.get_full_name() or request.user.username,
+            autor=nome_autor_mat,
             autor_email=request.user.email,
-            data_criacao=timezone.now()
+            data_criacao=agora,
+            data_atualizacao=agora,
         )
         messages.success(request, '✅ Material added successfully!')
         return redirect('materiais_lista')
@@ -689,6 +696,7 @@ def material_editar(request, id):
         material.topicos = request.POST.get('topicos', '')
         material.descricao = request.POST.get('descricao')
         material.url = request.POST.get('url', '')
+        material.data_atualizacao = timezone.now()
         material.save()
         messages.success(request, '✅ Material updated successfully!')
         return redirect('materiais_lista')

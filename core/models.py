@@ -89,6 +89,7 @@ class Material(models.Model):
     autor = models.TextField()
     autor_email = models.EmailField()
     data_criacao = models.DateTimeField()
+    data_atualizacao = models.DateTimeField(null=True, blank=True)  # NOT NULL in DB — must supply on create
 
     class Meta:
         db_table = 'materiais'
@@ -242,7 +243,6 @@ class Favorito(models.Model):
 
     class Meta:
         db_table = 'favoritos'
-        unique_together = ('usuario_email', 'content_type', 'object_id')
         ordering = ['-data_criacao']
 
     def __str__(self):
