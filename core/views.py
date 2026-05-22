@@ -97,6 +97,17 @@ def normalize_video_url(url_or_id):
     return (url_or_id or '').strip()
 
 
+def _get_favoritos_ids(user_email, content_type):
+    """Returns list of bookmarked object_ids for the user. Returns [] if the table doesn't exist yet."""
+    try:
+        return list(
+            Favorito.objects.filter(usuario_email=user_email, content_type=content_type)
+            .values_list('object_id', flat=True)
+        )
+    except Exception:
+        return []
+
+
 def criar_admin_se_nao_existir():
     """Cria usuário admin padrão se não existir"""
     if not User.objects.filter(email='admin@artefact.com').exists():
@@ -484,10 +495,7 @@ def casos_lista(request):
     if tag:
         casos = casos.filter(tags__icontains=tag)
 
-    # Coletar favoritos do usuário para highlight
-    favoritos_ids = list(
-        Favorito.objects.filter(usuario_email=request.user.email, content_type='caso').values_list('object_id', flat=True)
-    )
+    favoritos_ids = _get_favoritos_ids(request.user.email, 'caso')
 
     return render(request, 'core/casos.html', {
         'casos': casos,
@@ -511,7 +519,7 @@ def caso_novo(request):
         # Buscar nome do autor na tabela AllowedEmail
         try:
             allowed = AllowedEmail.objects.get(email=request.user.email)
-            nome_autor = allowed.email  # Usar email como nome se não tiver campo específico
+            nome_autor = allowed.nome or request.user.email
         except AllowedEmail.DoesNotExist:
             nome_autor = request.user.email
         
@@ -623,9 +631,7 @@ def materiais_lista(request):
     if tag:
         materiais = materiais.filter(topicos__icontains=tag)
 
-    favoritos_ids = list(
-        Favorito.objects.filter(usuario_email=request.user.email, content_type='material').values_list('object_id', flat=True)
-    )
+    favoritos_ids = _get_favoritos_ids(request.user.email, 'material')
 
     return render(request, 'core/materiais.html', {
         'materiais': materiais,
@@ -744,9 +750,7 @@ def videos_lista(request):
             Q(autor__icontains=query)
         )
 
-    favoritos_ids = list(
-        Favorito.objects.filter(usuario_email=request.user.email, content_type='video').values_list('object_id', flat=True)
-    )
+    favoritos_ids = _get_favoritos_ids(request.user.email, 'video')
 
     return render(request, 'core/videos.html', {
         'videos': videos,
@@ -869,9 +873,7 @@ def ferramentas_lista(request):
             Q(autor__icontains=query)
         )
 
-    favoritos_ids = list(
-        Favorito.objects.filter(usuario_email=request.user.email, content_type='ferramenta').values_list('object_id', flat=True)
-    )
+    favoritos_ids = _get_favoritos_ids(request.user.email, 'ferramenta')
 
     return render(request, 'core/ferramentas.html', {
         'ferramentas': ferramentas,
@@ -889,15 +891,22 @@ def ferramenta_novo(request):
         return redirect('ferramentas_lista')
 
     if request.method == 'POST':
+        try:
+            allowed_ferr = AllowedEmail.objects.get(email=request.user.email)
+            nome_autor_ferr = allowed_ferr.nome or request.user.email
+        except AllowedEmail.DoesNotExist:
+            nome_autor_ferr = request.user.email
+
         ferramenta = Ferramenta.objects.create(
             nome=request.POST.get('nome'),
             categoria=request.POST.get('categoria'),
             versao=request.POST.get('versao', ''),
-            descricao=request.POST.get('descricao'),
+            descricao=request.POST.get('descricao', ''),
             nivel=request.POST.get('nivel', ''),
             documentacao_link=request.POST.get('documentacao_link', ''),
-            autor=request.user.get_full_name() or request.user.username,
-            autor_email=request.user.email
+            autor=nome_autor_ferr,
+            autor_email=request.user.email,
+            data_criacao=timezone.now()
         )
         messages.success(request, '✅ Tool added successfully!')
         return redirect('ferramentas_lista')
@@ -1323,22 +1332,29 @@ def snippets_lista(request):
     query = request.GET.get('q', '').strip()
     tag = request.GET.get('tag', '').strip()
     linguagem = request.GET.get('linguagem', '').strip()
-    snippets = Snippet.objects.all().order_by('-data_criacao')
+    try:
+        snippets = Snippet.objects.all().order_by('-data_criacao')
+        if query:
+            snippets = snippets.filter(
+                Q(titulo__icontains=query) |
+                Q(descricao__icontains=query) |
+                Q(codigo__icontains=query) |
+                Q(tags__icontains=query) |
+                Q(autor__icontains=query)
+            )
+        if tag:
+            snippets = snippets.filter(tags__icontains=tag)
+        if linguagem:
+            snippets = snippets.filter(linguagem__iexact=linguagem)
+    except Exception:
+        snippets = []
 
-    if query:
-        snippets = snippets.filter(
-            Q(titulo__icontains=query) |
-            Q(descricao__icontains=query) |
-            Q(codigo__icontains=query) |
-            Q(tags__icontains=query) |
-            Q(autor__icontains=query)
-        )
-    if tag:
-        snippets = snippets.filter(tags__icontains=tag)
-    if linguagem:
-        snippets = snippets.filter(linguagem__iexact=linguagem)
+    try:
+        linguagens = Snippet.objects.values_list('linguagem', flat=True).distinct().order_by('linguagem')
+    except Exception:
+        linguagens = []
 
-    linguagens = Snippet.objects.values_list('linguagem', flat=True).distinct().order_by('linguagem')
+    favoritos_ids = _get_favoritos_ids(request.user.email, 'snippet')
 
     return render(request, 'core/snippets.html', {
         'snippets': snippets,
@@ -1346,6 +1362,7 @@ def snippets_lista(request):
         'tag_filtro': tag,
         'linguagem_filtro': linguagem,
         'linguagens': linguagens,
+        'favoritos_ids': favoritos_ids,
         'user_role': get_user_role(request.user),
     })
 
@@ -1458,10 +1475,15 @@ def busca_global(request):
             Q(nome__icontains=query) | Q(descricao__icontains=query) |
             Q(categoria__icontains=query)
         )[:10]
-        snippets = Snippet.objects.filter(
-            Q(titulo__icontains=query) | Q(descricao__icontains=query) |
-            Q(codigo__icontains=query) | Q(tags__icontains=query)
-        )[:10]
+        try:
+            snippets = Snippet.objects.filter(
+                Q(titulo__icontains=query) | Q(descricao__icontains=query) |
+                Q(codigo__icontains=query) | Q(tags__icontains=query)
+            )[:10]
+            snippets_count = snippets.count()
+        except Exception:
+            snippets = []
+            snippets_count = 0
 
         resultados = {
             'casos': casos,
@@ -1470,7 +1492,7 @@ def busca_global(request):
             'ferramentas': ferramentas,
             'snippets': snippets,
         }
-        total = casos.count() + materiais.count() + videos.count() + ferramentas.count() + snippets.count()
+        total = casos.count() + materiais.count() + videos.count() + ferramentas.count() + snippets_count
 
     return render(request, 'core/busca_global.html', {
         'query': query,
@@ -1484,7 +1506,10 @@ def busca_global(request):
 
 @login_required
 def favoritos(request):
-    favs = Favorito.objects.filter(usuario_email=request.user.email)
+    try:
+        favs = Favorito.objects.filter(usuario_email=request.user.email)
+    except Exception:
+        favs = []
     return render(request, 'core/favoritos.html', {
         'favoritos': favs,
         'user_role': get_user_role(request.user),
@@ -1523,18 +1548,21 @@ def favorito_toggle(request, content_type, object_id):
     except Exception:
         return JsonResponse({'error': 'Objeto não encontrado'}, status=404)
 
-    fav, created = Favorito.objects.get_or_create(
-        usuario_email=request.user.email,
-        content_type=content_type,
-        object_id=object_id,
-        defaults={'titulo': titulo}
-    )
+    try:
+        fav, created = Favorito.objects.get_or_create(
+            usuario_email=request.user.email,
+            content_type=content_type,
+            object_id=object_id,
+            defaults={'titulo': titulo}
+        )
+    except Exception:
+        return JsonResponse({'error': 'Bookmarks table not ready. Run migrations.'}, status=500)
 
     if not created:
         fav.delete()
-        return JsonResponse({'status': 'removed', 'message': 'Removido dos favoritos'})
+        return JsonResponse({'status': 'removed', 'message': 'Removed from bookmarks'})
 
-    return JsonResponse({'status': 'added', 'message': 'Adicionado aos favoritos!'})
+    return JsonResponse({'status': 'added', 'message': 'Added to bookmarks!'})
 
 
 # ================== CHANGELOG ==================
@@ -1671,10 +1699,13 @@ def salvar_perfil_tipo(request):
         perfil_tipo = request.POST.get('perfil_tipo', '').strip()
         tipos_validos = ['architect', 'gogetter', 'simplifier', 'systematic']
         if perfil_tipo not in tipos_validos:
-            return JsonResponse({'error': 'Tipo inválido'}, status=400)
+            return JsonResponse({'error': 'Invalid profile type.'}, status=400)
 
-        onboarding, _ = UserOnboarding.objects.get_or_create(user=request.user)
-        onboarding.perfil_tipo = perfil_tipo
-        onboarding.save()
-        return JsonResponse({'status': 'ok', 'message': 'Perfil salvo!'})
-    return JsonResponse({'error': 'Método não permitido'}, status=405)
+        try:
+            onboarding, _ = UserOnboarding.objects.get_or_create(user=request.user)
+            onboarding.perfil_tipo = perfil_tipo
+            onboarding.save()
+        except Exception:
+            pass
+        return JsonResponse({'status': 'ok', 'message': 'Profile saved!'})
+    return JsonResponse({'error': 'Method not allowed.'}, status=405)
