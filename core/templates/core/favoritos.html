@@ -3,20 +3,19 @@
 
 {% block content %}
 <div class="mb-4">
-    <h1 class="mb-1">🔖 Meus Favoritos</h1>
-    <p class="text-white-50">Conteúdos que você salvou para consultar depois.</p>
+    <h1 class="mb-1">🔖 My Bookmarks</h1>
+    <p class="text-white-50">Content you saved to revisit later.</p>
 </div>
 
 {% if not favoritos %}
 <div class="card text-center py-5">
     <div class="card-body">
         <i class="bi bi-bookmark-heart" style="font-size: 3rem; opacity: 0.3;"></i>
-        <p class="text-white-50 mt-3">Você ainda não tem favoritos. Clique no ícone <i class="bi bi-bookmark"></i> em qualquer conteúdo para salvar aqui.</p>
+        <p class="text-white-50 mt-3">No bookmarks yet. Click the <i class="bi bi-bookmark"></i> icon on any content to save it here.</p>
     </div>
 </div>
 {% else %}
 
-<!-- Agrupar por tipo -->
 {% regroup favoritos by content_type as grupos %}
 
 {% for grupo in grupos %}
@@ -36,8 +35,8 @@
         {% for fav in grupo.list %}
         <div class="p-3 border-bottom border-light d-flex justify-content-between align-items-center">
             <div>
-                <strong>{{ fav.titulo|default:"(sem título)" }}</strong>
-                <div class="small text-white-50">Salvo em {{ fav.data_criacao|date:"d/m/Y" }}</div>
+                <strong>{{ fav.titulo|default:"(no title)" }}</strong>
+                <div class="small text-white-50">Saved on {{ fav.data_criacao|date:"d/m/Y" }}</div>
             </div>
             <div class="d-flex gap-2">
                 <a href="
@@ -46,12 +45,12 @@
                     {% elif grupo.grouper == 'video' %}{% url 'videos_lista' %}
                     {% elif grupo.grouper == 'ferramenta' %}{% url 'ferramentas_lista' %}
                     {% elif grupo.grouper == 'snippet' %}{% url 'snippets_lista' %}
-                    {% endif %}" class="btn btn-sm btn-outline-light" title="Ver conteúdo">
+                    {% endif %}" class="btn btn-sm btn-outline-light" title="Go to content">
                     <i class="bi bi-arrow-right"></i>
                 </a>
                 <button class="btn btn-sm btn-outline-danger remove-fav-btn"
                         data-tipo="{{ grupo.grouper }}" data-id="{{ fav.object_id }}"
-                        data-csrf="{{ csrf_token }}" title="Remover favorito">
+                        data-csrf="{{ csrf_token }}" title="Remove bookmark">
                     <i class="bi bi-bookmark-x"></i>
                 </button>
             </div>

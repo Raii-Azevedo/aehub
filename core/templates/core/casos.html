@@ -29,7 +29,7 @@
 <div class="mb-3">
     <span class="text-white-50">Tag:</span>
     <span class="badge bg-primary ms-1">{{ tag_filtro }}</span>
-    <a href="{% url 'casos_lista' %}{% if query %}?q={{ query }}{% endif %}" class="text-white-50 small ms-2">✕ remover</a>
+    <a href="{% url 'casos_lista' %}{% if query %}?q={{ query }}{% endif %}" class="text-white-50 small ms-2">✕ remove</a>
 </div>
 {% endif %}
 
@@ -42,7 +42,7 @@
                 <div class="d-flex justify-content-between align-items-start mb-1">
                     <h5 class="card-title mb-0">{{ caso.titulo }}</h5>
                     <button class="btn btn-sm fav-btn ms-2 {% if caso.id in favoritos_ids %}btn-warning{% else %}btn-outline-secondary{% endif %}"
-                            onclick="toggleFavorito('caso', {{ caso.id }}, this)" title="Favoritar">
+                            onclick="toggleFavorito('caso', {{ caso.id }}, this)" title="Bookmark">
                         <i class="bi bi-bookmark{% if caso.id in favoritos_ids %}-fill{% endif %}"></i>
                     </button>
                 </div>

@@ -3,20 +3,20 @@
 
 {% block content %}
 <div class="mb-4">
-    <h1 class="mb-1">🔍 Busca Global</h1>
+    <h1 class="mb-1">🔍 Global Search</h1>
     {% if query %}
-    <p class="text-white-50">{{ total }} resultado{{ total|pluralize:"s" }} para <strong>"{{ query }}"</strong></p>
+    <p class="text-white-50">{{ total }} result{{ total|pluralize }} for <strong>"{{ query }}"</strong></p>
     {% else %}
-    <p class="text-white-50">Digite algo para buscar em todo o hub.</p>
+    <p class="text-white-50">Type something to search across the entire hub.</p>
     {% endif %}
 </div>
 
 <form method="get" class="mb-4">
     <div class="input-group">
         <input type="text" name="q" class="form-control form-control-lg bg-dark text-white border-secondary"
-               placeholder="Buscar em casos, materiais, vídeos, ferramentas, snippets..."
+               placeholder="Search cases, materials, videos, tools, snippets..."
                value="{{ query }}" autofocus>
-        <button class="btn btn-gradient btn-lg" type="submit"><i class="bi bi-search me-1"></i> Buscar</button>
+        <button class="btn btn-gradient btn-lg" type="submit"><i class="bi bi-search me-1"></i> Search</button>
     </div>
 </form>
 
@@ -24,7 +24,7 @@
 <div class="card text-center py-5">
     <div class="card-body">
         <i class="bi bi-search" style="font-size: 3rem; opacity: 0.3;"></i>
-        <p class="text-white-50 mt-3">Nenhum resultado encontrado para "{{ query }}".</p>
+        <p class="text-white-50 mt-3">No results found for "{{ query }}".</p>
     </div>
 </div>
 {% endif %}
@@ -50,7 +50,7 @@
         {% endfor %}
     </div>
     <div class="card-footer bg-transparent border-light text-end">
-        <a href="{% url 'casos_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">Ver todos em Cases →</a>
+        <a href="{% url 'casos_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">View all in Cases →</a>
     </div>
 </div>
 {% endif %}
@@ -68,12 +68,12 @@
                 <span class="badge bg-info text-dark">{{ mat.tipo }}</span>
             </div>
             <p class="small text-white-50 mb-0">{{ mat.descricao|truncatewords:20 }}</p>
-            {% if mat.url %}<a href="{{ mat.url }}" target="_blank" class="small text-info">🔗 Acessar</a>{% endif %}
+            {% if mat.url %}<a href="{{ mat.url }}" target="_blank" class="small text-info">🔗 Open</a>{% endif %}
         </div>
         {% endfor %}
     </div>
     <div class="card-footer bg-transparent border-light text-end">
-        <a href="{% url 'materiais_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">Ver todos em Materials →</a>
+        <a href="{% url 'materiais_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">View all in Materials →</a>
     </div>
 </div>
 {% endif %}
@@ -90,7 +90,7 @@
                 <strong>{{ video.titulo }}</strong>
                 <div>
                     <span class="badge bg-secondary me-1">{{ video.tema }}</span>
-                    <span class="badge bg-outline-light">{{ video.nivel }}</span>
+                    <span class="badge bg-secondary">{{ video.nivel }}</span>
                 </div>
             </div>
             <p class="small text-white-50 mb-0">{{ video.descricao|truncatewords:20 }}</p>
@@ -98,7 +98,7 @@
         {% endfor %}
     </div>
     <div class="card-footer bg-transparent border-light text-end">
-        <a href="{% url 'videos_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">Ver todos em Videos →</a>
+        <a href="{% url 'videos_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">View all in Videos →</a>
     </div>
 </div>
 {% endif %}
@@ -120,7 +120,7 @@
         {% endfor %}
     </div>
     <div class="card-footer bg-transparent border-light text-end">
-        <a href="{% url 'ferramentas_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">Ver todos em Tools →</a>
+        <a href="{% url 'ferramentas_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">View all in Tools →</a>
     </div>
 </div>
 {% endif %}
@@ -142,7 +142,7 @@
         {% endfor %}
     </div>
     <div class="card-footer bg-transparent border-light text-end">
-        <a href="{% url 'snippets_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">Ver todos em Snippets →</a>
+        <a href="{% url 'snippets_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">View all in Snippets →</a>
     </div>
 </div>
 {% endif %}

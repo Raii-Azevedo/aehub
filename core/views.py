@@ -265,7 +265,7 @@ def google_login_view(request):
         return redirect('boas_vindas')
 
     if not _is_google_auth_configured():
-        messages.error(request, 'Login Google não configurado no servidor.')
+        messages.error(request, 'Google login is not configured on the server.')
         return redirect('login')
 
     state = secrets.token_urlsafe(32)
@@ -289,23 +289,23 @@ def google_login_view(request):
 
 def google_callback_view(request):
     if not _is_google_auth_configured():
-        messages.error(request, 'Login Google não configurado no servidor.')
+        messages.error(request, 'Google login is not configured on the server.')
         return redirect('login')
 
     if request.GET.get('error'):
-        messages.error(request, 'Autenticação Google cancelada ou recusada.')
+        messages.error(request, 'Google authentication was cancelled or denied.')
         return redirect('login')
 
     expected_state = request.session.pop('google_oauth_state', None)
     received_state = request.GET.get('state')
 
     if not expected_state or expected_state != received_state:
-        messages.error(request, 'Falha de validação no retorno do Google. Tente novamente.')
+        messages.error(request, 'Google callback validation failed. Please try again.')
         return redirect('login')
 
     code = request.GET.get('code')
     if not code:
-        messages.error(request, 'Código de autenticação do Google não recebido.')
+        messages.error(request, 'Google authentication code was not received.')
         return redirect('login')
 
     try:
@@ -313,26 +313,26 @@ def google_callback_view(request):
         id_token = token_data.get('id_token')
         token_info = _fetch_google_token_info(id_token)
     except error.HTTPError:
-        messages.error(request, 'Não foi possível validar o login com Google.')
+        messages.error(request, 'Could not validate Google login.')
         return redirect('login')
     except error.URLError:
-        messages.error(request, 'Falha de comunicação com o Google. Tente novamente.')
+        messages.error(request, 'Communication with Google failed. Please try again.')
         return redirect('login')
     except json.JSONDecodeError:
-        messages.error(request, 'Resposta inválida recebida do Google.')
+        messages.error(request, 'Invalid response received from Google.')
         return redirect('login')
 
     if token_info.get('aud') != settings.GOOGLE_OAUTH_CLIENT_ID:
-        messages.error(request, 'Token Google inválido para esta aplicação.')
+        messages.error(request, 'Google token is invalid for this application.')
         return redirect('login')
 
     email = (token_info.get('email') or '').lower().strip()
     if not email:
-        messages.error(request, 'Conta Google sem email disponível.')
+        messages.error(request, 'Google account has no email available.')
         return redirect('login')
 
     if str(token_info.get('email_verified', '')).lower() != 'true':
-        messages.error(request, 'A conta Google precisa ter email verificado.')
+        messages.error(request, 'The Google account must have a verified email.')
         return redirect('login')
 
     expected_domain = (settings.GOOGLE_WORKSPACE_DOMAIN or '').lower().strip()
@@ -340,11 +340,11 @@ def google_callback_view(request):
     hosted_domain = (token_info.get('hd') or '').lower().strip()
 
     if expected_domain and email_domain != expected_domain:
-        messages.error(request, 'Use sua conta corporativa da Artefact para acessar.')
+        messages.error(request, 'Please use your Artefact corporate account to log in.')
         return redirect('login')
 
     if expected_domain and hosted_domain and hosted_domain != expected_domain:
-        messages.error(request, 'A conta Google autenticada não pertence ao workspace permitido.')
+        messages.error(request, 'The authenticated Google account does not belong to the allowed workspace.')
         return redirect('login')
 
     is_allowed, error_message = _validate_allowed_email(email)
@@ -354,7 +354,7 @@ def google_callback_view(request):
 
     user = _get_or_create_local_user(email)
     login(request, user)
-    messages.success(request, f'Login realizado com {email}.')
+    messages.success(request, f'Logged in as {email}.')
     return redirect('boas_vindas')
 
 
@@ -502,7 +502,7 @@ def casos_lista(request):
 def caso_novo(request):
     """Criar novo caso de uso"""
     if get_user_role(request.user) == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para adicionar itens.')
+        messages.error(request, '🚫 You do not have permission to add items.')
         return redirect('casos_lista')
 
     if request.method == 'POST':
@@ -528,7 +528,7 @@ def caso_novo(request):
             data_criacao=agora,
             data_atualizacao=agora
         )
-        messages.success(request, '✅ Caso adicionado com sucesso!')
+        messages.success(request, '✅ Case added successfully!')
         return redirect('casos_lista')
     
     # GET: retornar para lista
@@ -542,10 +542,10 @@ def caso_editar(request, id):
     role = get_user_role(request.user)
 
     if role == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para editar itens.')
+        messages.error(request, '🚫 You do not have permission to edit items.')
         return redirect('casos_lista')
     if role == 'user' and caso.autor_email != request.user.email:
-        messages.error(request, '🚫 Você só pode editar casos que você mesmo criou.')
+        messages.error(request, '🚫 You can only edit cases you created yourself.')
         return redirect('casos_lista')
 
     if request.method == 'POST':
@@ -557,7 +557,7 @@ def caso_editar(request, id):
         caso.tags = request.POST.get('tags', '')
         caso.data_atualizacao = timezone.now()
         caso.save()
-        messages.success(request, '✅ Caso atualizado com sucesso!')
+        messages.success(request, '✅ Case updated successfully!')
         return redirect('casos_lista')
     
     # GET não é tratado - formulário é renderizado em modal no template
@@ -571,15 +571,15 @@ def caso_excluir(request, id):
     role = get_user_role(request.user)
 
     if role == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para excluir itens.')
+        messages.error(request, '🚫 You do not have permission to delete items.')
         return redirect('casos_lista')
     if role == 'user' and caso.autor_email != request.user.email:
-        messages.error(request, '🚫 Você só pode excluir casos que você mesmo criou.')
+        messages.error(request, '🚫 You can only delete cases you created yourself.')
         return redirect('casos_lista')
 
     caso.ativo = False
     caso.save()
-    messages.success(request, '✅ Caso removido com sucesso!')
+    messages.success(request, '✅ Case deleted successfully!')
     return redirect('casos_lista')
 
 
@@ -640,7 +640,7 @@ def materiais_lista(request):
 def material_novo(request):
     """Criar novo material"""
     if get_user_role(request.user) == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para adicionar itens.')
+        messages.error(request, '🚫 You do not have permission to add items.')
         return redirect('materiais_lista')
 
     if request.method == 'POST':
@@ -654,7 +654,7 @@ def material_novo(request):
             autor_email=request.user.email,
             data_criacao=timezone.now()
         )
-        messages.success(request, '✅ Material adicionado com sucesso!')
+        messages.success(request, '✅ Material added successfully!')
         return redirect('materiais_lista')
     
     # GET: mostrar formulário
@@ -670,10 +670,10 @@ def material_editar(request, id):
     role = get_user_role(request.user)
 
     if role == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para editar itens.')
+        messages.error(request, '🚫 You do not have permission to edit items.')
         return redirect('materiais_lista')
     if role == 'user' and material.autor_email != request.user.email:
-        messages.error(request, '🚫 Você só pode editar materiais que você mesmo criou.')
+        messages.error(request, '🚫 You can only edit materials you created yourself.')
         return redirect('materiais_lista')
 
     if request.method == 'POST':
@@ -683,7 +683,7 @@ def material_editar(request, id):
         material.descricao = request.POST.get('descricao')
         material.url = request.POST.get('url', '')
         material.save()
-        messages.success(request, '✅ Material atualizado com sucesso!')
+        messages.success(request, '✅ Material updated successfully!')
         return redirect('materiais_lista')
     
     # GET: mostrar formulário com dados
@@ -701,14 +701,14 @@ def material_excluir(request, id):
     role = get_user_role(request.user)
 
     if role == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para excluir itens.')
+        messages.error(request, '🚫 You do not have permission to delete items.')
         return redirect('materiais_lista')
     if role == 'user' and material.autor_email != request.user.email:
-        messages.error(request, '🚫 Você só pode excluir materiais que você mesmo criou.')
+        messages.error(request, '🚫 You can only delete materials you created yourself.')
         return redirect('materiais_lista')
 
     material.delete()
-    messages.success(request, '✅ Material removido com sucesso!')
+    messages.success(request, '✅ Material deleted successfully!')
     return redirect('materiais_lista')
 
 
@@ -760,7 +760,7 @@ def videos_lista(request):
 def video_novo(request):
     """Criar novo vídeo"""
     if get_user_role(request.user) == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para adicionar itens.')
+        messages.error(request, '🚫 You do not have permission to add items.')
         return redirect('videos_lista')
 
     if request.method == 'POST':
@@ -778,7 +778,7 @@ def video_novo(request):
             autor_email=request.user.email,
             data_criacao=timezone.now()
         )
-        messages.success(request, '✅ Vídeo adicionado com sucesso!')
+        messages.success(request, '✅ Video added successfully!')
         return redirect('videos_lista')
     
     # GET: retornar para lista
@@ -792,10 +792,10 @@ def video_editar(request, id):
     role = get_user_role(request.user)
 
     if role == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para editar itens.')
+        messages.error(request, '🚫 You do not have permission to edit items.')
         return redirect('videos_lista')
     if role == 'user' and video.autor_email != request.user.email:
-        messages.error(request, '🚫 Você só pode editar vídeos que você mesmo criou.')
+        messages.error(request, '🚫 You can only edit videos you created yourself.')
         return redirect('videos_lista')
 
     if request.method == 'POST':
@@ -809,7 +809,7 @@ def video_editar(request, id):
         video.youtube_id = youtube_id
         video.autor = request.POST.get('autor', video.autor)
         video.save()
-        messages.success(request, '✅ Vídeo atualizado com sucesso!')
+        messages.success(request, '✅ Video updated successfully!')
         return redirect('videos_lista')
     
     # GET: retornar para lista
@@ -823,14 +823,14 @@ def video_excluir(request, id):
     role = get_user_role(request.user)
 
     if role == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para excluir itens.')
+        messages.error(request, '🚫 You do not have permission to delete items.')
         return redirect('videos_lista')
     if role == 'user' and video.autor_email != request.user.email:
-        messages.error(request, '🚫 Você só pode excluir vídeos que você mesmo criou.')
+        messages.error(request, '🚫 You can only delete videos you created yourself.')
         return redirect('videos_lista')
 
     video.delete()
-    messages.success(request, '✅ Vídeo removido com sucesso!')
+    messages.success(request, '✅ Video deleted successfully!')
     return redirect('videos_lista')
 
 
@@ -885,7 +885,7 @@ def ferramentas_lista(request):
 def ferramenta_novo(request):
     """Criar nova ferramenta"""
     if get_user_role(request.user) == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para adicionar itens.')
+        messages.error(request, '🚫 You do not have permission to add items.')
         return redirect('ferramentas_lista')
 
     if request.method == 'POST':
@@ -899,7 +899,7 @@ def ferramenta_novo(request):
             autor=request.user.get_full_name() or request.user.username,
             autor_email=request.user.email
         )
-        messages.success(request, '✅ Ferramenta adicionada com sucesso!')
+        messages.success(request, '✅ Tool added successfully!')
         return redirect('ferramentas_lista')
     
     # GET: mostrar formulário
@@ -915,10 +915,10 @@ def ferramenta_editar(request, id):
     role = get_user_role(request.user)
 
     if role == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para editar itens.')
+        messages.error(request, '🚫 You do not have permission to edit items.')
         return redirect('ferramentas_lista')
     if role == 'user' and ferramenta.autor_email != request.user.email:
-        messages.error(request, '🚫 Você só pode editar ferramentas que você mesmo criou.')
+        messages.error(request, '🚫 You can only edit tools you created yourself.')
         return redirect('ferramentas_lista')
 
     if request.method == 'POST':
@@ -929,7 +929,7 @@ def ferramenta_editar(request, id):
         ferramenta.nivel = request.POST.get('nivel', '')
         ferramenta.documentacao_link = request.POST.get('documentacao_link', '')
         ferramenta.save()
-        messages.success(request, '✅ Ferramenta atualizada com sucesso!')
+        messages.success(request, '✅ Tool updated successfully!')
         return redirect('ferramentas_lista')
     
     # GET: mostrar formulário com dados
@@ -947,14 +947,14 @@ def ferramenta_excluir(request, id):
     role = get_user_role(request.user)
 
     if role == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para excluir itens.')
+        messages.error(request, '🚫 You do not have permission to delete items.')
         return redirect('ferramentas_lista')
     if role == 'user' and ferramenta.autor_email != request.user.email:
-        messages.error(request, '🚫 Você só pode excluir ferramentas que você mesmo criou.')
+        messages.error(request, '🚫 You can only delete tools you created yourself.')
         return redirect('ferramentas_lista')
 
     ferramenta.delete()
-    messages.success(request, '✅ Ferramenta removida com sucesso!')
+    messages.success(request, '✅ Tool deleted successfully!')
     return redirect('ferramentas_lista')
 
 
@@ -997,7 +997,7 @@ def roadmap_index(request):
 def roadmap_progresso_editar(request, id):
     """Editar progresso de um pilar"""
     if get_user_role(request.user) != 'admin':
-        messages.error(request, 'Permissão negada. Apenas administradores.')
+        messages.error(request, 'Access denied. Admins only.')
         return redirect('roadmap_index')
     
     progresso = get_object_or_404(RoadmapProgresso, id=id)
@@ -1008,7 +1008,7 @@ def roadmap_progresso_editar(request, id):
             if novo_progresso is not None:
                 progresso.progresso = int(novo_progresso)
                 progresso.save()
-                messages.success(request, 'Progresso atualizado!')
+                messages.success(request, 'Progress updated!')
         except:
             pass
         return redirect('roadmap_index')
@@ -1039,7 +1039,7 @@ def roadmap_fase_atualizar(request, id):
 def roadmap_entrega_nova(request):
     """Criar nova entrega"""
     if get_user_role(request.user) != 'admin':
-        messages.error(request, 'Permissão negada. Apenas administradores.')
+        messages.error(request, 'Access denied. Admins only.')
         return redirect('roadmap_index')
     
     if request.method == 'POST':
@@ -1049,14 +1049,14 @@ def roadmap_entrega_nova(request):
         prazo_str = request.POST.get('prazo', '').strip()
         
         if not titulo or not responsavel or not prazo_str:
-            messages.error(request, '❌ Preencha todos os campos obrigatórios (Título, Responsável e Data).')
+            messages.error(request, '❌ Please fill in all required fields (Title, Owner, and Date).')
             return redirect('roadmap_index')
         
         # Converter prazo para DateField
         try:
             prazo = datetime.strptime(prazo_str, '%Y-%m-%d').date()
         except ValueError:
-            messages.error(request, '❌ Data inválida. Use o formato YYYY-MM-DD.')
+            messages.error(request, '❌ Invalid date. Use YYYY-MM-DD format.')
             return redirect('roadmap_index')
         
         try:
@@ -1069,9 +1069,9 @@ def roadmap_entrega_nova(request):
                 criado_por=request.user.username,
                 data_criacao=timezone.now()
             )
-            messages.success(request, '✅ Entrega adicionada com sucesso!')
+            messages.success(request, '✅ Delivery added successfully!')
         except Exception as e:
-            messages.error(request, f'❌ Erro ao criar entrega: {str(e)}')
+            messages.error(request, f'❌ Error creating delivery: {str(e)}')
         
         return redirect('roadmap_index')
     
@@ -1206,7 +1206,7 @@ def gamificacao_ranking(request):
 def admin_usuarios(request):
     """Gerenciamento de usuários autorizados (apenas admin)"""
     if get_user_role(request.user) != 'admin':
-        messages.error(request, 'Acesso negado. Apenas administradores.')
+        messages.error(request, 'Access denied. Admins only.')
         return redirect('dashboard')
     
     usuarios = AllowedEmail.objects.all().order_by('-data_criacao')
@@ -1231,12 +1231,12 @@ def admin_usuario_novo(request):
         
         # Validar domínio
         if not email.endswith('@artefact.com'):
-            messages.error(request, 'O email deve ser do domínio @artefact.com')
+            messages.error(request, 'Email must be from the @artefact.com domain.')
             return redirect('admin_usuarios')
         
         # Verificar se já existe
         if AllowedEmail.objects.filter(email=email).exists():
-            messages.error(request, f'Email {email} já cadastrado')
+            messages.error(request, f'Email {email} is already registered.')
             return redirect('admin_usuarios')
         
         # Criar novo usuário na lista de permitidos
@@ -1256,7 +1256,7 @@ def admin_usuario_novo(request):
                 password=None
             )
         
-        messages.success(request, f'✅ Usuário {email} adicionado com sucesso!')
+        messages.success(request, f'✅ User {email} added successfully!')
         return redirect('admin_usuarios')
     
     # GET: mostrar formulário
@@ -1281,7 +1281,7 @@ def admin_usuario_editar(request, email):
         usuario.role = role
         usuario.nome = nome
         usuario.save()
-        messages.success(request, f'✅ Usuário {email} atualizado com sucesso!')
+        messages.success(request, f'✅ User {email} updated successfully!')
         return redirect('admin_usuarios')
     
     # GET: mostrar formulário com dados
@@ -1302,11 +1302,11 @@ def admin_usuario_excluir(request, email):
     
     # Não permitir excluir a si mesmo
     if usuario.email == request.user.email:
-        messages.error(request, 'Você não pode excluir seu próprio usuário.')
+        messages.error(request, 'You cannot delete your own user account.')
         return redirect('admin_usuarios')
 
     usuario.delete()
-    messages.success(request, f'✅ Usuário {email} removido com sucesso!')
+    messages.success(request, f'✅ User {email} deleted successfully!')
     return redirect('admin_usuarios')
 
 
@@ -1353,7 +1353,7 @@ def snippets_lista(request):
 @login_required
 def snippet_novo(request):
     if get_user_role(request.user) == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para adicionar itens.')
+        messages.error(request, '🚫 You do not have permission to add items.')
         return redirect('snippets_lista')
 
     if request.method == 'POST':
@@ -1373,7 +1373,7 @@ def snippet_novo(request):
             autor_email=request.user.email,
             data_criacao=timezone.now()
         )
-        messages.success(request, '✅ Snippet adicionado com sucesso!')
+        messages.success(request, '✅ Snippet added successfully!')
         return redirect('snippets_lista')
     return redirect('snippets_lista')
 
@@ -1384,10 +1384,10 @@ def snippet_editar(request, id):
     role = get_user_role(request.user)
 
     if role == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para editar.')
+        messages.error(request, '🚫 You do not have permission to edit.')
         return redirect('snippets_lista')
     if role == 'user' and snippet.autor_email != request.user.email:
-        messages.error(request, '🚫 Você só pode editar snippets que você mesmo criou.')
+        messages.error(request, '🚫 You can only edit snippets you created yourself.')
         return redirect('snippets_lista')
 
     if request.method == 'POST':
@@ -1397,7 +1397,7 @@ def snippet_editar(request, id):
         snippet.descricao = request.POST.get('descricao', '')
         snippet.tags = request.POST.get('tags', '')
         snippet.save()
-        messages.success(request, '✅ Snippet atualizado!')
+        messages.success(request, '✅ Snippet updated!')
         return redirect('snippets_lista')
     return redirect('snippets_lista')
 
@@ -1408,14 +1408,14 @@ def snippet_excluir(request, id):
     role = get_user_role(request.user)
 
     if role == 'viewer':
-        messages.error(request, '🚫 Você não tem permissão para excluir.')
+        messages.error(request, '🚫 You do not have permission to delete.')
         return redirect('snippets_lista')
     if role == 'user' and snippet.autor_email != request.user.email:
-        messages.error(request, '🚫 Você só pode excluir snippets que você mesmo criou.')
+        messages.error(request, '🚫 You can only delete snippets you created yourself.')
         return redirect('snippets_lista')
 
     snippet.delete()
-    messages.success(request, '✅ Snippet removido!')
+    messages.success(request, '✅ Snippet deleted!')
     return redirect('snippets_lista')
 
 
@@ -1611,7 +1611,7 @@ def perfil_usuario(request, email):
     try:
         allowed = AllowedEmail.objects.get(email=email)
     except AllowedEmail.DoesNotExist:
-        messages.error(request, 'Usuário não encontrado.')
+        messages.error(request, 'User not found.')
         return redirect('dashboard')
 
     # Contribuições
