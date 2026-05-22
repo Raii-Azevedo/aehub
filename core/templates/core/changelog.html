@@ -1,0 +1,196 @@
+{% extends 'core/base.html' %}
+{% load static hub_filters %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1 class="mb-1">✨ O que há de novo</h1>
+        <p class="text-white-50 mb-0">Acompanhe as últimas adições ao hub.</p>
+    </div>
+    <div>
+        <div class="btn-group">
+            <a href="?periodo=7" class="btn btn-sm {% if periodo == 7 %}btn-gradient{% else %}btn-outline-light{% endif %}">7 dias</a>
+            <a href="?periodo=30" class="btn btn-sm {% if periodo == 30 %}btn-gradient{% else %}btn-outline-light{% endif %}">30 dias</a>
+            <a href="?periodo=90" class="btn btn-sm {% if periodo == 90 %}btn-gradient{% else %}btn-outline-light{% endif %}">90 dias</a>
+        </div>
+    </div>
+</div>
+
+{% if total_novidades == 0 %}
+<div class="card text-center py-5">
+    <div class="card-body">
+        <i class="bi bi-clock-history" style="font-size: 3rem; opacity: 0.3;"></i>
+        <p class="text-white-50 mt-3">Nenhuma novidade nos últimos {{ periodo }} dias.</p>
+    </div>
+</div>
+{% else %}
+
+<!-- Resumo -->
+<div class="row mb-4">
+    <div class="col">
+        <div class="card text-center py-3">
+            <div class="card-body">
+                <h2 class="mb-1">{{ total_novidades }}</h2>
+                <p class="text-white-50 mb-0 small">novidade{{ total_novidades|pluralize:"s" }} nos últimos {{ periodo }} dias</p>
+            </div>
+        </div>
+    </div>
+    {% if novos_casos %}<div class="col">
+        <div class="card text-center py-3">
+            <div class="card-body">
+                <h2 class="mb-1">{{ novos_casos.count }}</h2>
+                <p class="text-white-50 mb-0 small">📋 Cases</p>
+            </div>
+        </div>
+    </div>{% endif %}
+    {% if novos_videos %}<div class="col">
+        <div class="card text-center py-3">
+            <div class="card-body">
+                <h2 class="mb-1">{{ novos_videos.count }}</h2>
+                <p class="text-white-50 mb-0 small">🎥 Videos</p>
+            </div>
+        </div>
+    </div>{% endif %}
+    {% if novos_materiais %}<div class="col">
+        <div class="card text-center py-3">
+            <div class="card-body">
+                <h2 class="mb-1">{{ novos_materiais.count }}</h2>
+                <p class="text-white-50 mb-0 small">📚 Materials</p>
+            </div>
+        </div>
+    </div>{% endif %}
+    {% if novos_snippets %}<div class="col">
+        <div class="card text-center py-3">
+            <div class="card-body">
+                <h2 class="mb-1">{{ novos_snippets.count }}</h2>
+                <p class="text-white-50 mb-0 small">💻 Snippets</p>
+            </div>
+        </div>
+    </div>{% endif %}
+</div>
+
+<!-- Cases -->
+{% if novos_casos %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0">📋 Novos Cases</h5>
+    </div>
+    <div class="card-body p-0">
+        {% for caso in novos_casos %}
+        <div class="p-3 border-bottom border-light">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <strong>{{ caso.titulo }}</strong>
+                    <div class="mt-1">
+                        <span class="badge bg-secondary me-1">{{ caso.contexto }}</span>
+                        <span class="badge bg-secondary">{{ caso.tecnologia }}</span>
+                        {% if caso.tags %}
+                        {% for tag in caso.tags|split:',' %}
+                        <a href="{% url 'casos_lista' %}?tag={{ tag }}" class="badge bg-secondary text-decoration-none">{{ tag }}</a>
+                        {% endfor %}
+                        {% endif %}
+                    </div>
+                    <p class="small text-white-50 mt-1 mb-0">{{ caso.descricao|truncatewords:20 }}</p>
+                </div>
+                <small class="text-white-50 text-nowrap ms-3">{{ caso.data_criacao|date:"d/m/Y" }}</small>
+            </div>
+            <small class="text-white-50">por {{ caso.autor }}</small>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Vídeos -->
+{% if novos_videos %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0">🎥 Novos Videos</h5>
+    </div>
+    <div class="card-body p-0">
+        {% for video in novos_videos %}
+        <div class="p-3 border-bottom border-light d-flex justify-content-between">
+            <div>
+                <strong>{{ video.titulo }}</strong>
+                <div class="mt-1">
+                    <span class="badge bg-secondary me-1">{{ video.tema }}</span>
+                    <span class="badge bg-secondary">{{ video.nivel }}</span>
+                    {% if video.duracao %}<span class="badge bg-secondary">{{ video.duracao }}</span>{% endif %}
+                </div>
+                <small class="text-white-50">por {{ video.autor }}</small>
+            </div>
+            <small class="text-white-50 text-nowrap ms-3">{{ video.data_criacao|date:"d/m/Y" }}</small>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Materiais -->
+{% if novos_materiais %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0">📚 Novos Materials</h5>
+    </div>
+    <div class="card-body p-0">
+        {% for mat in novos_materiais %}
+        <div class="p-3 border-bottom border-light d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ mat.titulo }}</strong>
+                <span class="badge bg-info text-dark ms-2">{{ mat.tipo }}</span>
+                {% if mat.url %}<a href="{{ mat.url }}" target="_blank" class="small text-info ms-2">🔗 Acessar</a>{% endif %}
+                <div class="small text-white-50 mt-1">{{ mat.descricao|truncatewords:15 }}</div>
+            </div>
+            <small class="text-white-50 text-nowrap ms-3">{{ mat.data_criacao|date:"d/m/Y" }}</small>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Ferramentas -->
+{% if novas_ferramentas %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0">🔧 Novas Tools</h5>
+    </div>
+    <div class="card-body p-0">
+        {% for ferr in novas_ferramentas %}
+        <div class="p-3 border-bottom border-light d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ ferr.nome }}</strong>
+                <span class="badge bg-secondary ms-2">{{ ferr.categoria }}</span>
+                {% if ferr.nivel %}<span class="badge bg-secondary">{{ ferr.nivel }}</span>{% endif %}
+                {% if ferr.documentacao_link %}<a href="{{ ferr.documentacao_link }}" target="_blank" class="small text-info ms-2">📖 Docs</a>{% endif %}
+            </div>
+            <small class="text-white-50 text-nowrap ms-3">{{ ferr.data_criacao|date:"d/m/Y" }}</small>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- Snippets -->
+{% if novos_snippets %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0">💻 Novos Snippets</h5>
+    </div>
+    <div class="card-body p-0">
+        {% for sn in novos_snippets %}
+        <div class="p-3 border-bottom border-light d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ sn.titulo }}</strong>
+                <span class="badge bg-primary ms-2">{{ sn.linguagem }}</span>
+                {% if sn.descricao %}<div class="small text-white-50 mt-1">{{ sn.descricao }}</div>{% endif %}
+                <div class="small text-white-50">por {{ sn.autor }}</div>
+            </div>
+            <small class="text-white-50 text-nowrap ms-3">{{ sn.data_criacao|date:"d/m/Y" }}</small>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}

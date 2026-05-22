@@ -28,15 +28,28 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item"><a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'casos_lista' %}">Cases</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'materiais_lista' %}">Materials</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'videos_lista' %}">Videos</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Conteúdo</a>
+                        <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="{% url 'casos_lista' %}"><i class="bi bi-files me-2"></i>Cases</a></li>
+                            <li><a class="dropdown-item" href="{% url 'materiais_lista' %}"><i class="bi bi-book me-2"></i>Materials</a></li>
+                            <li><a class="dropdown-item" href="{% url 'videos_lista' %}"><i class="bi bi-play-circle me-2"></i>Videos</a></li>
+                            <li><a class="dropdown-item" href="{% url 'ferramentas_lista' %}"><i class="bi bi-wrench me-2"></i>Tools</a></li>
+                            <li><a class="dropdown-item" href="{% url 'snippets_lista' %}"><i class="bi bi-code-slash me-2"></i>Snippets</a></li>
+                        </ul>
                     </li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'ferramentas_lista' %}">Tools</a></li>
-                   <!-- <li class="nav-item"><a class="nav-link" href="{% url 'roadmap_index' %}">Roadmap</a></li>-->
+                    <li class="nav-item"><a class="nav-link" href="{% url 'roadmap_index' %}">Roadmap</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'perfis' %}">Profiles</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'changelog' %}">✨ Novidades</a></li>
                     <li class="nav-item"><a class="nav-link" href="{% url 'ranking' %}">🏆 Ranking</a></li>
                 </ul>
+                <!-- Busca Global -->
+                <form class="d-flex me-2" action="{% url 'busca_global' %}" method="get">
+                    <div class="input-group input-group-sm" style="width: 220px;">
+                        <input type="text" name="q" class="form-control bg-dark text-white border-secondary" placeholder="Buscar tudo..." value="{{ request.GET.q|default:'' }}">
+                        <button class="btn btn-outline-secondary" type="submit"><i class="bi bi-search"></i></button>
+                    </div>
+                </form>
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                     <li class="nav-item dropdown">
@@ -44,16 +57,22 @@
                             👤 {{ user.first_name|default:user.username }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark">
+                            <li><a class="dropdown-item" href="{% url 'perfil_usuario' user.email %}">
+                                <i class="bi bi-person-circle"></i> Meu Perfil
+                            </a></li>
+                            <li><a class="dropdown-item" href="{% url 'favoritos' %}">
+                                <i class="bi bi-bookmark-heart"></i> Favoritos
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
                             {% if user.role == 'admin' %}
                             <li><a class="dropdown-item" href="{% url 'admin_usuarios' %}">
-                                </a></li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
+                                <i class="bi bi-people"></i> Gerenciar Usuários
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
                             {% endif %}
                             <li><a class="dropdown-item" href="{% url 'logout' %}">
-                                    <i class="bi bi-box-arrow-right"></i> Logout
-                                </a></li>
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a></li>
                         </ul>
                     </li>
                     {% endif %}

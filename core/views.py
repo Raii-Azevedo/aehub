@@ -24,11 +24,13 @@ from .models import (
     Material,
     Video,
     Ferramenta,
+    Snippet,
     RoadmapProgresso,
     RoadmapFase,
     RoadmapEntrega,
     AllowedEmail,
     UserOnboarding,
+    Favorito,
 )
 
 def is_admin(user):
@@ -163,6 +165,10 @@ def boas_vindas(request):
     if request.method == 'POST':
         onboarding.onboarding_completo = True
         onboarding.data_conclusao = timezone.now()
+        # Capturar perfil_tipo se vier no POST do onboarding
+        perfil_tipo = request.POST.get('perfil_tipo', '').strip()
+        if perfil_tipo in ['architect', 'gogetter', 'simplifier', 'systematic']:
+            onboarding.perfil_tipo = perfil_tipo
         onboarding.save()
         return redirect('dashboard')
 
@@ -356,18 +362,63 @@ def google_callback_view(request):
 
 @login_required
 def dashboard(request):
-    criar_admin_se_nao_existir()  
+    criar_admin_se_nao_existir()
+
+    from datetime import timedelta
+
+    agora = timezone.now()
+    inicio_mes = agora.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    inicio_mes_anterior = (inicio_mes - timedelta(days=1)).replace(day=1)
+
+    # Totais atuais
+    total_casos = CasoUso.objects.filter(ativo=True).count()
+    total_materiais = Material.objects.count()
+    total_videos = Video.objects.count()
+    total_ferramentas = Ferramenta.objects.count()
+
+    # Novos este mês
+    novos_casos_mes = CasoUso.objects.filter(ativo=True, data_criacao__gte=inicio_mes).count()
+    novos_materiais_mes = Material.objects.filter(data_criacao__gte=inicio_mes).count()
+    novos_videos_mes = Video.objects.filter(data_criacao__gte=inicio_mes).count()
+    novos_ferramentas_mes = Ferramenta.objects.filter(data_criacao__gte=inicio_mes).count()
+
+    # Dados para gráfico de atividade (últimos 6 meses)
+    grafico_labels = []
+    grafico_casos = []
+    grafico_outros = []
+    for i in range(5, -1, -1):
+        mes_ref = (agora.replace(day=1) - timedelta(days=i * 28)).replace(day=1)
+        if i == 0:
+            fim_mes = agora
+        else:
+            prox = (mes_ref.replace(day=28) + timedelta(days=4)).replace(day=1)
+            fim_mes = prox - timedelta(seconds=1)
+
+        grafico_labels.append(mes_ref.strftime('%b/%y'))
+        n_casos = CasoUso.objects.filter(data_criacao__gte=mes_ref, data_criacao__lte=fim_mes, ativo=True).count()
+        n_outros = (
+            Material.objects.filter(data_criacao__gte=mes_ref, data_criacao__lte=fim_mes).count() +
+            Video.objects.filter(data_criacao__gte=mes_ref, data_criacao__lte=fim_mes).count() +
+            Ferramenta.objects.filter(data_criacao__gte=mes_ref, data_criacao__lte=fim_mes).count()
+        )
+        grafico_casos.append(n_casos)
+        grafico_outros.append(n_outros)
 
     context = {
-        'total_casos': CasoUso.objects.filter(ativo=True).count(),
-        'total_materiais': Material.objects.count(),
-        'total_videos': Video.objects.count(),
-        'total_ferramentas': Ferramenta.objects.count(),
-        'ultimos_casos': CasoUso.objects.filter(
-            ativo=True
-        ).order_by('-data_criacao')[:5],
+        'total_casos': total_casos,
+        'total_materiais': total_materiais,
+        'total_videos': total_videos,
+        'total_ferramentas': total_ferramentas,
+        'novos_casos_mes': novos_casos_mes,
+        'novos_materiais_mes': novos_materiais_mes,
+        'novos_videos_mes': novos_videos_mes,
+        'novos_ferramentas_mes': novos_ferramentas_mes,
+        'ultimos_casos': CasoUso.objects.filter(ativo=True).order_by('-data_criacao')[:5],
         'top_contribuidores': _get_top_contribuidores(),
         'user_role': get_user_role(request.user),
+        'grafico_labels': json.dumps(grafico_labels),
+        'grafico_casos': json.dumps(grafico_casos),
+        'grafico_outros': json.dumps(grafico_outros),
     }
 
     return render(request, 'core/dashboard.html', context)
@@ -375,37 +426,41 @@ def dashboard(request):
 
 def _get_top_contribuidores():
     try:
-        top = (
-            CasoUso.objects
-            .filter(ativo=True)
-            .values('autor_email')
-            .annotate(total_casos=Count('id'))
-            .order_by('-total_casos')[:5]
-        )
+        from collections import defaultdict
+        pontos_por_email = defaultdict(lambda: {'casos': 0, 'videos': 0, 'materiais': 0, 'ferramentas': 0})
+
+        for item in CasoUso.objects.filter(ativo=True).values('autor_email').annotate(n=Count('id')):
+            pontos_por_email[item['autor_email']]['casos'] = item['n']
+        for item in Video.objects.values('autor_email').annotate(n=Count('id')):
+            pontos_por_email[item['autor_email']]['videos'] = item['n']
+        for item in Material.objects.values('autor_email').annotate(n=Count('id')):
+            pontos_por_email[item['autor_email']]['materiais'] = item['n']
+        for item in Ferramenta.objects.values('autor_email').annotate(n=Count('id')):
+            pontos_por_email[item['autor_email']]['ferramentas'] = item['n']
 
         resultado = []
-
-        for item in top:
-            email = item['autor_email']
-
+        for email, d in pontos_por_email.items():
+            total = d['casos'] * 10 + d['videos'] * 15 + d['materiais'] * 3 + d['ferramentas'] * 8
+            if total == 0:
+                continue
             try:
                 allowed = AllowedEmail.objects.get(email=email)
-                nome = allowed.email
+                nome = allowed.nome or email
                 role = allowed.role
             except AllowedEmail.DoesNotExist:
                 nome = email
                 role = 'viewer'
-
             resultado.append({
                 'email': email,
                 'nome': nome,
                 'role': role,
-                'total_casos': item['total_casos']
+                'total_contribuicoes': d['casos'] + d['videos'] + d['materiais'] + d['ferramentas'],
+                'pontuacao': total,
             })
 
-        return resultado
+        resultado.sort(key=lambda x: x['pontuacao'], reverse=True)
+        return resultado[:5]
     except Exception:
-        # Column may not exist yet (before migration 0007 runs)
         return []
 
 # ================== CASOS DE USO ==================
@@ -414,6 +469,7 @@ def _get_top_contribuidores():
 def casos_lista(request):
     """Lista todos os casos de uso"""
     query = request.GET.get('q', '').strip()
+    tag = request.GET.get('tag', '').strip()
     casos = CasoUso.objects.filter(ativo=True).order_by('-data_criacao')
 
     if query:
@@ -425,10 +481,19 @@ def casos_lista(request):
             Q(resultado__icontains=query) |
             Q(tags__icontains=query)
         )
+    if tag:
+        casos = casos.filter(tags__icontains=tag)
+
+    # Coletar favoritos do usuário para highlight
+    favoritos_ids = list(
+        Favorito.objects.filter(usuario_email=request.user.email, content_type='caso').values_list('object_id', flat=True)
+    )
 
     return render(request, 'core/casos.html', {
         'casos': casos,
         'query': query,
+        'tag_filtro': tag,
+        'favoritos_ids': favoritos_ids,
         'user_role': get_user_role(request.user)
     })
 
@@ -544,6 +609,7 @@ def caso_dados(request, id):
 def materiais_lista(request):
     """Lista todos os materiais"""
     query = request.GET.get('q', '').strip()
+    tag = request.GET.get('tag', '').strip()
     materiais = Material.objects.all().order_by('-data_criacao')
 
     if query:
@@ -554,10 +620,18 @@ def materiais_lista(request):
             Q(descricao__icontains=query) |
             Q(autor__icontains=query)
         )
+    if tag:
+        materiais = materiais.filter(topicos__icontains=tag)
+
+    favoritos_ids = list(
+        Favorito.objects.filter(usuario_email=request.user.email, content_type='material').values_list('object_id', flat=True)
+    )
 
     return render(request, 'core/materiais.html', {
         'materiais': materiais,
         'query': query,
+        'tag_filtro': tag,
+        'favoritos_ids': favoritos_ids,
         'user_role': get_user_role(request.user)
     })
 
@@ -577,7 +651,8 @@ def material_novo(request):
             descricao=request.POST.get('descricao'),
             url=request.POST.get('url', ''),
             autor=request.user.get_full_name() or request.user.username,
-            autor_email=request.user.email
+            autor_email=request.user.email,
+            data_criacao=timezone.now()
         )
         messages.success(request, '✅ Material adicionado com sucesso!')
         return redirect('materiais_lista')
@@ -669,9 +744,14 @@ def videos_lista(request):
             Q(autor__icontains=query)
         )
 
+    favoritos_ids = list(
+        Favorito.objects.filter(usuario_email=request.user.email, content_type='video').values_list('object_id', flat=True)
+    )
+
     return render(request, 'core/videos.html', {
         'videos': videos,
         'query': query,
+        'favoritos_ids': favoritos_ids,
         'user_role': get_user_role(request.user)
     })
 
@@ -789,9 +869,14 @@ def ferramentas_lista(request):
             Q(autor__icontains=query)
         )
 
+    favoritos_ids = list(
+        Favorito.objects.filter(usuario_email=request.user.email, content_type='ferramenta').values_list('object_id', flat=True)
+    )
+
     return render(request, 'core/ferramentas.html', {
         'ferramentas': ferramentas,
         'query': query,
+        'favoritos_ids': favoritos_ids,
         'user_role': get_user_role(request.user)
     })
 
@@ -1124,7 +1209,7 @@ def admin_usuarios(request):
         messages.error(request, 'Acesso negado. Apenas administradores.')
         return redirect('dashboard')
     
-    usuarios = AllowedEmail.objects.all().order_by('-added_at')
+    usuarios = AllowedEmail.objects.all().order_by('-data_criacao')
     
     context = {
         'usuarios': usuarios,
@@ -1229,3 +1314,367 @@ def admin_usuario_excluir(request, email):
 def logout_view(request):
     logout(request)
     return redirect('home')
+
+
+# ================== SNIPPETS ==================
+
+@login_required
+def snippets_lista(request):
+    query = request.GET.get('q', '').strip()
+    tag = request.GET.get('tag', '').strip()
+    linguagem = request.GET.get('linguagem', '').strip()
+    snippets = Snippet.objects.all().order_by('-data_criacao')
+
+    if query:
+        snippets = snippets.filter(
+            Q(titulo__icontains=query) |
+            Q(descricao__icontains=query) |
+            Q(codigo__icontains=query) |
+            Q(tags__icontains=query) |
+            Q(autor__icontains=query)
+        )
+    if tag:
+        snippets = snippets.filter(tags__icontains=tag)
+    if linguagem:
+        snippets = snippets.filter(linguagem__iexact=linguagem)
+
+    linguagens = Snippet.objects.values_list('linguagem', flat=True).distinct().order_by('linguagem')
+
+    return render(request, 'core/snippets.html', {
+        'snippets': snippets,
+        'query': query,
+        'tag_filtro': tag,
+        'linguagem_filtro': linguagem,
+        'linguagens': linguagens,
+        'user_role': get_user_role(request.user),
+    })
+
+
+@login_required
+def snippet_novo(request):
+    if get_user_role(request.user) == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para adicionar itens.')
+        return redirect('snippets_lista')
+
+    if request.method == 'POST':
+        try:
+            allowed = AllowedEmail.objects.get(email=request.user.email)
+            nome_autor = allowed.nome or request.user.email
+        except AllowedEmail.DoesNotExist:
+            nome_autor = request.user.email
+
+        Snippet.objects.create(
+            titulo=request.POST.get('titulo'),
+            linguagem=request.POST.get('linguagem'),
+            codigo=request.POST.get('codigo'),
+            descricao=request.POST.get('descricao', ''),
+            tags=request.POST.get('tags', ''),
+            autor=nome_autor,
+            autor_email=request.user.email,
+            data_criacao=timezone.now()
+        )
+        messages.success(request, '✅ Snippet adicionado com sucesso!')
+        return redirect('snippets_lista')
+    return redirect('snippets_lista')
+
+
+@login_required
+def snippet_editar(request, id):
+    snippet = get_object_or_404(Snippet, id=id)
+    role = get_user_role(request.user)
+
+    if role == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para editar.')
+        return redirect('snippets_lista')
+    if role == 'user' and snippet.autor_email != request.user.email:
+        messages.error(request, '🚫 Você só pode editar snippets que você mesmo criou.')
+        return redirect('snippets_lista')
+
+    if request.method == 'POST':
+        snippet.titulo = request.POST.get('titulo')
+        snippet.linguagem = request.POST.get('linguagem')
+        snippet.codigo = request.POST.get('codigo')
+        snippet.descricao = request.POST.get('descricao', '')
+        snippet.tags = request.POST.get('tags', '')
+        snippet.save()
+        messages.success(request, '✅ Snippet atualizado!')
+        return redirect('snippets_lista')
+    return redirect('snippets_lista')
+
+
+@login_required
+def snippet_excluir(request, id):
+    snippet = get_object_or_404(Snippet, id=id)
+    role = get_user_role(request.user)
+
+    if role == 'viewer':
+        messages.error(request, '🚫 Você não tem permissão para excluir.')
+        return redirect('snippets_lista')
+    if role == 'user' and snippet.autor_email != request.user.email:
+        messages.error(request, '🚫 Você só pode excluir snippets que você mesmo criou.')
+        return redirect('snippets_lista')
+
+    snippet.delete()
+    messages.success(request, '✅ Snippet removido!')
+    return redirect('snippets_lista')
+
+
+@login_required
+def snippet_dados(request, id):
+    snippet = get_object_or_404(Snippet, id=id)
+    return JsonResponse({
+        'id': snippet.id,
+        'titulo': snippet.titulo,
+        'linguagem': snippet.linguagem,
+        'codigo': snippet.codigo,
+        'descricao': snippet.descricao,
+        'tags': snippet.tags,
+        'autor': snippet.autor,
+    })
+
+
+# ================== BUSCA GLOBAL ==================
+
+@login_required
+def busca_global(request):
+    query = request.GET.get('q', '').strip()
+    resultados = {}
+    total = 0
+
+    if query:
+        casos = CasoUso.objects.filter(ativo=True).filter(
+            Q(titulo__icontains=query) | Q(descricao__icontains=query) |
+            Q(tecnologia__icontains=query) | Q(tags__icontains=query)
+        )[:10]
+        materiais = Material.objects.filter(
+            Q(titulo__icontains=query) | Q(descricao__icontains=query) |
+            Q(topicos__icontains=query)
+        )[:10]
+        videos = Video.objects.filter(
+            Q(titulo__icontains=query) | Q(descricao__icontains=query) |
+            Q(tema__icontains=query)
+        )[:10]
+        ferramentas = Ferramenta.objects.filter(
+            Q(nome__icontains=query) | Q(descricao__icontains=query) |
+            Q(categoria__icontains=query)
+        )[:10]
+        snippets = Snippet.objects.filter(
+            Q(titulo__icontains=query) | Q(descricao__icontains=query) |
+            Q(codigo__icontains=query) | Q(tags__icontains=query)
+        )[:10]
+
+        resultados = {
+            'casos': casos,
+            'materiais': materiais,
+            'videos': videos,
+            'ferramentas': ferramentas,
+            'snippets': snippets,
+        }
+        total = casos.count() + materiais.count() + videos.count() + ferramentas.count() + snippets.count()
+
+    return render(request, 'core/busca_global.html', {
+        'query': query,
+        'resultados': resultados,
+        'total': total,
+        'user_role': get_user_role(request.user),
+    })
+
+
+# ================== FAVORITOS ==================
+
+@login_required
+def favoritos(request):
+    favs = Favorito.objects.filter(usuario_email=request.user.email)
+    return render(request, 'core/favoritos.html', {
+        'favoritos': favs,
+        'user_role': get_user_role(request.user),
+    })
+
+
+@login_required
+def favorito_toggle(request, content_type, object_id):
+    """Adiciona ou remove um favorito (toggle). Retorna JSON."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método não permitido'}, status=405)
+
+    # Validar content_type
+    tipos_validos = ['caso', 'material', 'video', 'ferramenta', 'snippet']
+    if content_type not in tipos_validos:
+        return JsonResponse({'error': 'Tipo inválido'}, status=400)
+
+    # Obter título do objeto
+    titulo = ''
+    try:
+        if content_type == 'caso':
+            obj = CasoUso.objects.get(id=object_id)
+            titulo = obj.titulo
+        elif content_type == 'material':
+            obj = Material.objects.get(id=object_id)
+            titulo = obj.titulo
+        elif content_type == 'video':
+            obj = Video.objects.get(id=object_id)
+            titulo = obj.titulo
+        elif content_type == 'ferramenta':
+            obj = Ferramenta.objects.get(id=object_id)
+            titulo = obj.nome
+        elif content_type == 'snippet':
+            obj = Snippet.objects.get(id=object_id)
+            titulo = obj.titulo
+    except Exception:
+        return JsonResponse({'error': 'Objeto não encontrado'}, status=404)
+
+    fav, created = Favorito.objects.get_or_create(
+        usuario_email=request.user.email,
+        content_type=content_type,
+        object_id=object_id,
+        defaults={'titulo': titulo}
+    )
+
+    if not created:
+        fav.delete()
+        return JsonResponse({'status': 'removed', 'message': 'Removido dos favoritos'})
+
+    return JsonResponse({'status': 'added', 'message': 'Adicionado aos favoritos!'})
+
+
+# ================== CHANGELOG ==================
+
+@login_required
+def changelog(request):
+    from datetime import timedelta
+    periodo = request.GET.get('periodo', '7')
+    try:
+        dias = int(periodo)
+    except ValueError:
+        dias = 7
+
+    desde = timezone.now() - timedelta(days=dias)
+
+    novos_casos = CasoUso.objects.filter(ativo=True, data_criacao__gte=desde).order_by('-data_criacao')
+    novos_materiais = Material.objects.filter(data_criacao__gte=desde).order_by('-data_criacao')
+    novos_videos = Video.objects.filter(data_criacao__gte=desde).order_by('-data_criacao')
+    novas_ferramentas = Ferramenta.objects.filter(data_criacao__gte=desde).order_by('-data_criacao')
+    novos_snippets = Snippet.objects.filter(data_criacao__gte=desde).order_by('-data_criacao')
+
+    total_novidades = (
+        novos_casos.count() + novos_materiais.count() + novos_videos.count() +
+        novas_ferramentas.count() + novos_snippets.count()
+    )
+
+    return render(request, 'core/changelog.html', {
+        'novos_casos': novos_casos,
+        'novos_materiais': novos_materiais,
+        'novos_videos': novos_videos,
+        'novas_ferramentas': novas_ferramentas,
+        'novos_snippets': novos_snippets,
+        'total_novidades': total_novidades,
+        'periodo': dias,
+        'user_role': get_user_role(request.user),
+    })
+
+
+# ================== PERFIL DE USUÁRIO ==================
+
+def _calcular_badges(casos, videos, materiais, ferramentas, snippets):
+    """Retorna lista de badges conquistados com base nas contribuições."""
+    badges = []
+    total = casos + videos + materiais + ferramentas + snippets
+
+    if casos >= 1:
+        badges.append({'icon': '📋', 'nome': 'Case Maker', 'desc': 'Registrou pelo menos 1 caso de uso'})
+    if casos >= 5:
+        badges.append({'icon': '🧠', 'nome': 'Case Expert', 'desc': '5+ casos de uso registrados'})
+    if casos >= 10:
+        badges.append({'icon': '🏛️', 'nome': 'Case Master', 'desc': '10+ casos de uso registrados'})
+    if videos >= 1:
+        badges.append({'icon': '🎬', 'nome': 'Video Creator', 'desc': 'Publicou pelo menos 1 vídeo'})
+    if videos >= 5:
+        badges.append({'icon': '📹', 'nome': 'Content Pro', 'desc': '5+ vídeos publicados'})
+    if materiais >= 3:
+        badges.append({'icon': '📚', 'nome': 'Bibliophile', 'desc': '3+ materiais compartilhados'})
+    if ferramentas >= 2:
+        badges.append({'icon': '🔧', 'nome': 'Tool Guru', 'desc': '2+ ferramentas catalogadas'})
+    if snippets >= 3:
+        badges.append({'icon': '💻', 'nome': 'Code Sharer', 'desc': '3+ snippets publicados'})
+    if total >= 10:
+        badges.append({'icon': '⭐', 'nome': 'Contributor', 'desc': '10+ contribuições no total'})
+    if total >= 25:
+        badges.append({'icon': '🚀', 'nome': 'Power User', 'desc': '25+ contribuições no total'})
+    if total >= 50:
+        badges.append({'icon': '🏆', 'nome': 'AE Legend', 'desc': '50+ contribuições — lenda do time!'})
+
+    return badges
+
+
+@login_required
+def perfil_usuario(request, email):
+    try:
+        allowed = AllowedEmail.objects.get(email=email)
+    except AllowedEmail.DoesNotExist:
+        messages.error(request, 'Usuário não encontrado.')
+        return redirect('dashboard')
+
+    # Contribuições
+    casos = list(CasoUso.objects.filter(autor_email=email, ativo=True).order_by('-data_criacao'))
+    videos = list(Video.objects.filter(autor_email=email).order_by('-data_criacao'))
+    materiais = list(Material.objects.filter(autor_email=email).order_by('-data_criacao'))
+    ferramentas = list(Ferramenta.objects.filter(autor_email=email).order_by('-data_criacao'))
+    snippets_list = list(Snippet.objects.filter(autor_email=email).order_by('-data_criacao'))
+
+    n_casos = len(casos)
+    n_videos = len(videos)
+    n_materiais = len(materiais)
+    n_ferramentas = len(ferramentas)
+    n_snippets = len(snippets_list)
+
+    pontuacao = n_casos * 10 + n_videos * 15 + n_materiais * 3 + n_ferramentas * 8 + n_snippets * 5
+    badges = _calcular_badges(n_casos, n_videos, n_materiais, n_ferramentas, n_snippets)
+
+    # Perfil salvo
+    perfil_tipo = None
+    try:
+        django_user = User.objects.get(email=email)
+        onboarding = UserOnboarding.objects.get(user=django_user)
+        perfil_tipo = onboarding.perfil_tipo
+    except (User.DoesNotExist, UserOnboarding.DoesNotExist):
+        pass
+
+    is_own_profile = request.user.email == email
+
+    return render(request, 'core/perfil_usuario.html', {
+        'perfil_email': email,
+        'perfil_nome': allowed.nome or email,
+        'perfil_role': allowed.role,
+        'perfil_tipo': perfil_tipo,
+        'casos': casos,
+        'videos': videos,
+        'materiais': materiais,
+        'ferramentas': ferramentas,
+        'snippets': snippets_list,
+        'n_casos': n_casos,
+        'n_videos': n_videos,
+        'n_materiais': n_materiais,
+        'n_ferramentas': n_ferramentas,
+        'n_snippets': n_snippets,
+        'pontuacao': pontuacao,
+        'badges': badges,
+        'is_own_profile': is_own_profile,
+        'user_role': get_user_role(request.user),
+    })
+
+
+# ================== SALVAR PERFIL TIPO ==================
+
+@login_required
+def salvar_perfil_tipo(request):
+    if request.method == 'POST':
+        perfil_tipo = request.POST.get('perfil_tipo', '').strip()
+        tipos_validos = ['architect', 'gogetter', 'simplifier', 'systematic']
+        if perfil_tipo not in tipos_validos:
+            return JsonResponse({'error': 'Tipo inválido'}, status=400)
+
+        onboarding, _ = UserOnboarding.objects.get_or_create(user=request.user)
+        onboarding.perfil_tipo = perfil_tipo
+        onboarding.save()
+        return JsonResponse({'status': 'ok', 'message': 'Perfil salvo!'})
+    return JsonResponse({'error': 'Método não permitido'}, status=405)

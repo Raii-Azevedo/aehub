@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-{% load static %}
+{% load static hub_filters %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -12,19 +12,26 @@
 </div>
 
 <!-- Search Form -->
-<div class="mb-4">
+<div class="mb-3">
     <form method="GET" class="d-flex flex-wrap gap-2">
-        <input type="text" name="q" class="form-control me-2" placeholder="Search cases..." value="{{ query }}">
+        <input type="text" name="q" class="form-control me-2" style="max-width: 400px;" placeholder="Search cases..." value="{{ query }}">
         <button type="submit" class="btn btn-outline-light">
             <i class="bi bi-search"></i> Search
         </button>
-        {% if query %}
-        <a href="{% url 'casos_lista' %}" class="btn btn-outline-secondary ms-2">
+        {% if query or tag_filtro %}
+        <a href="{% url 'casos_lista' %}" class="btn btn-outline-secondary">
             <i class="bi bi-x"></i> Clear
         </a>
         {% endif %}
     </form>
 </div>
+{% if tag_filtro %}
+<div class="mb-3">
+    <span class="text-white-50">Tag:</span>
+    <span class="badge bg-primary ms-1">{{ tag_filtro }}</span>
+    <a href="{% url 'casos_lista' %}{% if query %}?q={{ query }}{% endif %}" class="text-white-50 small ms-2">✕ remover</a>
+</div>
+{% endif %}
 
 <!-- Lista de casos -->
 <div class="row">
@@ -32,16 +39,29 @@
     <div class="col-lg-6 col-md-6 col-sm-12 mb-4">
         <div class="card h-100">
             <div class="card-body">
-                <h5 class="card-title">{{ caso.titulo }}</h5>
+                <div class="d-flex justify-content-between align-items-start mb-1">
+                    <h5 class="card-title mb-0">{{ caso.titulo }}</h5>
+                    <button class="btn btn-sm fav-btn ms-2 {% if caso.id in favoritos_ids %}btn-warning{% else %}btn-outline-secondary{% endif %}"
+                            onclick="toggleFavorito('caso', {{ caso.id }}, this)" title="Favoritar">
+                        <i class="bi bi-bookmark{% if caso.id in favoritos_ids %}-fill{% endif %}"></i>
+                    </button>
+                </div>
                 <div class="mb-2">
                     <span class="badge-custom">{{ caso.contexto }}</span>
                     <span class="badge-custom">{{ caso.tecnologia }}</span>
                 </div>
                 <p class="card-text">{{ caso.descricao|truncatewords:30 }}</p>
                 <p class="card-text"><strong>Results:</strong> {{ caso.resultado|truncatewords:20 }}</p>
+                {% if caso.tags %}
+                <div class="mb-2">
+                    {% for tag in caso.tags|split:',' %}
+                    <a href="?tag={{ tag }}" class="badge bg-secondary text-decoration-none me-1" style="font-size:0.75rem;">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
                 <div class="d-flex justify-content-between align-items-center">
                     <small class="text-white-50">
-                        👤 {{ caso.autor }} ({{ caso.autor_email }}) | 📅 {{ caso.data_criacao|date:"d/m/Y" }}
+                        👤 <a href="{% url 'perfil_usuario' caso.autor_email %}" class="text-white-50">{{ caso.autor }}</a> | 📅 {{ caso.data_criacao|date:"d/m/Y" }}
                     </small>
                     <div>
                         <button class="btn btn-sm btn-outline-light" onclick="detalharCaso({{ caso.id }})">Detail</button>
@@ -216,6 +236,21 @@
 </div>
 
 <script>
+function toggleFavorito(tipo, id, btn) {
+    fetch(`/favoritos/toggle/${tipo}/${id}/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+    }).then(r => r.json()).then(data => {
+        if (data.status === 'added') {
+            btn.classList.replace('btn-outline-secondary', 'btn-warning');
+            btn.innerHTML = '<i class="bi bi-bookmark-fill"></i>';
+        } else {
+            btn.classList.replace('btn-warning', 'btn-outline-secondary');
+            btn.innerHTML = '<i class="bi bi-bookmark"></i>';
+        }
+    });
+}
+
 function editarCaso(id) {
     console.log('Opening case edit:', id);
     fetch(`/casos/${id}/dados/`)

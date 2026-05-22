@@ -1,0 +1,151 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="mb-1">🔍 Busca Global</h1>
+    {% if query %}
+    <p class="text-white-50">{{ total }} resultado{{ total|pluralize:"s" }} para <strong>"{{ query }}"</strong></p>
+    {% else %}
+    <p class="text-white-50">Digite algo para buscar em todo o hub.</p>
+    {% endif %}
+</div>
+
+<form method="get" class="mb-4">
+    <div class="input-group">
+        <input type="text" name="q" class="form-control form-control-lg bg-dark text-white border-secondary"
+               placeholder="Buscar em casos, materiais, vídeos, ferramentas, snippets..."
+               value="{{ query }}" autofocus>
+        <button class="btn btn-gradient btn-lg" type="submit"><i class="bi bi-search me-1"></i> Buscar</button>
+    </div>
+</form>
+
+{% if query and total == 0 %}
+<div class="card text-center py-5">
+    <div class="card-body">
+        <i class="bi bi-search" style="font-size: 3rem; opacity: 0.3;"></i>
+        <p class="text-white-50 mt-3">Nenhum resultado encontrado para "{{ query }}".</p>
+    </div>
+</div>
+{% endif %}
+
+{% if resultados %}
+
+{% if resultados.casos %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0"><i class="bi bi-files me-2"></i>Cases <span class="badge bg-secondary">{{ resultados.casos.count }}</span></h5>
+    </div>
+    <div class="card-body p-0">
+        {% for caso in resultados.casos %}
+        <div class="p-3 border-bottom border-light">
+            <div class="d-flex justify-content-between">
+                <strong>{{ caso.titulo }}</strong>
+                <small class="text-white-50">{{ caso.data_criacao|date:"d/m/Y" }}</small>
+            </div>
+            <p class="small text-white-50 mb-1">{{ caso.descricao|truncatewords:25 }}</p>
+            <span class="badge bg-secondary me-1">{{ caso.contexto }}</span>
+            <span class="badge bg-secondary">{{ caso.tecnologia }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="card-footer bg-transparent border-light text-end">
+        <a href="{% url 'casos_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">Ver todos em Cases →</a>
+    </div>
+</div>
+{% endif %}
+
+{% if resultados.materiais %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0"><i class="bi bi-book me-2"></i>Materials <span class="badge bg-secondary">{{ resultados.materiais.count }}</span></h5>
+    </div>
+    <div class="card-body p-0">
+        {% for mat in resultados.materiais %}
+        <div class="p-3 border-bottom border-light">
+            <div class="d-flex justify-content-between">
+                <strong>{{ mat.titulo }}</strong>
+                <span class="badge bg-info text-dark">{{ mat.tipo }}</span>
+            </div>
+            <p class="small text-white-50 mb-0">{{ mat.descricao|truncatewords:20 }}</p>
+            {% if mat.url %}<a href="{{ mat.url }}" target="_blank" class="small text-info">🔗 Acessar</a>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    <div class="card-footer bg-transparent border-light text-end">
+        <a href="{% url 'materiais_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">Ver todos em Materials →</a>
+    </div>
+</div>
+{% endif %}
+
+{% if resultados.videos %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0"><i class="bi bi-play-circle me-2"></i>Videos <span class="badge bg-secondary">{{ resultados.videos.count }}</span></h5>
+    </div>
+    <div class="card-body p-0">
+        {% for video in resultados.videos %}
+        <div class="p-3 border-bottom border-light">
+            <div class="d-flex justify-content-between">
+                <strong>{{ video.titulo }}</strong>
+                <div>
+                    <span class="badge bg-secondary me-1">{{ video.tema }}</span>
+                    <span class="badge bg-outline-light">{{ video.nivel }}</span>
+                </div>
+            </div>
+            <p class="small text-white-50 mb-0">{{ video.descricao|truncatewords:20 }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="card-footer bg-transparent border-light text-end">
+        <a href="{% url 'videos_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">Ver todos em Videos →</a>
+    </div>
+</div>
+{% endif %}
+
+{% if resultados.ferramentas %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0"><i class="bi bi-wrench me-2"></i>Tools <span class="badge bg-secondary">{{ resultados.ferramentas.count }}</span></h5>
+    </div>
+    <div class="card-body p-0">
+        {% for ferr in resultados.ferramentas %}
+        <div class="p-3 border-bottom border-light">
+            <div class="d-flex justify-content-between">
+                <strong>{{ ferr.nome }}</strong>
+                <span class="badge bg-secondary">{{ ferr.categoria }}</span>
+            </div>
+            <p class="small text-white-50 mb-0">{{ ferr.descricao|truncatewords:20 }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="card-footer bg-transparent border-light text-end">
+        <a href="{% url 'ferramentas_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">Ver todos em Tools →</a>
+    </div>
+</div>
+{% endif %}
+
+{% if resultados.snippets %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0"><i class="bi bi-code-slash me-2"></i>Snippets <span class="badge bg-secondary">{{ resultados.snippets.count }}</span></h5>
+    </div>
+    <div class="card-body p-0">
+        {% for sn in resultados.snippets %}
+        <div class="p-3 border-bottom border-light">
+            <div class="d-flex justify-content-between">
+                <strong>{{ sn.titulo }}</strong>
+                <span class="badge bg-primary">{{ sn.linguagem }}</span>
+            </div>
+            {% if sn.descricao %}<p class="small text-white-50 mb-0">{{ sn.descricao }}</p>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    <div class="card-footer bg-transparent border-light text-end">
+        <a href="{% url 'snippets_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">Ver todos em Snippets →</a>
+    </div>
+</div>
+{% endif %}
+
+{% endif %}
+{% endblock %}

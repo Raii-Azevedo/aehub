@@ -2,22 +2,29 @@
 {% load static %}
 
 {% block content %}
-<div class="row">
+<div class="row mb-2">
     <div class="col-12">
-        <h1 class="mb-4">Dashboard</h1>
-        <p class="text-white-50 mb-4">Welcome back, {{ user.first_name|default:user.username }}!</p>
+        <h1 class="mb-1">Dashboard</h1>
+        <p class="text-white-50 mb-4">Bem-vindo de volta, {{ user.first_name|default:user.username }}!
+            <a href="{% url 'changelog' %}" class="text-info small ms-2">✨ Ver novidades</a>
+        </p>
     </div>
 </div>
 
-<!-- Metric cards -->
+<!-- Cards de Métricas -->
 <div class="row mb-4">
     <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
         <div class="card text-center">
             <div class="card-body">
                 <i class="bi bi-files" style="font-size: 2rem;"></i>
                 <h2 class="mt-2">{{ total_casos }}</h2>
-                <p class="text-white-50">Use Cases</p>
-                <a href="{% url 'casos_lista' %}" class="btn btn-sm btn-outline-light">View all</a>
+                <p class="text-white-50 mb-1">Use Cases</p>
+                {% if novos_casos_mes > 0 %}
+                <small class="text-success"><i class="bi bi-arrow-up-short"></i>+{{ novos_casos_mes }} este mês</small>
+                {% endif %}
+                <div class="mt-2">
+                    <a href="{% url 'casos_lista' %}" class="btn btn-sm btn-outline-light">Ver todos</a>
+                </div>
             </div>
         </div>
     </div>
@@ -26,8 +33,13 @@
             <div class="card-body">
                 <i class="bi bi-book" style="font-size: 2rem;"></i>
                 <h2 class="mt-2">{{ total_materiais }}</h2>
-                <p class="text-white-50">Materials</p>
-                <a href="{% url 'materiais_lista' %}" class="btn btn-sm btn-outline-light">View all</a>
+                <p class="text-white-50 mb-1">Materials</p>
+                {% if novos_materiais_mes > 0 %}
+                <small class="text-success"><i class="bi bi-arrow-up-short"></i>+{{ novos_materiais_mes }} este mês</small>
+                {% endif %}
+                <div class="mt-2">
+                    <a href="{% url 'materiais_lista' %}" class="btn btn-sm btn-outline-light">Ver todos</a>
+                </div>
             </div>
         </div>
     </div>
@@ -36,8 +48,13 @@
             <div class="card-body">
                 <i class="bi bi-play-circle" style="font-size: 2rem;"></i>
                 <h2 class="mt-2">{{ total_videos }}</h2>
-                <p class="text-white-50">Videos</p>
-                <a href="{% url 'videos_lista' %}" class="btn btn-sm btn-outline-light">View all</a>
+                <p class="text-white-50 mb-1">Videos</p>
+                {% if novos_videos_mes > 0 %}
+                <small class="text-success"><i class="bi bi-arrow-up-short"></i>+{{ novos_videos_mes }} este mês</small>
+                {% endif %}
+                <div class="mt-2">
+                    <a href="{% url 'videos_lista' %}" class="btn btn-sm btn-outline-light">Ver todos</a>
+                </div>
             </div>
         </div>
     </div>
@@ -46,55 +63,42 @@
             <div class="card-body">
                 <i class="bi bi-wrench" style="font-size: 2rem;"></i>
                 <h2 class="mt-2">{{ total_ferramentas }}</h2>
-                <p class="text-white-50">Tools</p>
-                <a href="{% url 'ferramentas_lista' %}" class="btn btn-sm btn-outline-light">View all</a>
+                <p class="text-white-50 mb-1">Tools</p>
+                {% if novos_ferramentas_mes > 0 %}
+                <small class="text-success"><i class="bi bi-arrow-up-short"></i>+{{ novos_ferramentas_mes }} este mês</small>
+                {% endif %}
+                <div class="mt-2">
+                    <a href="{% url 'ferramentas_lista' %}" class="btn btn-sm btn-outline-light">Ver todos</a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Recent cases -->
-<div class="row">
+<!-- Gráfico de Atividade + Top Contributors -->
+<div class="row mb-4">
     <div class="col-lg-8 col-md-12 mb-4">
-        <div class="card">
+        <div class="card h-100">
             <div class="card-header bg-transparent border-light">
-                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Cases</h5>
+                <h5 class="mb-0"><i class="bi bi-bar-chart-line me-2"></i>Atividade nos Últimos 6 Meses</h5>
             </div>
             <div class="card-body">
-                {% if ultimos_casos %}
-                    {% for caso in ultimos_casos %}
-                    <div class="border-bottom border-light pb-2 mb-2">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>{{ caso.titulo }}</strong>
-                                <span class="badge-custom ms-2">{{ caso.contexto }}</span>
-                                <span class="badge-custom">{{ caso.tecnologia }}</span>
-                            </div>
-                            <small class="text-white-50">{{ caso.data_criacao|date:"d/m/Y" }}</small>
-                        </div>
-                        <p class="small text-white-50 mb-0">{{ caso.descricao|truncatewords:20 }}</p>
-                    </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-white-50">No cases registered yet.</p>
-                {% endif %}
-            </div>
-            <div class="card-footer bg-transparent border-light text-end">
-                <a href="{% url 'casos_lista' %}" class="btn btn-sm btn-gradient">View all cases</a>
+                <canvas id="activityChart" height="110"></canvas>
             </div>
         </div>
     </div>
-    
-    <div class="col-md-4 mb-4">
-        <div class="card">
+
+    <div class="col-lg-4 col-md-12 mb-4">
+        <div class="card h-100">
             <div class="card-header bg-transparent border-light">
-                <h5 class="mb-0"><i class="bi bi-trophy"></i> Top Contributors</h5>
+                <h5 class="mb-0"><i class="bi bi-trophy me-2"></i>Top Contributors</h5>
             </div>
             <div class="card-body">
                 {% if top_contribuidores %}
                     {% for contribuidor in top_contribuidores %}
-                    <div class="d-flex align-items-center mb-3">
-                        <div class="me-3">
+                    <a href="{% url 'perfil_usuario' contribuidor.email %}" class="text-decoration-none text-white">
+                    <div class="d-flex align-items-center mb-3 hover-highlight rounded p-1">
+                        <div class="me-3 fs-5">
                             {% if forloop.counter == 1 %}🥇
                             {% elif forloop.counter == 2 %}🥈
                             {% elif forloop.counter == 3 %}🥉
@@ -106,18 +110,99 @@
                             <div class="small text-white-50">{{ contribuidor.email }}</div>
                         </div>
                         <div class="badge-custom">
-                            {{ contribuidor.total_casos }} cases
+                            {{ contribuidor.pontuacao }} pts
                         </div>
                     </div>
+                    </a>
                     {% endfor %}
                 {% else %}
-                    <p class="text-white-50">No contributors yet.</p>
+                    <p class="text-white-50">Ainda sem contribuições.</p>
                 {% endif %}
             </div>
             <div class="card-footer bg-transparent border-light text-end">
-                <a href="{% url 'ranking' %}" class="btn btn-sm btn-outline-light">View full ranking</a>
+                <a href="{% url 'ranking' %}" class="btn btn-sm btn-outline-light">Ranking completo</a>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Casos Recentes -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-transparent border-light">
+                <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Casos Recentes</h5>
+            </div>
+            <div class="card-body">
+                {% if ultimos_casos %}
+                    {% for caso in ultimos_casos %}
+                    <div class="border-bottom border-light pb-2 mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ caso.titulo }}</strong>
+                                <span class="badge-custom ms-2">{{ caso.contexto }}</span>
+                                <span class="badge-custom">{{ caso.tecnologia }}</span>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <small class="text-white-50">{{ caso.data_criacao|date:"d/m/Y" }}</small>
+                            </div>
+                        </div>
+                        <p class="small text-white-50 mb-0">{{ caso.descricao|truncatewords:20 }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-white-50">Nenhum caso registrado ainda.</p>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-transparent border-light text-end">
+                <a href="{% url 'casos_lista' %}" class="btn btn-sm btn-gradient">Ver todos os cases</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const ctx = document.getElementById('activityChart').getContext('2d');
+new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: {{ grafico_labels|safe }},
+        datasets: [
+            {
+                label: 'Cases',
+                data: {{ grafico_casos|safe }},
+                backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                borderColor: 'rgba(102, 126, 234, 1)',
+                borderWidth: 1,
+                borderRadius: 4,
+            },
+            {
+                label: 'Materials + Videos + Tools',
+                data: {{ grafico_outros|safe }},
+                backgroundColor: 'rgba(118, 75, 162, 0.8)',
+                borderColor: 'rgba(118, 75, 162, 1)',
+                borderWidth: 1,
+                borderRadius: 4,
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { labels: { color: 'rgba(255,255,255,0.7)', font: { size: 12 } } },
+            tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+            x: { ticks: { color: 'rgba(255,255,255,0.6)' }, grid: { color: 'rgba(255,255,255,0.05)' }, stacked: false },
+            y: { ticks: { color: 'rgba(255,255,255,0.6)', stepSize: 1 }, grid: { color: 'rgba(255,255,255,0.05)' }, beginAtZero: true }
+        }
+    }
+});
+</script>
+<style>
+.hover-highlight:hover { background: rgba(255,255,255,0.05); }
+</style>
+{% endblock %}
 {% endblock %}

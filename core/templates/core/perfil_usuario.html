@@ -1,0 +1,231 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Header do perfil -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex align-items-center">
+            <div class="me-4">
+                <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center"
+                     style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2) !important;">
+                    <span style="font-size: 2rem;">{{ perfil_nome|first|upper }}</span>
+                </div>
+            </div>
+            <div class="flex-grow-1">
+                <h2 class="mb-1">{{ perfil_nome }}</h2>
+                <p class="text-white-50 mb-2">{{ perfil_email }}</p>
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    {% if perfil_role == 'admin' %}
+                    <span class="badge bg-danger">Admin</span>
+                    {% elif perfil_role == 'user' %}
+                    <span class="badge bg-warning">Contributor</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Viewer</span>
+                    {% endif %}
+
+                    {% if perfil_tipo %}
+                    <span class="badge bg-info text-dark">
+                        {% if perfil_tipo == 'architect' %}🏗️ Architect
+                        {% elif perfil_tipo == 'gogetter' %}⚡ Go-Getter
+                        {% elif perfil_tipo == 'simplifier' %}🎯 Simplifier
+                        {% elif perfil_tipo == 'systematic' %}🔬 Systematic
+                        {% endif %}
+                    </span>
+                    {% endif %}
+
+                    <span class="badge bg-gradient" style="background: linear-gradient(135deg, #667eea, #764ba2);">
+                        ⭐ {{ pontuacao }} pts
+                    </span>
+                </div>
+            </div>
+            {% if is_own_profile %}
+            <div>
+                <a href="{% url 'perfis' %}" class="btn btn-outline-light btn-sm">
+                    <i class="bi bi-person-gear me-1"></i>Meu Perfil de Trabalho
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Métricas rápidas -->
+<div class="row mb-4">
+    <div class="col">
+        <div class="card text-center py-3">
+            <h3 class="mb-0">{{ n_casos }}</h3>
+            <small class="text-white-50">Cases</small>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-center py-3">
+            <h3 class="mb-0">{{ n_videos }}</h3>
+            <small class="text-white-50">Videos</small>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-center py-3">
+            <h3 class="mb-0">{{ n_materiais }}</h3>
+            <small class="text-white-50">Materials</small>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-center py-3">
+            <h3 class="mb-0">{{ n_ferramentas }}</h3>
+            <small class="text-white-50">Tools</small>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card text-center py-3">
+            <h3 class="mb-0">{{ n_snippets }}</h3>
+            <small class="text-white-50">Snippets</small>
+        </div>
+    </div>
+</div>
+
+<!-- Badges -->
+{% if badges %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0">🏅 Badges Conquistados</h5>
+    </div>
+    <div class="card-body">
+        <div class="d-flex flex-wrap gap-3">
+            {% for badge in badges %}
+            <div class="text-center" title="{{ badge.desc }}">
+                <div style="font-size: 2rem;">{{ badge.icon }}</div>
+                <div class="small fw-bold">{{ badge.nome }}</div>
+                <div class="small text-white-50">{{ badge.desc }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Tabs de contribuições -->
+<ul class="nav nav-tabs mb-3" id="contribuicoesTabs">
+    {% if casos %}<li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#tab-casos">📋 Cases ({{ n_casos }})</a></li>{% endif %}
+    {% if videos %}<li class="nav-item"><a class="nav-link {% if not casos %}active{% endif %}" data-bs-toggle="tab" href="#tab-videos">🎥 Videos ({{ n_videos }})</a></li>{% endif %}
+    {% if materiais %}<li class="nav-item"><a class="nav-link {% if not casos and not videos %}active{% endif %}" data-bs-toggle="tab" href="#tab-materiais">📚 Materials ({{ n_materiais }})</a></li>{% endif %}
+    {% if ferramentas %}<li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-ferramentas">🔧 Tools ({{ n_ferramentas }})</a></li>{% endif %}
+    {% if snippets %}<li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab-snippets">💻 Snippets ({{ n_snippets }})</a></li>{% endif %}
+</ul>
+
+<div class="tab-content">
+    <!-- Cases -->
+    {% if casos %}
+    <div class="tab-pane fade show active" id="tab-casos">
+        <div class="card">
+            <div class="card-body p-0">
+                {% for caso in casos %}
+                <div class="p-3 border-bottom border-light">
+                    <div class="d-flex justify-content-between">
+                        <strong>{{ caso.titulo }}</strong>
+                        <small class="text-white-50">{{ caso.data_criacao|date:"d/m/Y" }}</small>
+                    </div>
+                    <div class="mt-1">
+                        <span class="badge bg-secondary me-1">{{ caso.contexto }}</span>
+                        <span class="badge bg-secondary">{{ caso.tecnologia }}</span>
+                    </div>
+                    <p class="small text-white-50 mt-1 mb-0">{{ caso.descricao|truncatewords:20 }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Videos -->
+    {% if videos %}
+    <div class="tab-pane fade {% if not casos %}show active{% endif %}" id="tab-videos">
+        <div class="card">
+            <div class="card-body p-0">
+                {% for video in videos %}
+                <div class="p-3 border-bottom border-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ video.titulo }}</strong>
+                        <div class="mt-1">
+                            <span class="badge bg-secondary me-1">{{ video.tema }}</span>
+                            <span class="badge bg-secondary">{{ video.nivel }}</span>
+                        </div>
+                    </div>
+                    <small class="text-white-50">{{ video.data_criacao|date:"d/m/Y" }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Materiais -->
+    {% if materiais %}
+    <div class="tab-pane fade {% if not casos and not videos %}show active{% endif %}" id="tab-materiais">
+        <div class="card">
+            <div class="card-body p-0">
+                {% for mat in materiais %}
+                <div class="p-3 border-bottom border-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ mat.titulo }}</strong>
+                        <span class="badge bg-info text-dark ms-2">{{ mat.tipo }}</span>
+                        {% if mat.url %}<a href="{{ mat.url }}" target="_blank" class="small text-info ms-2">🔗</a>{% endif %}
+                    </div>
+                    <small class="text-white-50">{{ mat.data_criacao|date:"d/m/Y" }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Ferramentas -->
+    {% if ferramentas %}
+    <div class="tab-pane fade" id="tab-ferramentas">
+        <div class="card">
+            <div class="card-body p-0">
+                {% for ferr in ferramentas %}
+                <div class="p-3 border-bottom border-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ ferr.nome }}</strong>
+                        <span class="badge bg-secondary ms-2">{{ ferr.categoria }}</span>
+                    </div>
+                    <small class="text-white-50">{{ ferr.data_criacao|date:"d/m/Y" }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Snippets -->
+    {% if snippets %}
+    <div class="tab-pane fade" id="tab-snippets">
+        <div class="card">
+            <div class="card-body p-0">
+                {% for sn in snippets %}
+                <div class="p-3 border-bottom border-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong>{{ sn.titulo }}</strong>
+                        <span class="badge bg-primary ms-2">{{ sn.linguagem }}</span>
+                        {% if sn.descricao %}<div class="small text-white-50 mt-1">{{ sn.descricao }}</div>{% endif %}
+                    </div>
+                    <small class="text-white-50">{{ sn.data_criacao|date:"d/m/Y" }}</small>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if not casos and not videos and not materiais and not ferramentas and not snippets %}
+<div class="card text-center py-5 mt-3">
+    <div class="card-body">
+        <i class="bi bi-person-plus" style="font-size: 3rem; opacity: 0.3;"></i>
+        <p class="text-white-50 mt-3">Nenhuma contribuição ainda.</p>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

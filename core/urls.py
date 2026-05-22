@@ -68,4 +68,25 @@ urlpatterns = [
 
     # Perfis
     path('perfis/', views.perfis_view, name='perfis'),
+    path('perfis/salvar-tipo/', views.salvar_perfil_tipo, name='salvar_perfil_tipo'),
+
+    # Snippets
+    path('snippets/', views.snippets_lista, name='snippets_lista'),
+    path('snippets/novo/', views.snippet_novo, name='snippet_novo'),
+    path('snippets/editar/<int:id>/', views.snippet_editar, name='snippet_editar'),
+    path('snippets/excluir/<int:id>/', views.snippet_excluir, name='snippet_excluir'),
+    path('snippets/<int:id>/dados/', views.snippet_dados, name='snippet_dados'),
+
+    # Busca global
+    path('busca/', views.busca_global, name='busca_global'),
+
+    # Favoritos
+    path('favoritos/', views.favoritos, name='favoritos'),
+    path('favoritos/toggle/<str:content_type>/<int:object_id>/', views.favorito_toggle, name='favorito_toggle'),
+
+    # Changelog
+    path('novidades/', views.changelog, name='changelog'),
+
+    # Perfil de usuário
+    path('perfil/<str:email>/', views.perfil_usuario, name='perfil_usuario'),
 ]

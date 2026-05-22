@@ -6,7 +6,7 @@
 <p class="text-white-50 mb-4">Recognizing who contributes most to the team's growth.</p>
 
 <!-- AE of the Month -->
-{% if ae_mes %}
+{% if destaque_mes %}
 <div class="row mb-5">
     <div class="col-12">
         <div class="card bg-gradient text-white text-center">
@@ -23,8 +23,8 @@
                     </div>
                     <div class="text-start">
                         <h2 class="mb-0">🏆 AE of the Month</h2>
-                        <h3 class="mb-2">{{ ae_mes.nome }}</h3>
-                        <p class="mb-0">&#x2B50; {{ ae_mes.pontuacao }} points | &#x1F4DA; {{ ae_mes.total_contribuicoes }} contributions</p>
+                        <h3 class="mb-2">{{ destaque_mes.nome }}</h3>
+                        <p class="mb-0">&#x2B50; {{ destaque_mes.pontuacao }} points | &#x1F4DA; {{ destaque_mes.total_contribuicoes }} contributions</p>
                     </div>
                 </div>
             </div>

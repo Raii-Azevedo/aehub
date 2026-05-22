@@ -1,0 +1,89 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="mb-4">
+    <h1 class="mb-1">🔖 Meus Favoritos</h1>
+    <p class="text-white-50">Conteúdos que você salvou para consultar depois.</p>
+</div>
+
+{% if not favoritos %}
+<div class="card text-center py-5">
+    <div class="card-body">
+        <i class="bi bi-bookmark-heart" style="font-size: 3rem; opacity: 0.3;"></i>
+        <p class="text-white-50 mt-3">Você ainda não tem favoritos. Clique no ícone <i class="bi bi-bookmark"></i> em qualquer conteúdo para salvar aqui.</p>
+    </div>
+</div>
+{% else %}
+
+<!-- Agrupar por tipo -->
+{% regroup favoritos by content_type as grupos %}
+
+{% for grupo in grupos %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0">
+            {% if grupo.grouper == 'caso' %}📋 Cases
+            {% elif grupo.grouper == 'material' %}📚 Materials
+            {% elif grupo.grouper == 'video' %}🎥 Videos
+            {% elif grupo.grouper == 'ferramenta' %}🔧 Tools
+            {% elif grupo.grouper == 'snippet' %}💻 Snippets
+            {% endif %}
+            <span class="badge bg-secondary ms-2">{{ grupo.list|length }}</span>
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        {% for fav in grupo.list %}
+        <div class="p-3 border-bottom border-light d-flex justify-content-between align-items-center">
+            <div>
+                <strong>{{ fav.titulo|default:"(sem título)" }}</strong>
+                <div class="small text-white-50">Salvo em {{ fav.data_criacao|date:"d/m/Y" }}</div>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="
+                    {% if grupo.grouper == 'caso' %}{% url 'casos_lista' %}
+                    {% elif grupo.grouper == 'material' %}{% url 'materiais_lista' %}
+                    {% elif grupo.grouper == 'video' %}{% url 'videos_lista' %}
+                    {% elif grupo.grouper == 'ferramenta' %}{% url 'ferramentas_lista' %}
+                    {% elif grupo.grouper == 'snippet' %}{% url 'snippets_lista' %}
+                    {% endif %}" class="btn btn-sm btn-outline-light" title="Ver conteúdo">
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+                <button class="btn btn-sm btn-outline-danger remove-fav-btn"
+                        data-tipo="{{ grupo.grouper }}" data-id="{{ fav.object_id }}"
+                        data-csrf="{{ csrf_token }}" title="Remover favorito">
+                    <i class="bi bi-bookmark-x"></i>
+                </button>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endfor %}
+
+{% endif %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('.remove-fav-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const tipo = this.dataset.tipo;
+        const id = this.dataset.id;
+        const csrf = this.dataset.csrf;
+        const row = this.closest('.border-bottom');
+
+        fetch(`/favoritos/toggle/${tipo}/${id}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrf }
+        }).then(r => r.json()).then(data => {
+            if (data.status === 'removed') {
+                row.style.transition = 'opacity 0.3s';
+                row.style.opacity = '0';
+                setTimeout(() => { row.remove(); }, 300);
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

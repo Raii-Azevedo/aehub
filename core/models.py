@@ -213,9 +213,36 @@ class UserOnboarding(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='onboarding')
     onboarding_completo = models.BooleanField(default=False)
     data_conclusao = models.DateTimeField(null=True, blank=True)
+    perfil_tipo = models.CharField(max_length=50, blank=True, null=True)  # architect, gogetter, simplifier, systematic
 
     class Meta:
         db_table = 'user_onboarding'
 
     def __str__(self):
         return f"{self.user.email} - {'ok' if self.onboarding_completo else 'pendente'}"
+
+
+# ============================================
+# FAVORITOS
+# ============================================
+class Favorito(models.Model):
+    CONTENT_TYPES = [
+        ('caso', 'Caso de Uso'),
+        ('material', 'Material'),
+        ('video', 'Vídeo'),
+        ('ferramenta', 'Ferramenta'),
+        ('snippet', 'Snippet'),
+    ]
+    usuario_email = models.EmailField()
+    content_type = models.CharField(max_length=20, choices=CONTENT_TYPES)
+    object_id = models.IntegerField()
+    titulo = models.CharField(max_length=500, blank=True)  # cache do título para exibição rápida
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'favoritos'
+        unique_together = ('usuario_email', 'content_type', 'object_id')
+        ordering = ['-data_criacao']
+
+    def __str__(self):
+        return f"{self.usuario_email} → {self.content_type}:{self.object_id}"
