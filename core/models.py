@@ -48,6 +48,7 @@ class CasoUso(models.Model):
     tags = models.TextField(blank=True, null=True)
     autor = models.TextField()
     autor_email = models.EmailField()
+    autor_id = models.IntegerField(null=True, blank=True)  # FK to auth_user (NOT NULL in DB — must supply)
     ativo = models.BooleanField()
     data_criacao = models.DateTimeField()
     data_atualizacao = models.DateTimeField()

@@ -530,8 +530,9 @@ def caso_novo(request):
             descricao=request.POST.get('descricao'),
             resultado=request.POST.get('resultado'),
             tags=request.POST.get('tags', ''),
-            autor=nome_autor,  # ✅ Preencher campo autor
+            autor=nome_autor,
             autor_email=request.user.email,
+            autor_id=request.user.id,  # satisfies NOT NULL FK constraint in casos_uso
             ativo=True,
             data_criacao=agora,
             data_atualizacao=agora
@@ -1708,4 +1709,6 @@ def salvar_perfil_tipo(request):
         except Exception:
             pass
         return JsonResponse({'status': 'ok', 'message': 'Profile saved!'})
+    return JsonResponse({'error': 'Method not allowed.'}, status=405)
+)
     return JsonResponse({'error': 'Method not allowed.'}, status=405)
