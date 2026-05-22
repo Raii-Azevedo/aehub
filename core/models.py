@@ -190,14 +190,15 @@ class Ferramenta(models.Model):
 class Video(models.Model):
     titulo = models.CharField(max_length=500)
     descricao = models.TextField(blank=True, null=True)
-    tema = models.CharField(max_length=100)
-    nivel = models.CharField(max_length=20)
+    tema = models.CharField(max_length=500)   # expanded from legacy varchar(20) via migration 0009
+    nivel = models.CharField(max_length=100)  # expanded from legacy varchar(20) via migration 0009
     duracao = models.CharField(max_length=20, blank=True, null=True)
     youtube_id = models.TextField(blank=True, null=True)
     thumbnail_url = models.TextField(blank=True, null=True)
     autor = models.CharField(max_length=255)
     autor_email = models.EmailField()
     data_criacao = models.DateTimeField(null=True, blank=True)
+    data_atualizacao = models.DateTimeField(null=True, blank=True)  # added by migration 0002
 
     class Meta:
         db_table = 'videos'
@@ -238,11 +239,11 @@ class Favorito(models.Model):
     usuario_email = models.EmailField()
     content_type = models.CharField(max_length=20, choices=CONTENT_TYPES)
     object_id = models.IntegerField()
-    titulo = models.CharField(max_length=500, blank=True)  # cache do título para exibição rápida
     data_criacao = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'favoritos'
+        unique_together = ('usuario_email', 'content_type', 'object_id')
         ordering = ['-data_criacao']
 
     def __str__(self):

@@ -780,6 +780,7 @@ def video_novo(request):
         autor = request.POST.get('autor', request.user.get_full_name() or request.user.username)
         youtube_id = normalize_video_url(request.POST.get('youtube_id', ''))
         
+        agora_video = timezone.now()
         video = Video.objects.create(
             titulo=request.POST.get('titulo'),
             descricao=request.POST.get('descricao', ''),
@@ -789,7 +790,8 @@ def video_novo(request):
             youtube_id=youtube_id,
             autor=autor,
             autor_email=request.user.email,
-            data_criacao=timezone.now()
+            data_criacao=agora_video,
+            data_atualizacao=agora_video,
         )
         messages.success(request, '✅ Video added successfully!')
         return redirect('videos_lista')
@@ -821,6 +823,7 @@ def video_editar(request, id):
         video.duracao = request.POST.get('duracao', '')
         video.youtube_id = youtube_id
         video.autor = request.POST.get('autor', video.autor)
+        video.data_atualizacao = timezone.now()
         video.save()
         messages.success(request, '✅ Video updated successfully!')
         return redirect('videos_lista')
@@ -1707,7 +1710,6 @@ def salvar_perfil_tipo(request):
     if request.method == 'POST':
         perfil_tipo = request.POST.get('perfil_tipo', '').strip()
         tipos_validos = ['architect', 'gogetter', 'simplifier', 'systematic']
-
         if perfil_tipo not in tipos_validos:
             return JsonResponse({'error': 'Invalid profile type.'}, status=400)
 
@@ -1717,7 +1719,5 @@ def salvar_perfil_tipo(request):
             onboarding.save()
         except Exception:
             pass
-
         return JsonResponse({'status': 'ok', 'message': 'Profile saved!'})
-
     return JsonResponse({'error': 'Method not allowed.'}, status=405)
