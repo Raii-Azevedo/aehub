@@ -793,6 +793,7 @@ def video_novo(request):
             nivel=request.POST.get('nivel'),
             duracao=request.POST.get('duracao', ''),
             youtube_id=youtube_id,
+            thumbnail_url='',
             autor=autor,
             autor_email=request.user.email,
             data_criacao=agora_video,

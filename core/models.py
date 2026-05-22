@@ -194,7 +194,7 @@ class Video(models.Model):
     nivel = models.CharField(max_length=100)  # expanded from legacy varchar(20) via migration 0009
     duracao = models.TextField(blank=True, null=True)  # expanded from varchar(20) via migration 0011
     youtube_id = models.TextField(blank=True, null=True)
-    thumbnail_url = models.TextField(blank=True, null=True)
+    thumbnail_url = models.TextField(blank=True, default='')  # NOT NULL in DB
     autor = models.CharField(max_length=255)
     autor_email = models.EmailField()
     data_criacao = models.DateTimeField(null=True, blank=True)
