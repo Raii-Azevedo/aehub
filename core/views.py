@@ -1699,6 +1699,7 @@ def salvar_perfil_tipo(request):
     if request.method == 'POST':
         perfil_tipo = request.POST.get('perfil_tipo', '').strip()
         tipos_validos = ['architect', 'gogetter', 'simplifier', 'systematic']
+
         if perfil_tipo not in tipos_validos:
             return JsonResponse({'error': 'Invalid profile type.'}, status=400)
 
@@ -1708,7 +1709,7 @@ def salvar_perfil_tipo(request):
             onboarding.save()
         except Exception:
             pass
+
         return JsonResponse({'status': 'ok', 'message': 'Profile saved!'})
-    return JsonResponse({'error': 'Method not allowed.'}, status=405)
-)
+
     return JsonResponse({'error': 'Method not allowed.'}, status=405)
