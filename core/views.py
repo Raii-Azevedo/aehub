@@ -909,6 +909,7 @@ def ferramenta_novo(request):
         return redirect('ferramentas_lista')
 
     if request.method == 'POST':
+        agora_ferramenta = timezone.now()
         try:
             allowed_ferr = AllowedEmail.objects.get(email=request.user.email)
             nome_autor_ferr = allowed_ferr.nome or request.user.email
@@ -924,7 +925,8 @@ def ferramenta_novo(request):
             documentacao_link=request.POST.get('documentacao_link', ''),
             autor=nome_autor_ferr,
             autor_email=request.user.email,
-            data_criacao=timezone.now()
+            data_criacao=agora_ferramenta,
+            data_atualizacao=agora_ferramenta,
         )
         messages.success(request, '✅ Tool added successfully!')
         return redirect('ferramentas_lista')
@@ -949,12 +951,14 @@ def ferramenta_editar(request, id):
         return redirect('ferramentas_lista')
 
     if request.method == 'POST':
+        agora_ferramenta = timezone.now()
         ferramenta.nome = request.POST.get('nome')
         ferramenta.categoria = request.POST.get('categoria')
         ferramenta.versao = request.POST.get('versao', '')
         ferramenta.descricao = request.POST.get('descricao')
         ferramenta.nivel = request.POST.get('nivel', '')
         ferramenta.documentacao_link = request.POST.get('documentacao_link', '')
+        ferramenta.data_atualizacao = agora_ferramenta
         ferramenta.save()
         messages.success(request, '✅ Tool updated successfully!')
         return redirect('ferramentas_lista')

@@ -178,6 +178,7 @@ class Ferramenta(models.Model):
     autor = models.TextField()
     autor_email = models.EmailField()
     data_criacao = models.DateTimeField()
+    data_atualizacao = models.DateTimeField(null=True, blank=True)  # NOT NULL in DB — added by migration 0002
 
     class Meta:
         db_table = 'ferramentas'
