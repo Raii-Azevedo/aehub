@@ -294,6 +294,7 @@ class Certification(models.Model):
 
     class Meta:
         db_table = 'certifications'
+        managed = False
         ordering = ['categoria', 'nivel', 'titulo']
 
     def __str__(self):
@@ -312,69 +313,7 @@ class CertificationProgress(models.Model):
 
     class Meta:
         db_table = 'certification_progress'
-        unique_together = ('usuario_email', 'certification')
-
-    def __str__(self):
-        return f"{self.usuario_email} → {self.certification.titulo}: {self.status}"
-
-
-# ============================================
-# CERTIFICATIONS
-# ============================================
-class Certification(models.Model):
-    CATEGORIA_CHOICES = [
-        ('Cloud & Data Engineering', 'Cloud & Data Engineering'),
-        ('Analytics Engineering / Modern Data Stack', 'Analytics Engineering / Modern Data Stack'),
-        ('BI & Visualization', 'BI & Visualization'),
-        ('Data Modeling / SQL', 'Data Modeling / SQL'),
-        ('AI & Data Platform', 'AI & Data Platform'),
-        ('Beginner / Foundations', 'Beginner / Foundations'),
-    ]
-    NIVEL_CHOICES = [
-        ('Beginner', 'Beginner'),
-        ('Junior', 'Junior'),
-        ('Mid-level', 'Mid-level'),
-        ('Senior', 'Senior'),
-    ]
-    PRIORIDADE_CHOICES = [
-        ('must_have', '🔥 Must Have'),
-        ('recommended', '☁️ Recommended'),
-        ('complementary', '🧠 Complementary'),
-        ('foundations', '📚 Foundations'),
-    ]
-
-    titulo = models.CharField(max_length=200)
-    fornecedor = models.CharField(max_length=100)
-    categoria = models.CharField(max_length=100, choices=CATEGORIA_CHOICES)
-    nivel = models.CharField(max_length=50, choices=NIVEL_CHOICES)
-    prioridade = models.CharField(max_length=30, choices=PRIORIDADE_CHOICES, default='recommended')
-    descricao = models.TextField()
-    tags = models.CharField(max_length=500, blank=True, default='')
-    link_oficial = models.URLField(max_length=500)
-    link_curso = models.URLField(max_length=500, blank=True, default='')
-    ativo = models.BooleanField(default=True)
-    data_criacao = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'certifications'
-        ordering = ['categoria', 'nivel', 'titulo']
-
-    def __str__(self):
-        return self.titulo
-
-
-class CertificationProgress(models.Model):
-    STATUS_CHOICES = [
-        ('in_progress', 'In Progress'),
-        ('completed', 'Completed'),
-    ]
-    usuario_email = models.EmailField()
-    certification = models.ForeignKey(Certification, on_delete=models.CASCADE, related_name='progress_entries')
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
-    data_atualizacao = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'certification_progress'
+        managed = False
         unique_together = ('usuario_email', 'certification')
 
     def __str__(self):
