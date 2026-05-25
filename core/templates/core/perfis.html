@@ -164,14 +164,17 @@
             <h4 class="mb-0 fw-bold">The Systematic</h4>
             <small class="text-white-50">Analytical · Documenter · Traceable</small>
           </div>
-          <span class="ms-auto badge" style="background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.35);">Bianca</span>
+          <div class="ms-auto d-flex flex-column gap-1 align-items-end">
+            <span class="badge" style="background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.35);">Bianca</span>
+            <span class="badge" style="background:rgba(245,158,11,0.15);color:#fcd34d;border:1px solid rgba(245,158,11,0.35);">Henrique</span>
+          </div>
         </div>
-        <p class="text-white-50 mb-3">"I externalize everything, diagram to think, and document so there's no doubt."</p>
+        <p class="text-white-50 mb-3">"I externalize everything, have a system (built or adopted), and document to solve problems consistently."</p>
         <div class="d-flex flex-wrap gap-2 mb-3">
           <span class="badge-custom">Excalidraw</span>
-          <span class="badge-custom">Mermaid</span>
+          <span class="badge-custom">Obsidian</span>
+          <span class="badge-custom">GTD</span>
           <span class="badge-custom">NotebookLM</span>
-          <span class="badge-custom">Notion</span>
         </div>
         <div class="text-end">
           <small style="color:#fbbf24;">View full profile →</small>
@@ -412,53 +415,105 @@ const PROFILES = {
   systematic: {
     emoji: '🧩',
     nome: 'The Systematic',
-    tagline: '"I externalize everything, diagram to think, and document so there\'s no doubt."',
+    tagline: '"I externalize everything, have a system (built or adopted), and document to solve problems consistently."',
     cor: '#f59e0b',
     corSuave: 'rgba(245,158,11,0.12)',
-    representantes: 'Bianca, Henrique',
+    representantes: 'Bianca · Henrique',
     descricao: `
-      <p>The Systematic externalizes everything. Diagrams before coding, tracks every initiative in a spreadsheet, uses AI as a cognitive extension, and never has doubt about what was delivered — because it's all documented.</p>
-      <p class="text-white-50">Uses visual thinking tools (Excalidraw, Mermaid) and AI to process large volumes of information (NotebookLM). Maintains a full ecosystem and connects every task to their People Review — the famous "anti-imposter spreadsheet."</p>
-      <div class="row mt-4 g-3">
+      <p>The Systematic externalizes everything. Whether through diagrams, spreadsheets, or personal knowledge bases — nothing stays in their head. They document decisions with full traceability, communicate risks before they become problems, and always know exactly what was delivered.</p>
+      <p class="text-white-50">What distinguishes this profile from others is the investment in <strong>systems of thinking</strong>, not just tools. The Systematic has a method — built from scratch or adapted from references — that scales with the complexity of the work.</p>
+
+      <div class="row mt-4 g-3 mb-4">
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(245,158,11,0.1);border-radius:10px;border:1px solid rgba(245,158,11,0.2);">
             <div style="font-size:1.8rem;margin-bottom:4px;">🗺️</div>
-            <div class="fw-semibold small">Thinking</div>
-            <div class="text-white-50 small">Visual & diagrammatic</div>
+            <div class="fw-semibold small">Externalizes</div>
+            <div class="text-white-50 small">Diagrams, notes, bases of knowledge</div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(245,158,11,0.1);border-radius:10px;border:1px solid rgba(245,158,11,0.2);">
-            <div style="font-size:1.8rem;margin-bottom:4px;">🤖</div>
-            <div class="fw-semibold small">AI</div>
-            <div class="text-white-50 small">Cognitive extension</div>
+            <div style="font-size:1.8rem;margin-bottom:4px;">⚙️</div>
+            <div class="fw-semibold small">Has a system</div>
+            <div class="text-white-50 small">Built or adopted — always intentional</div>
           </div>
         </div>
         <div class="col-md-4">
           <div class="text-center p-3" style="background:rgba(245,158,11,0.1);border-radius:10px;border:1px solid rgba(245,158,11,0.2);">
-            <div style="font-size:1.8rem;margin-bottom:4px;">📊</div>
-            <div class="fw-semibold small">Traceability</div>
-            <div class="text-white-50 small">Anti-imposter spreadsheet</div>
+            <div style="font-size:1.8rem;margin-bottom:4px;">📡</div>
+            <div class="fw-semibold small">Communicates</div>
+            <div class="text-white-50 small">Risks, blockers, progress — proactively</div>
           </div>
         </div>
       </div>
+
+      <hr style="border-color:rgba(255,255,255,0.1);" class="my-4">
+
+      <div class="row g-4">
+        <div class="col-md-6">
+          <div class="p-3 h-100" style="background:rgba(245,158,11,0.07);border-radius:10px;border:1px solid rgba(245,158,11,0.18);">
+            <div class="d-flex align-items-center mb-2">
+              <span style="font-size:1.4rem;margin-right:0.5rem;">🧩</span>
+              <strong>Bianca</strong>
+              <span class="ms-2 text-white-50 small">— Builder</span>
+            </div>
+            <p class="text-white-50 small mb-2">Builds her own systems from scratch. Uses visual tools (Excalidraw, Mermaid) to think before writing a single line of code. Maintains an "anti-imposter spreadsheet" — every initiative, deliverable, and impact connected to her People Review.</p>
+            <div class="d-flex flex-wrap gap-1">
+              <span class="badge bg-dark border border-secondary" style="font-size:.7rem;">Excalidraw</span>
+              <span class="badge bg-dark border border-secondary" style="font-size:.7rem;">Mermaid</span>
+              <span class="badge bg-dark border border-secondary" style="font-size:.7rem;">NotebookLM</span>
+              <span class="badge bg-dark border border-secondary" style="font-size:.7rem;">Anti-imposter spreadsheet</span>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="p-3 h-100" style="background:rgba(245,158,11,0.07);border-radius:10px;border:1px solid rgba(245,158,11,0.18);">
+            <div class="d-flex align-items-center mb-2">
+              <span style="font-size:1.4rem;margin-right:0.5rem;">🧩</span>
+              <strong>Henrique</strong>
+              <span class="ms-2 text-white-50 small">— Curator</span>
+            </div>
+            <p class="text-white-50 small mb-2">Adopted and adapted frameworks from references he curates obsessively (GTD, Eisenhower, High Agency). Built discipline out of natural disorganization. Treats communication as part of technical execution — if you don't communicate a risk, you're part of the problem.</p>
+            <div class="d-flex flex-wrap gap-1">
+              <span class="badge bg-dark border border-secondary" style="font-size:.7rem;">GTD</span>
+              <span class="badge bg-dark border border-secondary" style="font-size:.7rem;">Obsidian</span>
+              <span class="badge bg-dark border border-secondary" style="font-size:.7rem;">Eisenhower Matrix</span>
+              <span class="badge bg-dark border border-secondary" style="font-size:.7rem;">Bullet Journal</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 p-3" style="background:rgba(245,158,11,0.06);border-radius:8px;border-left:3px solid rgba(245,158,11,0.5);">
+        <p class="mb-1 small text-white-50"><strong style="color:#fcd34d;">Henrique's foundational insight:</strong></p>
+        <p class="mb-0 small fst-italic text-white-50">"Autogerenciamento é uma coisa muito complicada. Aprender a fazer isso o quanto antes, porque senão você vai acabar com maus hábitos péssimos que se refletem na qualidade do trabalho."</p>
+      </div>
     `,
     habitos: [
-      'Diagrams the problem before starting to write code or documentation',
-      'Maintains an initiative spreadsheet connecting tasks to the People Review',
-      'Uses AI (NotebookLM, Claude) to process large volumes of information',
-      'Externalizes thoughts to avoid cognitive overload',
+      'Externalizes before it becomes a problem — diagrams, notes, spreadsheets, knowledge bases',
+      'Diagrams the problem before writing a single line of code or documentation (Bianca)',
+      'Maintains an initiative spreadsheet that connects every task to its impact and People Review (Bianca)',
+      'Uses AI (NotebookLM, Claude) as a cognitive extension to process large volumes of information (Bianca)',
+      'Applies GTD workflow: capture → process → organize → review → engage (Henrique)',
+      'Uses Obsidian + Bullet Journal as a personal knowledge base and task capture system (Henrique)',
+      'Prioritizes with Eisenhower Matrix + dependency logic: "the ball never stays on our side" (Henrique)',
+      'Communicates risks proactively before they become blockers — frames it as part of technical execution (Henrique)',
+      'Curates external references (Thorst Ball, David Allen) to learn from people who already thought about the problem (Henrique)',
       'Documents decisions with full traceability — nothing stays in their head',
     ],
     riscos: [
-      'May invest more time in structure than the situation requires in short projects',
-      'The full ecosystem can be intimidating to those just starting to work alongside',
+      'May invest more time in structure than short, fast-paced projects require',
+      'The full ecosystem (tools + frameworks) can feel overwhelming to those just starting to work alongside',
+      'Risk of over-engineering the system instead of shipping — the method can become the goal (Henrique)',
+      'May be hard to pair with more improvised profiles (GoGetters) who see the frameworks as overhead',
     ],
     onboarding: [
-      { titulo: 'Create your initiative spreadsheet on day one', desc: 'List every task/project with context, expected impact, and date. This will save you at People Review time.' },
-      { titulo: 'Map the ecosystem with Excalidraw', desc: 'In the first week, diagram the client/team data stack. It gives you fast overview and already communicates competence.' },
-      { titulo: 'Set up your NotebookLM with project documentation', desc: 'Feed project docs into NotebookLM to process quickly in the first weeks. It dramatically accelerates ramp-up.' },
-      { titulo: 'Share your diagrams with the team', desc: 'Your visual way of thinking is a gift to the team. Present an architecture diagram early — it creates connection.' },
+      { titulo: 'Pick one system and commit to it for 30 days', desc: 'GTD, Bullet Journal, or a spreadsheet — doesn\'t matter which. What matters is consistency. Henrique: "Can be GTD, Bullet Journal, whatever. But have a system. Don\'t rely only on your head."' },
+      { titulo: 'Create your initiative spreadsheet on day one', desc: 'List every task/project with context, expected impact, and date. This anti-imposter spreadsheet will save you at People Review time. (Bianca\'s method.)' },
+      { titulo: 'Map the ecosystem with a diagram in week one', desc: 'Use Excalidraw or Mermaid to diagram the client/team data stack. It gives you a fast overview and already communicates competence to the team.' },
+      { titulo: 'Set up a personal knowledge base from the start', desc: 'Use Obsidian, Notion, or NotebookLM — feed it with project docs, decisions, and lessons learned. The ramp-up investment pays off in weeks 3–4.' },
+      { titulo: 'Learn to communicate risks before they\'re problems', desc: 'Henrique: "If you think something could be done differently to mitigate a problem and you don\'t say it — you\'re contributing to the problem." Risk communication is a technical skill, not just soft skills.' },
+      { titulo: 'Read Nailing the Basics by Thorst Ball', desc: 'Henrique\'s top recommendation: "The rate of practical good ideas per paragraph is very high. Absurd writing — super practical, straight to the point." Start with the newsletter/Substack.' },
     ],
   },
 };

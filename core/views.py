@@ -72,8 +72,9 @@ def perfis_view(request):
             {'nome': 'WhatsApp / Slack', 'descricao': 'Asking the team for help without ceremony', 'link': 'https://slack.com'},
         ],
         'systematic': [
-            {'nome': 'Excalidraw', 'descricao': 'Quick diagrams to externalize thinking', 'link': 'https://excalidraw.com'},
+            {'nome': 'Excalidraw', 'descricao': 'Quick diagrams to externalize thinking before coding', 'link': 'https://excalidraw.com'},
             {'nome': 'Mermaid', 'descricao': 'Diagrams as code — traceable and versionable', 'link': 'https://mermaid.js.org'},
+            {'nome': 'Obsidian', 'descricao': 'Personal knowledge base with linked notes — Henrique\'s main thinking tool', 'link': 'https://obsidian.md'},
             {'nome': 'NotebookLM', 'descricao': 'AI as cognitive extension to process large documents', 'link': 'https://notebooklm.google.com'},
             {'nome': 'Notion', 'descricao': 'Personal knowledge base and initiative spreadsheet', 'link': 'https://notion.so'},
             {'nome': 'dbt', 'descricao': 'Documentation and traceability at the analytics layer', 'link': 'https://www.getdbt.com'},
