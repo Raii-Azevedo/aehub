@@ -121,6 +121,16 @@
         const canEdit = userRole === 'admin' || userRole === 'user';
     </script>
     {% block extra_js %}{% endblock %}
+    <script>
+    /* ── Macrotopic description helper (shared across all content forms) ── */
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('macrotopic-select')) {
+            var opt = e.target.options[e.target.selectedIndex];
+            var descEl = e.target.closest('.macrotopic-wrapper')?.querySelector('.macrotopic-desc');
+            if (descEl) descEl.textContent = opt ? (opt.dataset.desc || '') : '';
+        }
+    });
+    </script>
 </body>
 
 </html>

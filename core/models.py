@@ -49,6 +49,7 @@ class CasoUso(models.Model):
     autor = models.TextField()
     autor_email = models.EmailField()
     autor_id = models.IntegerField(null=True, blank=True)  # FK to auth_user (NOT NULL in DB — must supply)
+    macrotopico = models.CharField(max_length=100, blank=True, default='')
     ativo = models.BooleanField()
     data_criacao = models.DateTimeField()
     data_atualizacao = models.DateTimeField(null=True, blank=True)
@@ -88,6 +89,7 @@ class Material(models.Model):
     url = models.TextField(blank=True, null=True)
     autor = models.TextField()
     autor_email = models.EmailField()
+    macrotopico = models.CharField(max_length=100, blank=True, default='')
     data_criacao = models.DateTimeField()
     data_atualizacao = models.DateTimeField(null=True, blank=True)  # NOT NULL in DB — must supply on create
 
@@ -158,6 +160,7 @@ class Snippet(models.Model):
     tags = models.TextField(blank=True, null=True)
     autor = models.TextField()
     autor_email = models.EmailField()
+    macrotopico = models.CharField(max_length=100, blank=True, default='')
     data_criacao = models.DateTimeField()
 
     class Meta:
@@ -177,6 +180,7 @@ class Ferramenta(models.Model):
     documentacao_link = models.TextField(blank=True, null=True)
     autor = models.TextField()
     autor_email = models.EmailField()
+    macrotopico = models.CharField(max_length=100, blank=True, default='')
     data_criacao = models.DateTimeField()
     data_atualizacao = models.DateTimeField(null=True, blank=True)  # NOT NULL in DB — added by migration 0002
 
@@ -198,6 +202,7 @@ class Video(models.Model):
     thumbnail_url = models.TextField(blank=True, default='')  # NOT NULL in DB
     autor = models.CharField(max_length=255)
     autor_email = models.EmailField()
+    macrotopico = models.CharField(max_length=100, blank=True, default='')
     data_criacao = models.DateTimeField(null=True, blank=True)
     data_atualizacao = models.DateTimeField(null=True, blank=True)  # added by migration 0002
 
@@ -243,9 +248,8 @@ class Favorito(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'favoritos'
         unique_together = ('usuario_email', 'content_type', 'object_id')
-        ordering = ['-data_criacao']
+        managed = False
 
     def __str__(self):
         return f"{self.usuario_email} → {self.content_type}:{self.object_id}"

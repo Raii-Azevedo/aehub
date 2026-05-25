@@ -147,6 +147,9 @@
                             <label class="form-label">Tags</label>
                             <input type="text" name="tags" class="form-control" placeholder="e.g. pandas, dataframe, cleaning (comma-separated)">
                         </div>
+                        <div class="col-12">
+                            {% include "core/_macrotopic_select.html" %}
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -190,6 +193,22 @@
                         <div class="col-12">
                             <label class="form-label">Tags</label>
                             <input type="text" name="tags" id="edit-tags" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3 macrotopic-wrapper">
+                                <label class="form-label">Macrotopic <span class="text-white-50" style="font-size:.8rem;">(helps with discovery)</span></label>
+                                <select name="macrotopico" id="edit-macrotopico-snippet" class="form-select macrotopic-select">
+                                    <option value="">— Select a macrotopic —</option>
+                                    <option value="AI & Machine Learning" data-desc="Focused on developing models and algorithms capable of learning from data to make predictions, classifications and intelligent automations.">AI &amp; Machine Learning</option>
+                                    <option value="Data Science & Analytics" data-desc="Dedicated to exploring, analysing and interpreting data to generate insights and support decision-making.">Data Science &amp; Analytics</option>
+                                    <option value="Statistics & Math" data-desc="Theoretical foundation using mathematical and statistical concepts to rigorously analyse, model and validate data.">Statistics &amp; Math</option>
+                                    <option value="Data Engineering & Platforms" data-desc="Responsible for designing, building and maintaining the infrastructure, pipelines and systems that collect, process and deliver data.">Data Engineering &amp; Platforms</option>
+                                    <option value="Data Visualization & BI" data-desc="Focused on the visual representation of data through dashboards, charts and storytelling, making insights easier to understand and communicate.">Data Visualization &amp; BI</option>
+                                    <option value="Data Strategy & Governance" data-desc="Defines guidelines, processes and policies to ensure the strategic, secure and efficient use of data as an organisational asset.">Data Strategy &amp; Governance</option>
+                                    <option value="Soft Skills, Agile & Career" data-desc="Behavioural skills, methodologies and work practices that enable collaboration, organisation and value delivery in data projects.">Soft Skills, Agile &amp; Career</option>
+                                </select>
+                                <div class="macrotopic-desc small text-info mt-1" style="min-height:1.4em;font-style:italic;"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -266,6 +285,7 @@ function editarSnippet(id) {
             document.getElementById('edit-codigo').value = data.codigo;
             document.getElementById('edit-descricao').value = data.descricao || '';
             document.getElementById('edit-tags').value = data.tags || '';
+            document.getElementById('edit-macrotopico-snippet').value = data.macrotopico || '';
             document.getElementById('formEditarSnippet').action = `/snippets/editar/${id}/`;
             new bootstrap.Modal(document.getElementById('modalEditarSnippet')).show();
         });

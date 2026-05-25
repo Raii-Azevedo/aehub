@@ -538,6 +538,7 @@ def caso_novo(request):
             autor=nome_autor,
             autor_email=request.user.email,
             autor_id=request.user.id,  # satisfies NOT NULL FK constraint in casos_uso
+            macrotopico=request.POST.get('macrotopico', ''),
             ativo=True,
             data_criacao=agora,
             data_atualizacao=agora
@@ -569,6 +570,7 @@ def caso_editar(request, id):
         caso.descricao = request.POST.get('descricao')
         caso.resultado = request.POST.get('resultado')
         caso.tags = request.POST.get('tags', '')
+        caso.macrotopico = request.POST.get('macrotopico', '')
         caso.data_atualizacao = timezone.now()
         caso.save()
         messages.success(request, '✅ Case updated successfully!')
@@ -612,6 +614,7 @@ def caso_dados(request, id):
         'tags': caso.tags,
         'autor': caso.autor,
         'autor_email': caso.autor_email,
+        'macrotopico': caso.macrotopico or '',
         'data_criacao': caso.data_criacao.isoformat() if caso.data_criacao else None,
     }
     return JsonResponse(data)
@@ -670,6 +673,7 @@ def material_novo(request):
             url=request.POST.get('url', ''),
             autor=nome_autor_mat,
             autor_email=request.user.email,
+            macrotopico=request.POST.get('macrotopico', ''),
             data_criacao=agora,
             data_atualizacao=agora,
         )
@@ -701,6 +705,7 @@ def material_editar(request, id):
         material.topicos = request.POST.get('topicos', '')
         material.descricao = request.POST.get('descricao')
         material.url = request.POST.get('url', '')
+        material.macrotopico = request.POST.get('macrotopico', '')
         material.data_atualizacao = timezone.now()
         material.save()
         messages.success(request, '✅ Material updated successfully!')
@@ -744,6 +749,7 @@ def material_dados(request, id):
         'descricao': material.descricao,
         'url': material.url,
         'autor': material.autor,
+        'macrotopico': material.macrotopico or '',
     }
     return JsonResponse(data)
 
@@ -796,6 +802,7 @@ def video_novo(request):
             thumbnail_url='',
             autor=autor,
             autor_email=request.user.email,
+            macrotopico=request.POST.get('macrotopico', ''),
             data_criacao=agora_video,
             data_atualizacao=agora_video,
         )
@@ -829,6 +836,7 @@ def video_editar(request, id):
         video.duracao = request.POST.get('duracao', '')
         video.youtube_id = youtube_id
         video.autor = normalize_video_author(request.POST.get('autor', video.autor))
+        video.macrotopico = request.POST.get('macrotopico', '')
         video.data_atualizacao = timezone.now()
         video.save()
         messages.success(request, '✅ Video updated successfully!')
@@ -870,6 +878,7 @@ def video_dados(request, id):
         'youtube_id': video.youtube_id,
         'autor': video.autor,
         'autor_email': video.autor_email,
+        'macrotopico': video.macrotopico or '',
     }
     return JsonResponse(data)
 
@@ -925,6 +934,7 @@ def ferramenta_novo(request):
             documentacao_link=request.POST.get('documentacao_link', ''),
             autor=nome_autor_ferr,
             autor_email=request.user.email,
+            macrotopico=request.POST.get('macrotopico', ''),
             data_criacao=agora_ferramenta,
             data_atualizacao=agora_ferramenta,
         )
@@ -958,6 +968,7 @@ def ferramenta_editar(request, id):
         ferramenta.descricao = request.POST.get('descricao')
         ferramenta.nivel = request.POST.get('nivel', '')
         ferramenta.documentacao_link = request.POST.get('documentacao_link', '')
+        ferramenta.macrotopico = request.POST.get('macrotopico', '')
         ferramenta.data_atualizacao = agora_ferramenta
         ferramenta.save()
         messages.success(request, '✅ Tool updated successfully!')
@@ -1002,6 +1013,7 @@ def ferramenta_dados(request, id):
         'nivel': ferramenta.nivel,
         'documentacao_link': ferramenta.documentacao_link,
         'autor': ferramenta.autor,
+        'macrotopico': ferramenta.macrotopico or '',
     }
     return JsonResponse(data)
 
@@ -1410,6 +1422,7 @@ def snippet_novo(request):
             tags=request.POST.get('tags', ''),
             autor=nome_autor,
             autor_email=request.user.email,
+            macrotopico=request.POST.get('macrotopico', ''),
             data_criacao=timezone.now()
         )
         messages.success(request, '✅ Snippet added successfully!')
@@ -1435,6 +1448,7 @@ def snippet_editar(request, id):
         snippet.codigo = request.POST.get('codigo')
         snippet.descricao = request.POST.get('descricao', '')
         snippet.tags = request.POST.get('tags', '')
+        snippet.macrotopico = request.POST.get('macrotopico', '')
         snippet.save()
         messages.success(request, '✅ Snippet updated!')
         return redirect('snippets_lista')
@@ -1469,6 +1483,7 @@ def snippet_dados(request, id):
         'descricao': snippet.descricao,
         'tags': snippet.tags,
         'autor': snippet.autor,
+        'macrotopico': snippet.macrotopico or '',
     })
 
 
@@ -1709,11 +1724,8 @@ def perfil_usuario(request, email):
         'pontuacao': pontuacao,
         'badges': badges,
         'is_own_profile': is_own_profile,
-        'user_role': get_user_role(request.user),
     })
 
-
-# ================== SALVAR PERFIL TIPO ==================
 
 @login_required
 def salvar_perfil_tipo(request):
@@ -1722,7 +1734,6 @@ def salvar_perfil_tipo(request):
         tipos_validos = ['architect', 'gogetter', 'simplifier', 'systematic']
         if perfil_tipo not in tipos_validos:
             return JsonResponse({'error': 'Invalid profile type.'}, status=400)
-
         try:
             onboarding, _ = UserOnboarding.objects.get_or_create(user=request.user)
             onboarding.perfil_tipo = perfil_tipo
