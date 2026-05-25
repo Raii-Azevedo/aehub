@@ -248,6 +248,7 @@ class Favorito(models.Model):
     data_criacao = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        db_table = 'favoritos'
         unique_together = ('usuario_email', 'content_type', 'object_id')
         managed = False
 
