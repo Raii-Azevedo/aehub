@@ -25,6 +25,12 @@ h1, h2, h3, h4, h5, h6 {
     background: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    z-index: 1050;
+}
+
+.navbar .dropdown-menu {
+    z-index: 1051;
 }
 
 .navbar-brand {
