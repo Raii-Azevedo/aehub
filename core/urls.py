@@ -89,4 +89,12 @@ urlpatterns = [
 
     # Perfil de usuário
     path('perfil/<str:email>/', views.perfil_usuario, name='perfil_usuario'),
+
+    # Certifications
+    path('certificacoes/', views.certificacoes_lista, name='certificacoes_lista'),
+    path('certificacoes/nova/', views.certificacao_nova, name='certificacao_nova'),
+    path('certificacoes/editar/<int:id>/', views.certificacao_editar, name='certificacao_editar'),
+    path('certificacoes/excluir/<int:id>/', views.certificacao_excluir, name='certificacao_excluir'),
+    path('certificacoes/<int:id>/dados/', views.certificacao_dados, name='certificacao_dados'),
+    path('certificacoes/<int:id>/progresso/', views.certificacao_toggle_progresso, name='certificacao_toggle_progresso'),
 ]

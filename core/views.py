@@ -31,6 +31,8 @@ from .models import (
     AllowedEmail,
     UserOnboarding,
     Favorito,
+    Certification,
+    CertificationProgress,
 )
 
 def is_admin(user):
@@ -1742,3 +1744,174 @@ def salvar_perfil_tipo(request):
             pass
         return JsonResponse({'status': 'ok', 'message': 'Profile saved!'})
     return JsonResponse({'error': 'Method not allowed.'}, status=405)
+
+
+# ============================================
+# CERTIFICATIONS
+# ============================================
+@login_required
+def certificacoes_lista(request):
+    user_role = _get_user_role(request.user)
+    query = request.GET.get('q', '').strip()
+    categoria_filtro = request.GET.get('categoria', '').strip()
+    nivel_filtro = request.GET.get('nivel', '').strip()
+    prioridade_filtro = request.GET.get('prioridade', '').strip()
+
+    certs = Certification.objects.filter(ativo=True)
+    if query:
+        certs = certs.filter(
+            Q(titulo__icontains=query) |
+            Q(fornecedor__icontains=query) |
+            Q(descricao__icontains=query) |
+            Q(tags__icontains=query)
+        )
+    if categoria_filtro:
+        certs = certs.filter(categoria=categoria_filtro)
+    if nivel_filtro:
+        certs = certs.filter(nivel=nivel_filtro)
+    if prioridade_filtro:
+        certs = certs.filter(prioridade=prioridade_filtro)
+
+    certs = list(certs.order_by('categoria', 'nivel', 'titulo'))
+
+    # User progress map: {cert_id: status}
+    progress_map = {}
+    try:
+        for p in CertificationProgress.objects.filter(usuario_email=request.user.email):
+            progress_map[p.certification_id] = p.status
+    except Exception:
+        pass
+
+    # Group by category for card view
+    from collections import OrderedDict
+    CATEGORY_ORDER = [
+        'Analytics Engineering / Modern Data Stack',
+        'Cloud & Data Engineering',
+        'BI & Visualization',
+        'Data Modeling / SQL',
+        'AI & Data Platform',
+        'Beginner / Foundations',
+    ]
+    grouped = OrderedDict()
+    for cat in CATEGORY_ORDER:
+        grouped[cat] = []
+    for cert in certs:
+        if cert.categoria in grouped:
+            grouped[cert.categoria].append(cert)
+        else:
+            grouped.setdefault(cert.categoria, []).append(cert)
+    # Remove empty categories
+    grouped = {k: v for k, v in grouped.items() if v}
+
+    categorias = Certification.objects.filter(ativo=True).values_list('categoria', flat=True).distinct()
+    niveis = Certification.objects.filter(ativo=True).values_list('nivel', flat=True).distinct()
+
+    return render(request, 'core/certificacoes.html', {
+        'certs': certs,
+        'grouped': grouped,
+        'progress_map': progress_map,
+        'query': query,
+        'categoria_filtro': categoria_filtro,
+        'nivel_filtro': nivel_filtro,
+        'prioridade_filtro': prioridade_filtro,
+        'categorias': sorted(set(categorias)),
+        'niveis': sorted(set(niveis)),
+        'user_role': user_role,
+    })
+
+
+@login_required
+def certificacao_nova(request):
+    if _get_user_role(request.user) != 'admin':
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+    if request.method == 'POST':
+        p = request.POST
+        Certification.objects.create(
+            titulo=p.get('titulo', '').strip(),
+            fornecedor=p.get('fornecedor', '').strip(),
+            categoria=p.get('categoria', '').strip(),
+            nivel=p.get('nivel', 'Junior'),
+            prioridade=p.get('prioridade', 'recommended'),
+            descricao=p.get('descricao', '').strip(),
+            tags=p.get('tags', '').strip(),
+            link_oficial=p.get('link_oficial', '').strip(),
+            link_curso=p.get('link_curso', '').strip(),
+        )
+        messages.success(request, 'Certification added successfully!')
+        return redirect('certificacoes_lista')
+    return redirect('certificacoes_lista')
+
+
+@login_required
+def certificacao_editar(request, id):
+    if _get_user_role(request.user) != 'admin':
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+    cert = get_object_or_404(Certification, id=id)
+    if request.method == 'POST':
+        p = request.POST
+        cert.titulo = p.get('titulo', cert.titulo).strip()
+        cert.fornecedor = p.get('fornecedor', cert.fornecedor).strip()
+        cert.categoria = p.get('categoria', cert.categoria).strip()
+        cert.nivel = p.get('nivel', cert.nivel)
+        cert.prioridade = p.get('prioridade', cert.prioridade)
+        cert.descricao = p.get('descricao', cert.descricao).strip()
+        cert.tags = p.get('tags', cert.tags).strip()
+        cert.link_oficial = p.get('link_oficial', cert.link_oficial).strip()
+        cert.link_curso = p.get('link_curso', cert.link_curso).strip()
+        cert.save()
+        messages.success(request, 'Certification updated!')
+        return redirect('certificacoes_lista')
+    return redirect('certificacoes_lista')
+
+
+@login_required
+def certificacao_excluir(request, id):
+    if _get_user_role(request.user) != 'admin':
+        return JsonResponse({'error': 'Forbidden'}, status=403)
+    cert = get_object_or_404(Certification, id=id)
+    cert.ativo = False
+    cert.save()
+    messages.success(request, 'Certification removed.')
+    return redirect('certificacoes_lista')
+
+
+@login_required
+def certificacao_dados(request, id):
+    cert = get_object_or_404(Certification, id=id)
+    return JsonResponse({
+        'id': cert.id,
+        'titulo': cert.titulo,
+        'fornecedor': cert.fornecedor,
+        'categoria': cert.categoria,
+        'nivel': cert.nivel,
+        'prioridade': cert.prioridade,
+        'descricao': cert.descricao,
+        'tags': cert.tags,
+        'link_oficial': cert.link_oficial,
+        'link_curso': cert.link_curso,
+    })
+
+
+@login_required
+def certificacao_toggle_progresso(request, id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Method not allowed'}, status=405)
+    cert = get_object_or_404(Certification, id=id)
+    status_req = request.POST.get('status', 'completed')
+    try:
+        prog, created = CertificationProgress.objects.get_or_create(
+            usuario_email=request.user.email,
+            certification=cert,
+            defaults={'status': status_req},
+        )
+        if not created:
+            if prog.status == status_req:
+                # Toggle off — remove the entry
+                prog.delete()
+                return JsonResponse({'status': 'removed'})
+            else:
+                prog.status = status_req
+                prog.save()
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    return JsonResponse({'status': status_req})
