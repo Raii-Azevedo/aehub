@@ -1751,7 +1751,7 @@ def salvar_perfil_tipo(request):
 # ============================================
 @login_required
 def certificacoes_lista(request):
-    user_role = _get_user_role(request.user)
+    user_role = get_user_role(request.user)
     query = request.GET.get('q', '').strip()
     categoria_filtro = request.GET.get('categoria', '').strip()
     nivel_filtro = request.GET.get('nivel', '').strip()
@@ -1822,7 +1822,7 @@ def certificacoes_lista(request):
 
 @login_required
 def certificacao_nova(request):
-    if _get_user_role(request.user) != 'admin':
+    if get_user_role(request.user) != 'admin':
         return JsonResponse({'error': 'Forbidden'}, status=403)
     if request.method == 'POST':
         p = request.POST
@@ -1844,7 +1844,7 @@ def certificacao_nova(request):
 
 @login_required
 def certificacao_editar(request, id):
-    if _get_user_role(request.user) != 'admin':
+    if get_user_role(request.user) != 'admin':
         return JsonResponse({'error': 'Forbidden'}, status=403)
     cert = get_object_or_404(Certification, id=id)
     if request.method == 'POST':
@@ -1866,7 +1866,7 @@ def certificacao_editar(request, id):
 
 @login_required
 def certificacao_excluir(request, id):
-    if _get_user_role(request.user) != 'admin':
+    if get_user_role(request.user) != 'admin':
         return JsonResponse({'error': 'Forbidden'}, status=403)
     cert = get_object_or_404(Certification, id=id)
     cert.ativo = False
