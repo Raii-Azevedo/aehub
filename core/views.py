@@ -463,7 +463,7 @@ def _get_top_contribuidores():
 
         resultado = []
         for email, d in pontos_por_email.items():
-            total = d['casos'] * 10 + d['videos'] * 15 + d['materiais'] * 3 + d['ferramentas'] * 8
+            total = d['casos'] * 10 + d['videos'] * 12 + d['materiais'] * 6 + d['ferramentas'] * 8
             if total == 0:
                 continue
             try:
@@ -1195,15 +1195,20 @@ def gamificacao_ranking(request):
             ferramentas = Ferramenta.objects.filter(autor_email=user.email).count()
         except Exception:
             ferramentas = 0
-        
+        try:
+            snippets = Snippet.objects.filter(autor_email=user.email).count()
+        except Exception:
+            snippets = 0
+
         # Calcular pontuação
         pontos_casos = casos * 10
-        pontos_videos = videos * 15
-        pontos_materiais = materiais * 3
+        pontos_videos = videos * 12
+        pontos_materiais = materiais * 6
         pontos_ferramentas = ferramentas * 8
-        
-        pontuacao_total = pontos_casos + pontos_videos + pontos_materiais + pontos_ferramentas
-        total_contribuicoes = casos + videos + materiais + ferramentas
+        pontos_snippets = snippets * 7
+
+        pontuacao_total = pontos_casos + pontos_videos + pontos_materiais + pontos_ferramentas + pontos_snippets
+        total_contribuicoes = casos + videos + materiais + ferramentas + snippets
         
         if pontuacao_total > 0 or total_contribuicoes > 0:
             # Buscar role do usuário
@@ -1228,6 +1233,7 @@ def gamificacao_ranking(request):
                     'videos': videos,
                     'materiais': materiais,
                     'ferramentas': ferramentas,
+                    'snippets': snippets,
                 }
             })
     
@@ -1699,7 +1705,7 @@ def perfil_usuario(request, email):
     n_ferramentas = len(ferramentas)
     n_snippets = len(snippets_list)
 
-    pontuacao = n_casos * 10 + n_videos * 15 + n_materiais * 3 + n_ferramentas * 8 + n_snippets * 5
+    pontuacao = n_casos * 10 + n_videos * 12 + n_materiais * 6 + n_ferramentas * 8 + n_snippets * 7
     badges = _calcular_badges(n_casos, n_videos, n_materiais, n_ferramentas, n_snippets)
 
     # Perfil salvo
@@ -1920,3 +1926,46 @@ def certificacao_toggle_progresso(request, id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
     return JsonResponse({'status': status_req})
+
+
+# ============================================
+# DUPLICATE CHECK (AJAX)
+# ============================================
+@login_required
+def check_duplicate(request):
+    """
+    GET /check-duplicate/?tipo=video&titulo=Intro+to+dbt
+    Returns up to 3 existing items with similar titles so the UI
+    can warn the user before they submit a duplicate.
+    """
+    tipo = request.GET.get('tipo', '').strip()
+    titulo = request.GET.get('titulo', '').strip()
+
+    if not tipo or len(titulo) < 4:
+        return JsonResponse({'duplicates': []})
+
+    MODEL_MAP = {
+        'video':      (Video,      'titulo'),
+        'material':   (Material,   'titulo'),
+        'ferramenta': (Ferramenta, 'nome'),
+        'snippet':    (Snippet,    'titulo'),
+    }
+
+    if tipo not in MODEL_MAP:
+        return JsonResponse({'duplicates': []})
+
+    Model, field = MODEL_MAP[tipo]
+    kwargs = {f'{field}__icontains': titulo}
+    try:
+        qs = Model.objects.filter(**kwargs)[:3]
+        duplicates = [
+            {
+                'titulo': getattr(obj, field),
+                'autor': getattr(obj, 'autor', ''),
+            }
+            for obj in qs
+        ]
+    except Exception:
+        duplicates = []
+
+    return JsonResponse({'duplicates': duplicates})

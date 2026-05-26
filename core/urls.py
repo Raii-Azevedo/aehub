@@ -97,4 +97,7 @@ urlpatterns = [
     path('certificacoes/excluir/<int:id>/', views.certificacao_excluir, name='certificacao_excluir'),
     path('certificacoes/<int:id>/dados/', views.certificacao_dados, name='certificacao_dados'),
     path('certificacoes/<int:id>/progresso/', views.certificacao_toggle_progresso, name='certificacao_toggle_progresso'),
+
+    # Duplicate check
+    path('api/check-duplicate/', views.check_duplicate, name='check_duplicate'),
 ]

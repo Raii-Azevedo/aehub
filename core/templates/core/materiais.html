@@ -80,7 +80,8 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label class="form-label">Title</label>
-                        <input type="text" name="titulo" class="form-control" required>
+                        <input type="text" name="titulo" id="new-material-titulo" class="form-control" required>
+                        <div id="dup-warn-material" class="alert alert-warning py-2 mt-2 mb-0 d-none small"></div>
                     </div>
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -200,6 +201,28 @@
 </div>
 
 <script>
+// ── Duplicate detection ──
+document.getElementById('new-material-titulo').addEventListener('blur', function() {
+    checkDuplicate('material', this.value, 'dup-warn-material');
+});
+
+function checkDuplicate(tipo, titulo, warnId) {
+    var el = document.getElementById(warnId);
+    if (!el || titulo.trim().length < 4) { if(el) el.classList.add('d-none'); return; }
+    fetch('/api/check-duplicate/?tipo=' + encodeURIComponent(tipo) + '&titulo=' + encodeURIComponent(titulo.trim()))
+        .then(r => r.json())
+        .then(data => {
+            if (data.duplicates && data.duplicates.length > 0) {
+                var items = data.duplicates.map(d => '<strong>' + d.titulo + '</strong>' + (d.autor ? ' <span class="text-muted">by ' + d.autor + '</span>' : '')).join('<br>');
+                el.innerHTML = '⚠️ Similar content already exists:<br>' + items;
+                el.classList.remove('d-none');
+            } else {
+                el.classList.add('d-none');
+            }
+        })
+        .catch(() => el.classList.add('d-none'));
+}
+
 function editarMaterial(id) {
     fetch(`/materiais/${id}/dados/`)
         .then(response => response.json())
