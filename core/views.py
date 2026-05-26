@@ -394,12 +394,14 @@ def dashboard(request):
     total_materiais = Material.objects.count()
     total_videos = Video.objects.count()
     total_ferramentas = Ferramenta.objects.count()
+    total_snippets = Snippet.objects.count()
 
     # Novos este mês
     novos_casos_mes = CasoUso.objects.filter(ativo=True, data_criacao__gte=inicio_mes).count()
     novos_materiais_mes = Material.objects.filter(data_criacao__gte=inicio_mes).count()
     novos_videos_mes = Video.objects.filter(data_criacao__gte=inicio_mes).count()
     novos_ferramentas_mes = Ferramenta.objects.filter(data_criacao__gte=inicio_mes).count()
+    novos_snippets_mes = Snippet.objects.filter(data_criacao__gte=inicio_mes).count()
 
     # Dados para gráfico de atividade (últimos 6 meses)
     grafico_labels = []
@@ -428,10 +430,12 @@ def dashboard(request):
         'total_materiais': total_materiais,
         'total_videos': total_videos,
         'total_ferramentas': total_ferramentas,
+        'total_snippets': total_snippets,
         'novos_casos_mes': novos_casos_mes,
         'novos_materiais_mes': novos_materiais_mes,
         'novos_videos_mes': novos_videos_mes,
         'novos_ferramentas_mes': novos_ferramentas_mes,
+        'novos_snippets_mes': novos_snippets_mes,
         'ultimos_casos': CasoUso.objects.filter(ativo=True).order_by('-data_criacao')[:5],
         'top_contribuidores': _get_top_contribuidores(),
         'user_role': get_user_role(request.user),

@@ -13,12 +13,12 @@
 
 <!-- Metric Cards -->
 <div class="row mb-4">
-    <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="bi bi-files" style="font-size: 2rem;"></i>
-                <h2 class="mt-2">{{ total_casos }}</h2>
-                <p class="text-white-50 mb-1">Use Cases</p>
+    <div class="col-xl col-lg-4 col-md-4 col-sm-6 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body py-3">
+                <i class="bi bi-files" style="font-size: 1.8rem; opacity:.85;"></i>
+                <h2 class="mt-2 mb-0">{{ total_casos }}</h2>
+                <p class="text-white-50 mb-1 small">Use Cases</p>
                 {% if novos_casos_mes > 0 %}
                 <small class="text-success"><i class="bi bi-arrow-up-short"></i>+{{ novos_casos_mes }} this month</small>
                 {% endif %}
@@ -28,12 +28,12 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="bi bi-book" style="font-size: 2rem;"></i>
-                <h2 class="mt-2">{{ total_materiais }}</h2>
-                <p class="text-white-50 mb-1">Materials</p>
+    <div class="col-xl col-lg-4 col-md-4 col-sm-6 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body py-3">
+                <i class="bi bi-book" style="font-size: 1.8rem; opacity:.85;"></i>
+                <h2 class="mt-2 mb-0">{{ total_materiais }}</h2>
+                <p class="text-white-50 mb-1 small">Materials</p>
                 {% if novos_materiais_mes > 0 %}
                 <small class="text-success"><i class="bi bi-arrow-up-short"></i>+{{ novos_materiais_mes }} this month</small>
                 {% endif %}
@@ -43,12 +43,12 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="bi bi-play-circle" style="font-size: 2rem;"></i>
-                <h2 class="mt-2">{{ total_videos }}</h2>
-                <p class="text-white-50 mb-1">Videos</p>
+    <div class="col-xl col-lg-4 col-md-4 col-sm-6 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body py-3">
+                <i class="bi bi-play-circle" style="font-size: 1.8rem; opacity:.85;"></i>
+                <h2 class="mt-2 mb-0">{{ total_videos }}</h2>
+                <p class="text-white-50 mb-1 small">Videos</p>
                 {% if novos_videos_mes > 0 %}
                 <small class="text-success"><i class="bi bi-arrow-up-short"></i>+{{ novos_videos_mes }} this month</small>
                 {% endif %}
@@ -58,17 +58,32 @@
             </div>
         </div>
     </div>
-    <div class="col-lg-3 col-md-6 col-sm-12 mb-3">
-        <div class="card text-center">
-            <div class="card-body">
-                <i class="bi bi-wrench" style="font-size: 2rem;"></i>
-                <h2 class="mt-2">{{ total_ferramentas }}</h2>
-                <p class="text-white-50 mb-1">Tools</p>
+    <div class="col-xl col-lg-4 col-md-4 col-sm-6 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body py-3">
+                <i class="bi bi-wrench" style="font-size: 1.8rem; opacity:.85;"></i>
+                <h2 class="mt-2 mb-0">{{ total_ferramentas }}</h2>
+                <p class="text-white-50 mb-1 small">Tools</p>
                 {% if novos_ferramentas_mes > 0 %}
                 <small class="text-success"><i class="bi bi-arrow-up-short"></i>+{{ novos_ferramentas_mes }} this month</small>
                 {% endif %}
                 <div class="mt-2">
                     <a href="{% url 'ferramentas_lista' %}" class="btn btn-sm btn-outline-light">View all</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl col-lg-4 col-md-4 col-sm-6 mb-3">
+        <div class="card text-center h-100">
+            <div class="card-body py-3">
+                <i class="bi bi-code-slash" style="font-size: 1.8rem; opacity:.85;"></i>
+                <h2 class="mt-2 mb-0">{{ total_snippets }}</h2>
+                <p class="text-white-50 mb-1 small">Snippets</p>
+                {% if novos_snippets_mes > 0 %}
+                <small class="text-success"><i class="bi bi-arrow-up-short"></i>+{{ novos_snippets_mes }} this month</small>
+                {% endif %}
+                <div class="mt-2">
+                    <a href="{% url 'snippets_lista' %}" class="btn btn-sm btn-outline-light">View all</a>
                 </div>
             </div>
         </div>
