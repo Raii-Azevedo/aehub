@@ -235,4 +235,32 @@ function checkDuplicate(tipo, titulo, warnId) {
             if (data.duplicates && data.duplicates.length > 0) {
                 var items = data.duplicates.map(d => '<strong>' + d.titulo + '</strong>' + (d.autor ? ' <span class="text-muted">by ' + d.autor + '</span>' : '')).join('<br>');
                 el.innerHTML = '⚠️ Similar content already exists:<br>' + items;
-   
+                el.classList.remove('d-none');
+            } else {
+                el.classList.add('d-none');
+            }
+        })
+        .catch(() => el.classList.add('d-none'));
+}
+
+function editarMaterial(id) {
+    fetch(`/materiais/${id}/dados/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('edit_material_id').value = data.id;
+            document.getElementById('edit_titulo').value = data.titulo;
+            document.getElementById('edit_tipo').value = data.tipo;
+            document.getElementById('edit_url').value = data.url || '';
+            document.getElementById('edit_topicos').value = data.topicos || '';
+            document.getElementById('edit_macrotopico_mat').value = data.macrotopico || '';
+            document.getElementById('edit_descricao').value = data.descricao;
+            document.getElementById('edit_autor').value = data.autor;
+            document.getElementById('formMaterialEdit').action = `/materiais/editar/${id}/`;
+            new bootstrap.Modal(document.getElementById('modalMaterialEdit')).show();
+        })
+        .catch(error => console.error('Erro:', error));
+}
+</script>
+
+{% include 'core/_engagement_js.html' %}
+{% endblock %}

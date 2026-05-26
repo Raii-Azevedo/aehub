@@ -207,8 +207,8 @@
                             <option value="Statistics & Math" data-desc="Theoretical foundation using mathematical and statistical concepts to rigorously analyse, model and validate data.">Statistics &amp; Math</option>
                             <option value="Data Engineering & Platforms" data-desc="Responsible for designing, building and maintaining the infrastructure, pipelines and systems that collect, process and deliver data.">Data Engineering &amp; Platforms</option>
                             <option value="Data Visualization & BI" data-desc="Focused on the visual representation of data through dashboards, charts and storytelling, making insights easier to understand and communicate.">Data Visualization &amp; BI</option>
-                            <option value="Data Strategy & Governance" data-desc="Defines guidelines, processes and policies to ensure the strategic, secure and efficient use of data as an organisational asset.">Data Strategy &amp; Governance</option>
-                            <option value="Soft Skills, Agile & Career" data-desc="Behavioural skills, methodologies and work practices that enable collaboration, organisation and value delivery in data projects.">Soft Skills, Agile &amp; Career</option>
+                            <option value="Data Strategy &amp; Governance" data-desc="Defines guidelines, processes and policies to ensure the strategic, secure and efficient use of data as an organisational asset.">Data Strategy &amp; Governance</option>
+                            <option value="Soft Skills, Agile &amp; Career" data-desc="Behavioural skills, methodologies and work practices that enable collaboration, organisation and value delivery in data projects.">Soft Skills, Agile &amp; Career</option>
                         </select>
                         <div class="macrotopic-desc small text-info mt-1" style="min-height:1.4em;font-style:italic;"></div>
                     </div>
@@ -223,7 +223,7 @@
 </div>
 
 <script>
-// ── Duplicate detection ──
+// Duplicate detection
 document.getElementById('new-video-titulo').addEventListener('blur', function() {
     checkDuplicate('video', this.value, 'dup-warn-video');
 });
@@ -236,7 +236,7 @@ function checkDuplicate(tipo, titulo, warnId) {
         .then(data => {
             if (data.duplicates && data.duplicates.length > 0) {
                 var items = data.duplicates.map(d => '<strong>' + d.titulo + '</strong>' + (d.autor ? ' <span class="text-muted">by ' + d.autor + '</span>' : '')).join('<br>');
-                el.innerHTML = '⚠️ Similar content already exists:<br>' + items;
+                el.innerHTML = 'Similar content already exists:<br>' + items;
                 el.classList.remove('d-none');
             } else {
                 el.classList.add('d-none');
