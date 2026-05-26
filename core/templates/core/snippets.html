@@ -36,6 +36,12 @@
             <div class="col-md-2">
                 <button type="submit" class="btn btn-outline-light w-100">Filter</button>
             </div>
+            <div class="col-auto">
+                <a href="{% url 'snippets_lista' %}?sort=popular{% if query %}&q={{ query }}{% endif %}"
+                   class="btn {% if sort == 'popular' %}btn-warning{% else %}btn-outline-secondary{% endif %}">
+                    🔥 Most Popular
+                </a>
+            </div>
             {% if query or linguagem_filtro or tag_filtro %}
             <div class="col-md-2">
                 <a href="{% url 'snippets_lista' %}" class="btn btn-outline-secondary w-100">Clear</a>
@@ -90,6 +96,26 @@
         <div class="card-body p-0">
             <pre class="snippet-code m-0" id="code-{{ snippet.id }}"><code class="language-{{ snippet.linguagem|lower }}">{{ snippet.codigo }}</code></pre>
         </div>
+
+            <!-- Engagement row -->
+            <div class="card-footer bg-transparent border-0 pb-0 pt-2 px-3">
+                {% with lcount=likes_map|get_item:snippet.id ravg=ratings_avg|get_item:snippet.id rcount=ratings_count|get_item:snippet.id urating=user_ratings|get_item:snippet.id %}
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <button class="btn btn-sm engagement-like-btn {% if snippet.id in user_likes %}btn-warning{% else %}btn-outline-secondary{% endif %}"
+                            data-type="snippet" data-id="{{snippet.id}}" onclick="toggleLike(this)">
+                        👍 <span class="like-count">{{ lcount|default:0 }}</span>
+                    </button>
+                    <div class="star-row d-flex align-items-center gap-1" data-type="snippet" data-id="{{snippet.id}}" data-user-rating="{{urating|default:0}}">
+                        {% for i in "12345" %}
+                        <i class="bi bi-star{% if ravg and forloop.counter <= ravg|floatformat:'0'|add:0 %}-fill text-warning{% endif %} star-icon"
+                           style="cursor:pointer;font-size:.9rem;"
+                           onclick="submitRating('snippet', {{snippet.id}}, {{forloop.counter}}, this.closest('.star-row'))"></i>
+                        {% endfor %}
+                        {% if ravg %}<small class="text-white-50 ms-1 avg-label" style="font-size:.75rem;">{{ravg}} ({{rcount}})</small>{% endif %}
+                    </div>
+                </div>
+                {% endwith %}
+            </div>
         <div class="card-footer bg-transparent border-light d-flex justify-content-between align-items-center">
             <div>
                 {% if snippet.tags %}
@@ -307,32 +333,4 @@ function editarSnippet(id) {
             document.getElementById('edit-linguagem').value = data.linguagem;
             document.getElementById('edit-codigo').value = data.codigo;
             document.getElementById('edit-descricao').value = data.descricao || '';
-            document.getElementById('edit-tags').value = data.tags || '';
-            document.getElementById('edit-macrotopico-snippet').value = data.macrotopico || '';
-            document.getElementById('formEditarSnippet').action = `/snippets/editar/${id}/`;
-            new bootstrap.Modal(document.getElementById('modalEditarSnippet')).show();
-        });
-}
-
-function excluirSnippet(id) {
-    document.getElementById('formExcluirSnippet').action = `/snippets/excluir/${id}/`;
-    new bootstrap.Modal(document.getElementById('modalExcluirSnippet')).show();
-}
-
-function toggleFavorito(tipo, id, btn) {
-    fetch(`/favoritos/toggle/${tipo}/${id}/`, {
-        method: 'POST',
-        headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' }
-    }).then(r => r.json()).then(data => {
-        if (data.status === 'added') {
-            btn.classList.replace('btn-outline-secondary', 'btn-warning');
-            btn.innerHTML = '<i class="bi bi-bookmark-fill"></i>';
-        } else {
-            btn.classList.replace('btn-warning', 'btn-outline-secondary');
-            btn.innerHTML = '<i class="bi bi-bookmark"></i>';
-        }
-    });
-}
-</script>
-{% endblock %}
-{% endblock %}
+      

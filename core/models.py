@@ -319,3 +319,52 @@ class CertificationProgress(models.Model):
 
     def __str__(self):
         return f"{self.usuario_email} → {self.certification.titulo}: {self.status}"
+
+
+# ============================================
+# CONTENT ENGAGEMENT (Likes + Ratings)
+# ============================================
+class ContentLike(models.Model):
+    CONTENT_TYPES = [
+        ('caso', 'Caso de Uso'),
+        ('material', 'Material'),
+        ('video', 'Vídeo'),
+        ('ferramenta', 'Ferramenta'),
+        ('snippet', 'Snippet'),
+    ]
+    usuario_email = models.EmailField()
+    content_type = models.CharField(max_length=20, choices=CONTENT_TYPES)
+    object_id = models.IntegerField()
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'content_likes'
+        unique_together = ('usuario_email', 'content_type', 'object_id')
+        managed = False
+
+    def __str__(self):
+        return f"{self.usuario_email} liked {self.content_type}:{self.object_id}"
+
+
+class ContentRating(models.Model):
+    CONTENT_TYPES = [
+        ('caso', 'Caso de Uso'),
+        ('material', 'Material'),
+        ('video', 'Vídeo'),
+        ('ferramenta', 'Ferramenta'),
+        ('snippet', 'Snippet'),
+    ]
+    usuario_email = models.EmailField()
+    content_type = models.CharField(max_length=20, choices=CONTENT_TYPES)
+    object_id = models.IntegerField()
+    rating = models.IntegerField()  # 1–5
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    data_atualizacao = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'content_ratings'
+        unique_together = ('usuario_email', 'content_type', 'object_id')
+        managed = False
+
+    def __str__(self):
+        return f"{self.usuario_email} rated {self.content_type}:{self.object_id} → {self.rating}"

@@ -100,4 +100,8 @@ urlpatterns = [
 
     # Duplicate check
     path('api/check-duplicate/', views.check_duplicate, name='check_duplicate'),
+
+    # Engagement (likes + ratings)
+    path('api/like/<str:content_type>/<int:object_id>/', views.like_toggle, name='like_toggle'),
+    path('api/rate/<str:content_type>/<int:object_id>/', views.rating_submit, name='rating_submit'),
 ]

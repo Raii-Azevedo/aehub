@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-{% load static %}
+{% load static hub_filters %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -14,15 +14,15 @@
 
 <!-- Search Form -->
 <div class="mb-4">
-    <form method="GET" class="d-flex flex-wrap gap-2">
-        <input type="text" name="q" class="form-control me-2" placeholder="Search materials..." value="{{ query }}">
-        <button type="submit" class="btn btn-outline-light">
-            <i class="bi bi-search"></i> Search
-        </button>
-        {% if query %}
-        <a href="{% url 'materiais_lista' %}" class="btn btn-outline-secondary ms-2">
-            <i class="bi bi-x"></i> Clear
+    <form method="GET" class="d-flex flex-wrap gap-2 align-items-center">
+        <input type="text" name="q" class="form-control me-2" placeholder="Search materials..." value="{{ query }}" style="max-width:260px;">
+        <button type="submit" class="btn btn-outline-light"><i class="bi bi-search"></i> Search</button>
+        <a href="{% url 'materiais_lista' %}?sort=popular{% if query %}&q={{ query }}{% endif %}"
+           class="btn {% if sort == 'popular' %}btn-warning{% else %}btn-outline-secondary{% endif %} ms-2">
+            🔥 Most Popular
         </a>
+        {% if query or sort %}
+        <a href="{% url 'materiais_lista' %}" class="btn btn-outline-secondary"><i class="bi bi-x"></i> Clear</a>
         {% endif %}
     </form>
 </div>
@@ -46,6 +46,26 @@
                     <small class="text-white-50">📌 {{ material.topicos|truncatewords:5 }}</small>
                     {% endif %}
                 </div>
+            </div>
+
+            <!-- Engagement row -->
+            <div class="card-footer bg-transparent border-0 pb-0 pt-2 px-3">
+                {% with lcount=likes_map|get_item:material.id ravg=ratings_avg|get_item:material.id rcount=ratings_count|get_item:material.id urating=user_ratings|get_item:material.id %}
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <button class="btn btn-sm engagement-like-btn {% if material.id in user_likes %}btn-warning{% else %}btn-outline-secondary{% endif %}"
+                            data-type="material" data-id="{{material.id}}" onclick="toggleLike(this)">
+                        👍 <span class="like-count">{{ lcount|default:0 }}</span>
+                    </button>
+                    <div class="star-row d-flex align-items-center gap-1" data-type="material" data-id="{{material.id}}" data-user-rating="{{urating|default:0}}">
+                        {% for i in "12345" %}
+                        <i class="bi bi-star{% if ravg and forloop.counter <= ravg|floatformat:'0'|add:0 %}-fill text-warning{% endif %} star-icon"
+                           style="cursor:pointer;font-size:.9rem;"
+                           onclick="submitRating('material', {{material.id}}, {{forloop.counter}}, this.closest('.star-row'))"></i>
+                        {% endfor %}
+                        {% if ravg %}<small class="text-white-50 ms-1 avg-label" style="font-size:.75rem;">{{ravg}} ({{rcount}})</small>{% endif %}
+                    </div>
+                </div>
+                {% endwith %}
             </div>
             <div class="card-footer bg-transparent border-light d-flex justify-content-between align-items-center">
                 <small class="text-white-50">👤 {{ material.autor }}</small>
@@ -215,30 +235,4 @@ function checkDuplicate(tipo, titulo, warnId) {
             if (data.duplicates && data.duplicates.length > 0) {
                 var items = data.duplicates.map(d => '<strong>' + d.titulo + '</strong>' + (d.autor ? ' <span class="text-muted">by ' + d.autor + '</span>' : '')).join('<br>');
                 el.innerHTML = '⚠️ Similar content already exists:<br>' + items;
-                el.classList.remove('d-none');
-            } else {
-                el.classList.add('d-none');
-            }
-        })
-        .catch(() => el.classList.add('d-none'));
-}
-
-function editarMaterial(id) {
-    fetch(`/materiais/${id}/dados/`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('edit_material_id').value = data.id;
-            document.getElementById('edit_titulo').value = data.titulo;
-            document.getElementById('edit_tipo').value = data.tipo;
-            document.getElementById('edit_url').value = data.url || '';
-            document.getElementById('edit_topicos').value = data.topicos || '';
-            document.getElementById('edit_macrotopico_mat').value = data.macrotopico || '';
-            document.getElementById('edit_descricao').value = data.descricao;
-            document.getElementById('edit_autor').value = data.autor;
-            document.getElementById('formMaterialEdit').action = `/materiais/editar/${id}/`;
-            new bootstrap.Modal(document.getElementById('modalMaterialEdit')).show();
-        })
-        .catch(error => console.error('Erro:', error));
-}
-</script>
-{% endblock %}
+   

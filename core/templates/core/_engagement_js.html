@@ -1,0 +1,83 @@
+<script>
+// ── Engagement: likes + star ratings ──
+
+const CSRF = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '{{ csrf_token }}';
+
+function toggleLike(btn) {
+    const type = btn.dataset.type;
+    const id   = btn.dataset.id;
+    fetch(`/api/like/${type}/${id}/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' }
+    })
+    .then(r => r.json())
+    .then(data => {
+        btn.querySelector('.like-count').textContent = data.count;
+        if (data.liked) {
+            btn.classList.replace('btn-outline-secondary', 'btn-warning');
+        } else {
+            btn.classList.replace('btn-warning', 'btn-outline-secondary');
+        }
+    })
+    .catch(console.error);
+}
+
+function submitRating(type, id, val, rowEl) {
+    fetch(`/api/rate/${type}/${id}/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ rating: val })
+    })
+    .then(r => r.json())
+    .then(data => {
+        renderStars(rowEl, data.avg, val);
+        // update or create avg label
+        let label = rowEl.querySelector('.avg-label');
+        if (!label) {
+            label = document.createElement('small');
+            label.className = 'text-white-50 ms-1 avg-label';
+            label.style.fontSize = '.75rem';
+            rowEl.appendChild(label);
+        }
+        label.textContent = `${data.avg} (${data.count})`;
+    })
+    .catch(console.error);
+}
+
+function renderStars(rowEl, avg, userRating) {
+    rowEl.querySelectorAll('.star-icon').forEach((star, i) => {
+        const val = i + 1;
+        star.className = 'bi star-icon';
+        star.style.cursor = 'pointer';
+        star.style.fontSize = '.9rem';
+        if (avg && val <= Math.round(avg)) {
+            star.classList.add('bi-star-fill', 'text-warning');
+        } else {
+            star.classList.add('bi-star');
+        }
+    });
+}
+
+// Hover effect on star rows
+document.querySelectorAll('.star-row').forEach(row => {
+    const stars = row.querySelectorAll('.star-icon');
+    stars.forEach((star, i) => {
+        star.addEventListener('mouseenter', () => {
+            stars.forEach((s, j) => {
+                s.className = 'bi star-icon';
+                s.style.fontSize = '.9rem';
+                s.style.cursor = 'pointer';
+                s.classList.add(j <= i ? 'bi-star-fill text-warning' : 'bi-star');
+            });
+        });
+        star.addEventListener('mouseleave', () => {
+            const avg = parseFloat(row.dataset.avgRating || 0);
+            const userR = parseInt(row.dataset.userRating || 0);
+            renderStars(row, userR || avg, userR);
+        });
+    });
+    // seed initial state from data attribute
+    const userR = parseInt(row.dataset.userRating || 0);
+    if (userR) renderStars(row, userR, userR);
+});
+</script>

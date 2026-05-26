@@ -33,6 +33,8 @@ from .models import (
     Favorito,
     Certification,
     CertificationProgress,
+    ContentLike,
+    ContentRating,
 )
 
 def is_admin(user):
@@ -114,6 +116,114 @@ def _get_favoritos_ids(user_email, content_type):
         )
     except Exception:
         return []
+
+
+def _get_engagement_data(content_type, object_ids, user_email):
+    """
+    Returns (likes_map, ratings_map, user_likes_set, user_ratings_map) for a list of object_ids.
+    likes_map: {object_id: count}
+    ratings_map: {object_id: {'avg': float, 'count': int}}
+    user_likes_set: set of object_ids the user has liked
+    user_ratings_map: {object_id: rating}
+    """
+    if not object_ids:
+        return {}, {}, set(), {}
+    try:
+        from django.db.models import Avg, Count as DCount
+        likes_qs = (
+            ContentLike.objects
+            .filter(content_type=content_type, object_id__in=object_ids)
+            .values('object_id')
+            .annotate(n=DCount('id'))
+        )
+        likes_map = {row['object_id']: row['n'] for row in likes_qs}
+
+        ratings_qs = (
+            ContentRating.objects
+            .filter(content_type=content_type, object_id__in=object_ids)
+            .values('object_id')
+            .annotate(avg=Avg('rating'), n=DCount('id'))
+        )
+        # flat dicts for easy template access
+        ratings_avg = {row['object_id']: round(row['avg'], 1) for row in ratings_qs}
+        ratings_count = {row['object_id']: row['n'] for row in ratings_qs}
+
+        user_likes_set = set(
+            ContentLike.objects
+            .filter(content_type=content_type, object_id__in=object_ids, usuario_email=user_email)
+            .values_list('object_id', flat=True)
+        )
+        user_ratings_map = dict(
+            ContentRating.objects
+            .filter(content_type=content_type, object_id__in=object_ids, usuario_email=user_email)
+            .values_list('object_id', 'rating')
+        )
+    except Exception:
+        likes_map, ratings_avg, ratings_count, user_likes_set, user_ratings_map = {}, {}, {}, set(), {}
+    return likes_map, ratings_avg, ratings_count, user_likes_set, user_ratings_map
+
+
+def _popularity_score(obj_id, likes_map, ratings_avg):
+    """Simple score: likes * 2 + avg_rating (for sort)"""
+    likes = likes_map.get(obj_id, 0)
+    avg = ratings_avg.get(obj_id, 0) or 0
+    return likes * 2 + avg
+
+
+@login_required
+def like_toggle(request, content_type, object_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    email = request.user.email
+    try:
+        existing = ContentLike.objects.filter(
+            usuario_email=email, content_type=content_type, object_id=object_id
+        ).first()
+        if existing:
+            existing.delete()
+            liked = False
+        else:
+            ContentLike.objects.create(
+                usuario_email=email, content_type=content_type, object_id=object_id
+            )
+            liked = True
+        count = ContentLike.objects.filter(content_type=content_type, object_id=object_id).count()
+        return JsonResponse({'liked': liked, 'count': count})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
+@login_required
+def rating_submit(request, content_type, object_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    try:
+        body = json.loads(request.body)
+        rating_val = int(body.get('rating', 0))
+    except Exception:
+        rating_val = int(request.POST.get('rating', 0))
+    if rating_val not in range(1, 6):
+        return JsonResponse({'error': 'Rating must be 1–5'}, status=400)
+    email = request.user.email
+    try:
+        obj, created = ContentRating.objects.get_or_create(
+            usuario_email=email, content_type=content_type, object_id=object_id,
+            defaults={'rating': rating_val}
+        )
+        if not created:
+            obj.rating = rating_val
+            obj.save()
+        from django.db.models import Avg, Count as DCount
+        agg = ContentRating.objects.filter(content_type=content_type, object_id=object_id).aggregate(
+            avg=Avg('rating'), n=DCount('id')
+        )
+        return JsonResponse({
+            'user_rating': rating_val,
+            'avg': round(agg['avg'] or 0, 1),
+            'count': agg['n']
+        })
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
 
 
 def criar_admin_se_nao_existir():
@@ -507,13 +617,25 @@ def casos_lista(request):
     if tag:
         casos = casos.filter(tags__icontains=tag)
 
+    sort = request.GET.get('sort', '').strip()
     favoritos_ids = _get_favoritos_ids(request.user.email, 'caso')
+    ids = [c.id for c in casos]
+    likes_map, ratings_avg, ratings_count, user_likes, user_ratings = _get_engagement_data('caso', ids, request.user.email)
+
+    if sort == 'popular':
+        casos = sorted(casos, key=lambda c: _popularity_score(c.id, likes_map, ratings_avg), reverse=True)
 
     return render(request, 'core/casos.html', {
         'casos': casos,
         'query': query,
         'tag_filtro': tag,
+        'sort': sort,
         'favoritos_ids': favoritos_ids,
+        'likes_map': likes_map,
+        'ratings_avg': ratings_avg,
+        'ratings_count': ratings_count,
+        'user_likes': list(user_likes),
+        'user_ratings': user_ratings,
         'user_role': get_user_role(request.user)
     })
 
@@ -647,13 +769,25 @@ def materiais_lista(request):
     if tag:
         materiais = materiais.filter(topicos__icontains=tag)
 
+    sort = request.GET.get('sort', '').strip()
     favoritos_ids = _get_favoritos_ids(request.user.email, 'material')
+    ids = [m.id for m in materiais]
+    likes_map, ratings_avg, ratings_count, user_likes, user_ratings = _get_engagement_data('material', ids, request.user.email)
+
+    if sort == 'popular':
+        materiais = sorted(materiais, key=lambda m: _popularity_score(m.id, likes_map, ratings_avg), reverse=True)
 
     return render(request, 'core/materiais.html', {
         'materiais': materiais,
         'query': query,
         'tag_filtro': tag,
+        'sort': sort,
         'favoritos_ids': favoritos_ids,
+        'likes_map': likes_map,
+        'ratings_avg': ratings_avg,
+        'ratings_count': ratings_count,
+        'user_likes': list(user_likes),
+        'user_ratings': user_ratings,
         'user_role': get_user_role(request.user)
     })
 
@@ -777,12 +911,24 @@ def videos_lista(request):
             Q(autor__icontains=query)
         )
 
+    sort = request.GET.get('sort', '').strip()
     favoritos_ids = _get_favoritos_ids(request.user.email, 'video')
+    ids = [v.id for v in videos]
+    likes_map, ratings_avg, ratings_count, user_likes, user_ratings = _get_engagement_data('video', ids, request.user.email)
+
+    if sort == 'popular':
+        videos = sorted(videos, key=lambda v: _popularity_score(v.id, likes_map, ratings_avg), reverse=True)
 
     return render(request, 'core/videos.html', {
         'videos': videos,
         'query': query,
+        'sort': sort,
         'favoritos_ids': favoritos_ids,
+        'likes_map': likes_map,
+        'ratings_avg': ratings_avg,
+        'ratings_count': ratings_count,
+        'user_likes': list(user_likes),
+        'user_ratings': user_ratings,
         'user_role': get_user_role(request.user)
     })
 
@@ -907,12 +1053,24 @@ def ferramentas_lista(request):
             Q(autor__icontains=query)
         )
 
+    sort = request.GET.get('sort', '').strip()
     favoritos_ids = _get_favoritos_ids(request.user.email, 'ferramenta')
+    ids = [f.id for f in ferramentas]
+    likes_map, ratings_avg, ratings_count, user_likes, user_ratings = _get_engagement_data('ferramenta', ids, request.user.email)
+
+    if sort == 'popular':
+        ferramentas = sorted(ferramentas, key=lambda f: _popularity_score(f.id, likes_map, ratings_avg), reverse=True)
 
     return render(request, 'core/ferramentas.html', {
         'ferramentas': ferramentas,
         'query': query,
+        'sort': sort,
         'favoritos_ids': favoritos_ids,
+        'likes_map': likes_map,
+        'ratings_avg': ratings_avg,
+        'ratings_count': ratings_count,
+        'user_likes': list(user_likes),
+        'user_ratings': user_ratings,
         'user_role': get_user_role(request.user)
     })
 
@@ -1401,7 +1559,13 @@ def snippets_lista(request):
     except Exception:
         linguagens = []
 
+    sort = request.GET.get('sort', '').strip()
     favoritos_ids = _get_favoritos_ids(request.user.email, 'snippet')
+    ids = [s.id for s in snippets]
+    likes_map, ratings_avg, ratings_count, user_likes, user_ratings = _get_engagement_data('snippet', ids, request.user.email)
+
+    if sort == 'popular':
+        snippets = sorted(snippets, key=lambda s: _popularity_score(s.id, likes_map, ratings_avg), reverse=True)
 
     return render(request, 'core/snippets.html', {
         'snippets': snippets,
@@ -1409,7 +1573,13 @@ def snippets_lista(request):
         'tag_filtro': tag,
         'linguagem_filtro': linguagem,
         'linguagens': linguagens,
+        'sort': sort,
         'favoritos_ids': favoritos_ids,
+        'likes_map': likes_map,
+        'ratings_avg': ratings_avg,
+        'ratings_count': ratings_count,
+        'user_likes': list(user_likes),
+        'user_ratings': user_ratings,
         'user_role': get_user_role(request.user),
     })
 

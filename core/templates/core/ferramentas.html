@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-{% load static %}
+{% load static hub_filters %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -14,15 +14,15 @@
 
 <!-- Search Form -->
 <div class="mb-4">
-    <form method="GET" class="d-flex flex-wrap gap-2">
-        <input type="text" name="q" class="form-control me-2" placeholder="Search tools..." value="{{ query }}">
-        <button type="submit" class="btn btn-outline-light">
-            <i class="bi bi-search"></i> Search
-        </button>
-        {% if query %}
-        <a href="{% url 'ferramentas_lista' %}" class="btn btn-outline-secondary ms-2">
-            <i class="bi bi-x"></i> Clear
+    <form method="GET" class="d-flex flex-wrap gap-2 align-items-center">
+        <input type="text" name="q" class="form-control me-2" placeholder="Search tools..." value="{{ query }}" style="max-width:260px;">
+        <button type="submit" class="btn btn-outline-light"><i class="bi bi-search"></i> Search</button>
+        <a href="{% url 'ferramentas_lista' %}?sort=popular{% if query %}&q={{ query }}{% endif %}"
+           class="btn {% if sort == 'popular' %}btn-warning{% else %}btn-outline-secondary{% endif %} ms-2">
+            🔥 Most Popular
         </a>
+        {% if query or sort %}
+        <a href="{% url 'ferramentas_lista' %}" class="btn btn-outline-secondary"><i class="bi bi-x"></i> Clear</a>
         {% endif %}
     </form>
 </div>
@@ -49,6 +49,26 @@
                     &#x1F4DA; Documentation
                 </a>
                 {% endif %}
+            </div>
+
+            <!-- Engagement row -->
+            <div class="card-footer bg-transparent border-0 pb-0 pt-2 px-3">
+                {% with lcount=likes_map|get_item:ferramenta.id ravg=ratings_avg|get_item:ferramenta.id rcount=ratings_count|get_item:ferramenta.id urating=user_ratings|get_item:ferramenta.id %}
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                    <button class="btn btn-sm engagement-like-btn {% if ferramenta.id in user_likes %}btn-warning{% else %}btn-outline-secondary{% endif %}"
+                            data-type="ferramenta" data-id="{{ferramenta.id}}" onclick="toggleLike(this)">
+                        👍 <span class="like-count">{{ lcount|default:0 }}</span>
+                    </button>
+                    <div class="star-row d-flex align-items-center gap-1" data-type="ferramenta" data-id="{{ferramenta.id}}" data-user-rating="{{urating|default:0}}">
+                        {% for i in "12345" %}
+                        <i class="bi bi-star{% if ravg and forloop.counter <= ravg|floatformat:'0'|add:0 %}-fill text-warning{% endif %} star-icon"
+                           style="cursor:pointer;font-size:.9rem;"
+                           onclick="submitRating('ferramenta', {{ferramenta.id}}, {{forloop.counter}}, this.closest('.star-row'))"></i>
+                        {% endfor %}
+                        {% if ravg %}<small class="text-white-50 ms-1 avg-label" style="font-size:.75rem;">{{ravg}} ({{rcount}})</small>{% endif %}
+                    </div>
+                </div>
+                {% endwith %}
             </div>
             <div class="card-footer bg-transparent border-light d-flex justify-content-between align-items-center">
                 <small class="text-white-50">👤 {{ ferramenta.autor }}</small>
@@ -233,28 +253,6 @@ function checkDuplicate(tipo, titulo, warnId) {
                 el.classList.remove('d-none');
             } else {
                 el.classList.add('d-none');
-            }
-        })
-        .catch(() => el.classList.add('d-none'));
-}
 
-function editarFerramenta(id) {
-    fetch(`/ferramentas/${id}/dados/`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('edit_ferramenta_id').value = data.id;
-            document.getElementById('edit_nome').value = data.nome;
-            document.getElementById('edit_categoria').value = data.categoria;
-            document.getElementById('edit_versao').value = data.versao || '';
-            document.getElementById('edit_nivel').value = data.nivel || '';
-            document.getElementById('edit_descricao').value = data.descricao;
-            document.getElementById('edit_documentacao_link').value = data.documentacao_link || '';
-            document.getElementById('edit_autor').value = data.autor;
-            document.getElementById('edit_macrotopico_ferr').value = data.macrotopico || '';
-            document.getElementById('formFerramentaEdit').action = `/ferramentas/editar/${id}/`;
-            new bootstrap.Modal(document.getElementById('modalFerramentaEdit')).show();
-        })
-        .catch(error => console.error('Erro:', error));
-}
-</script>
+{% include 'core/_engagement_js.html' %}
 {% endblock %}

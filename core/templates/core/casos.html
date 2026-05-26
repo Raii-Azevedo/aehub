@@ -18,7 +18,11 @@
         <button type="submit" class="btn btn-outline-light">
             <i class="bi bi-search"></i> Search
         </button>
-        {% if query or tag_filtro %}
+        <a href="{% url 'casos_lista' %}?sort=popular{% if query %}&q={{ query }}{% endif %}"
+           class="btn {% if sort == 'popular' %}btn-warning{% else %}btn-outline-secondary{% endif %}">
+            🔥 Most Popular
+        </a>
+        {% if query or tag_filtro or sort %}
         <a href="{% url 'casos_lista' %}" class="btn btn-outline-secondary">
             <i class="bi bi-x"></i> Clear
         </a>
@@ -59,6 +63,24 @@
                     {% endfor %}
                 </div>
                 {% endif %}
+
+                <!-- Engagement row -->
+                {% with lcount=likes_map|get_item:caso.id ravg=ratings_avg|get_item:caso.id rcount=ratings_count|get_item:caso.id urating=user_ratings|get_item:caso.id %}
+                <div class="d-flex align-items-center gap-2 flex-wrap mt-2 mb-1">
+                    <button class="btn btn-sm engagement-like-btn {% if caso.id in user_likes %}btn-warning{% else %}btn-outline-secondary{% endif %}"
+                            data-type="caso" data-id="{{ caso.id }}" onclick="toggleLike(this)">
+                        👍 <span class="like-count">{{ lcount|default:0 }}</span>
+                    </button>
+                    <div class="star-row d-flex align-items-center gap-1" data-type="caso" data-id="{{ caso.id }}" data-user-rating="{{urating|default:0}}">
+                        {% for i in "12345" %}
+                        <i class="bi bi-star{% if ravg and forloop.counter <= ravg|floatformat:'0'|add:0 %}-fill text-warning{% endif %} star-icon"
+                           style="cursor:pointer;font-size:.9rem;"
+                           onclick="submitRating('caso', {{ caso.id }}, {{ forloop.counter }}, this.closest('.star-row'))"></i>
+                        {% endfor %}
+                        {% if ravg %}<small class="text-white-50 ms-1 avg-label" style="font-size:.75rem;">{{ravg}} ({{rcount}})</small>{% endif %}
+                    </div>
+                </div>
+                {% endwith %}
                 <div class="d-flex justify-content-between align-items-center">
                     <small class="text-white-50">
                         👤 <a href="{% url 'perfil_usuario' caso.autor_email %}" class="text-white-50">{{ caso.autor }}</a> | 📅 {{ caso.data_criacao|date:"d/m/Y" }}
@@ -345,4 +367,6 @@ function detalharCaso(id) {
         });
 }
 </script>
+
+{% include 'core/_engagement_js.html' %}
 {% endblock %}
