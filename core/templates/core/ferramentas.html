@@ -72,13 +72,17 @@
             </div>
             <div class="card-footer bg-transparent border-light d-flex justify-content-between align-items-center">
                 <small class="text-white-50">👤 {{ ferramenta.autor }}</small>
-                {% if user_role == 'admin' or user_role == 'user' and ferramenta.autor_email == user.email %}
-                <div>
+                <div class="d-flex gap-1">
+                    <button class="btn btn-sm fav-btn {% if ferramenta.id in favoritos_ids %}btn-warning{% else %}btn-outline-secondary{% endif %}"
+                            onclick="toggleFavorito('ferramenta', {{ ferramenta.id }}, this)" title="Bookmark">
+                        <i class="bi bi-bookmark{% if ferramenta.id in favoritos_ids %}-fill{% endif %}"></i>
+                    </button>
+                    {% if user_role == 'admin' or user_role == 'user' and ferramenta.autor_email == user.email %}
                     <button class="btn btn-sm btn-outline-light" onclick="editarFerramenta({{ ferramenta.id }})">✏️</button>
                     <a href="{% url 'ferramenta_excluir' ferramenta.id %}" class="btn btn-sm btn-outline-danger"
                        onclick="return confirm('Are you sure you want to delete this tool?')">🗑️</a>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>
