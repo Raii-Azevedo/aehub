@@ -253,6 +253,30 @@ function checkDuplicate(tipo, titulo, warnId) {
                 el.classList.remove('d-none');
             } else {
                 el.classList.add('d-none');
+            }
+        })
+        .catch(() => el.classList.add('d-none'));
+}
+
+function editarFerramenta(id) {
+    fetch(`/ferramentas/${id}/dados/`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('edit_ferramenta_id').value = data.id;
+            document.getElementById('edit_nome').value = data.nome;
+            document.getElementById('edit_categoria').value = data.categoria;
+            document.getElementById('edit_versao').value = data.versao || '';
+            document.getElementById('edit_nivel').value = data.nivel || '';
+            document.getElementById('edit_descricao').value = data.descricao;
+            document.getElementById('edit_documentacao_link').value = data.documentacao_link || '';
+            document.getElementById('edit_autor').value = data.autor;
+            document.getElementById('edit_macrotopico_ferr').value = data.macrotopico || '';
+            document.getElementById('formFerramentaEdit').action = `/ferramentas/editar/${id}/`;
+            new bootstrap.Modal(document.getElementById('modalFerramentaEdit')).show();
+        })
+        .catch(error => console.error('Erro:', error));
+}
+</script>
 
 {% include 'core/_engagement_js.html' %}
 {% endblock %}
