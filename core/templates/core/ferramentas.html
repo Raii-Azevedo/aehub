@@ -43,7 +43,7 @@
                     <span class="badge-custom">v{{ ferramenta.versao }}</span>
                     {% endif %}
                 </div>
-                <p class="card-text">{{ ferramenta.descricao|truncatewords:20 }}</p>
+                <p class="card-text">{{ ferramenta.descricao }}</p>
                 {% if ferramenta.documentacao_link %}
                 <a href="{{ ferramenta.documentacao_link }}" target="_blank" class="btn btn-sm btn-gradient mt-2">
                     &#x1F4DA; Documentation

@@ -43,7 +43,7 @@
                     <span class="badge-custom">⏱️ {{ video.duracao }}</span>
                     {% endif %}
                 </div>
-                <p class="card-text">{{ video.descricao|truncatewords:20 }}</p>
+                <p class="card-text">{{ video.descricao }}</p>
                 {% if video.youtube_id %}
                     <a class="btn btn-sm btn-gradient mt-2" href="{{ video.youtube_id }}" target="_blank" rel="noopener noreferrer">
                         🔗 Open Link
