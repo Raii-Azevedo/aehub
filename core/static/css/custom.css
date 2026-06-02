@@ -64,6 +64,32 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
 }
 
+/* ── Expandable description ── */
+.card-text-clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: none;
+}
+.card-text-clamp.expanded {
+    display: block;
+    overflow: visible;
+}
+.btn-expand-desc {
+    font-size: .75rem;
+    padding: 0;
+    border: none;
+    background: none;
+    color: rgba(255,255,255,0.45);
+    cursor: pointer;
+    margin-top: 2px;
+    display: block;
+}
+.btn-expand-desc:hover {
+    color: rgba(255,255,255,0.85);
+}
+
 /* Ensure all text inside cards stays white (fixes changelog + dark-theme overrides) */
 .card strong,
 .card h5,

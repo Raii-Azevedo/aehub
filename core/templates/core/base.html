@@ -133,6 +133,31 @@
             if (descEl) descEl.textContent = opt ? (opt.dataset.desc || '') : '';
         }
     });
+
+    /* ── Expandable card descriptions ── */
+    document.addEventListener('DOMContentLoaded', function() {
+        // Wrap every .card-text that is long enough to be clamped
+        document.querySelectorAll('.card .card-text, .card p.card-text').forEach(function(el) {
+            // Skip if already processed or too short
+            if (el.dataset.expandInit) return;
+            el.dataset.expandInit = '1';
+            el.classList.add('card-text-clamp');
+
+            // After adding clamp, check if text is actually overflowing
+            requestAnimationFrame(function() {
+                if (el.scrollHeight > el.clientHeight + 2) {
+                    var btn = document.createElement('button');
+                    btn.className = 'btn-expand-desc';
+                    btn.textContent = '▼ Show more';
+                    btn.addEventListener('click', function() {
+                        var expanded = el.classList.toggle('expanded');
+                        btn.textContent = expanded ? '▲ Show less' : '▼ Show more';
+                    });
+                    el.insertAdjacentElement('afterend', btn);
+                }
+            });
+        });
+    });
     </script>
 </body>
 
