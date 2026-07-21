@@ -262,6 +262,21 @@ function checkDuplicate(tipo, titulo, warnId) {
         .catch(() => el.classList.add('d-none'));
 }
 
+function toggleFavorito(tipo, id, btn) {
+    fetch(`/favoritos/toggle/${tipo}/${id}/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': '{{ csrf_token }}', 'Content-Type': 'application/json' }
+    }).then(r => r.json()).then(data => {
+        if (data.status === 'added') {
+            btn.classList.replace('btn-outline-secondary', 'btn-warning');
+            btn.innerHTML = '<i class="bi bi-bookmark-fill"></i>';
+        } else {
+            btn.classList.replace('btn-warning', 'btn-outline-secondary');
+            btn.innerHTML = '<i class="bi bi-bookmark"></i>';
+        }
+    });
+}
+
 function editarFerramenta(id) {
     fetch(`/ferramentas/${id}/dados/`)
         .then(response => response.json())

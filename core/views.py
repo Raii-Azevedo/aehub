@@ -11,6 +11,8 @@ from django.utils import timezone
 from django.urls import reverse
 from datetime import datetime
 import json
+import os
+import re
 import secrets
 import traceback
 from urllib import error, parse, request as urllib_request
@@ -1374,16 +1376,18 @@ def gamificacao_ranking(request):
                 allowed = AllowedEmail.objects.get(email=user.email)
                 role = allowed.role
                 nome_exibicao = user.get_full_name() or user.username
+                avatar = allowed.avatar or None
             except AllowedEmail.DoesNotExist:
                 role = 'viewer'
                 nome_exibicao = user.get_full_name() or user.username
-            
+                avatar = None
+
             ranking.append({
                 'id': user.id,
                 'email': user.email,
                 'nome': nome_exibicao,
                 'role': role,
-                'avatar': None,
+                'avatar': avatar,
                 'pontuacao': pontuacao_total,
                 'total_contribuicoes': total_contribuicoes,
                 'detalhes': {
@@ -1727,11 +1731,38 @@ def busca_global(request):
 @login_required
 def favoritos(request):
     try:
-        favs = Favorito.objects.filter(usuario_email=request.user.email)
+        favs_qs = Favorito.objects.filter(usuario_email=request.user.email).order_by('-data_criacao')
     except Exception:
-        favs = []
+        favs_qs = []
+
+    # O campo 'titulo' foi removido da tabela favoritos (migration 0010), então
+    # o título exibido é buscado dinamicamente no objeto de origem.
+    favoritos_list = []
+    for fav in favs_qs:
+        titulo = '(conteúdo removido)'
+        try:
+            if fav.content_type == 'caso':
+                titulo = CasoUso.objects.get(id=fav.object_id).titulo
+            elif fav.content_type == 'material':
+                titulo = Material.objects.get(id=fav.object_id).titulo
+            elif fav.content_type == 'video':
+                titulo = Video.objects.get(id=fav.object_id).titulo
+            elif fav.content_type == 'ferramenta':
+                titulo = Ferramenta.objects.get(id=fav.object_id).nome
+            elif fav.content_type == 'snippet':
+                titulo = Snippet.objects.get(id=fav.object_id).titulo
+        except Exception:
+            pass
+
+        favoritos_list.append({
+            'content_type': fav.content_type,
+            'object_id': fav.object_id,
+            'titulo': titulo,
+            'data_criacao': fav.data_criacao,
+        })
+
     return render(request, 'core/favoritos.html', {
-        'favoritos': favs,
+        'favoritos': favoritos_list,
         'user_role': get_user_role(request.user),
     })
 
@@ -1769,13 +1800,15 @@ def favorito_toggle(request, content_type, object_id):
         return JsonResponse({'error': 'Objeto não encontrado'}, status=404)
 
     try:
+        # 'titulo' não existe mais como coluna no modelo (migration 0010_remove_favorito_titulo);
+        # o título é resolvido dinamicamente quando a lista de favoritos é exibida.
         fav, created = Favorito.objects.get_or_create(
             usuario_email=request.user.email,
             content_type=content_type,
             object_id=object_id,
-            defaults={'titulo': titulo}
         )
     except Exception:
+        traceback.print_exc()
         return JsonResponse({'error': 'Bookmarks table not ready. Run migrations.'}, status=500)
 
     if not created:
@@ -1892,6 +1925,7 @@ def perfil_usuario(request, email):
     return render(request, 'core/perfil_usuario.html', {
         'perfil_email': email,
         'perfil_nome': allowed.nome or email,
+        'perfil_avatar': allowed.avatar or None,
         'perfil_role': allowed.role,
         'perfil_tipo': perfil_tipo,
         'casos': casos,
@@ -1908,6 +1942,60 @@ def perfil_usuario(request, email):
         'badges': badges,
         'is_own_profile': is_own_profile,
     })
+
+
+@login_required
+def perfil_avatar_upload(request, email):
+    """Permite que a própria pessoa (ou um admin) envie/atualize a foto de perfil."""
+    if request.method != 'POST':
+        return JsonResponse({'error': 'Método não permitido'}, status=405)
+
+    if request.user.email != email and get_user_role(request.user) != 'admin':
+        messages.error(request, 'You can only update your own photo.')
+        return redirect('perfil_usuario', email=email)
+
+    usuario = get_object_or_404(AllowedEmail, email=email)
+    arquivo = request.FILES.get('avatar')
+
+    if not arquivo:
+        messages.error(request, 'Select an image to upload.')
+        return redirect('perfil_usuario', email=email)
+
+    ext = os.path.splitext(arquivo.name)[1].lower()
+    if ext not in ('.jpg', '.jpeg', '.png', '.webp', '.gif'):
+        messages.error(request, 'Invalid format. Use JPG, PNG, WEBP or GIF.')
+        return redirect('perfil_usuario', email=email)
+
+    if arquivo.size > 5 * 1024 * 1024:
+        messages.error(request, 'Image too large (max 5MB).')
+        return redirect('perfil_usuario', email=email)
+
+    avatar_dir = os.path.join(settings.MEDIA_ROOT, 'avatars')
+    os.makedirs(avatar_dir, exist_ok=True)
+
+    # Nome de arquivo estável por usuário (sobrescreve a foto anterior) e
+    # com um sufixo aleatório para evitar cache desatualizado no navegador.
+    safe_name = re.sub(r'[^a-zA-Z0-9_.-]', '_', email.lower())
+    filename = f'{safe_name}_{secrets.token_hex(4)}{ext}'
+
+    # Remove fotos antigas desse usuário antes de salvar a nova
+    try:
+        for f in os.listdir(avatar_dir):
+            if f.startswith(safe_name + '_'):
+                os.remove(os.path.join(avatar_dir, f))
+    except FileNotFoundError:
+        pass
+
+    filepath = os.path.join(avatar_dir, filename)
+    with open(filepath, 'wb+') as destino:
+        for chunk in arquivo.chunks():
+            destino.write(chunk)
+
+    usuario.avatar = f'{settings.MEDIA_URL}avatars/{filename}'
+    usuario.save(update_fields=['avatar'])
+
+    messages.success(request, '✅ Profile photo updated!')
+    return redirect('perfil_usuario', email=email)
 
 
 @login_required

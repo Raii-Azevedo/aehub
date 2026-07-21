@@ -89,6 +89,7 @@ urlpatterns = [
 
     # Perfil de usuário
     path('perfil/<str:email>/', views.perfil_usuario, name='perfil_usuario'),
+    path('perfil/<str:email>/avatar/', views.perfil_avatar_upload, name='perfil_avatar_upload'),
 
     # Certifications
     path('certificacoes/', views.certificacoes_lista, name='certificacoes_lista'),

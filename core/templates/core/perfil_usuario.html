@@ -7,9 +7,29 @@
     <div class="card-body">
         <div class="d-flex align-items-center">
             <div class="me-4">
-                <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center"
-                     style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2) !important;">
-                    <span style="font-size: 2rem;">{{ perfil_nome|first|upper }}</span>
+                <div class="position-relative" style="width: 80px; height: 80px;">
+                    {% if perfil_avatar %}
+                    <img src="{{ perfil_avatar }}" class="rounded-circle" width="80" height="80" style="object-fit: cover;">
+                    {% else %}
+                    <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center"
+                         style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2) !important;">
+                        <span style="font-size: 2rem;">{{ perfil_nome|first|upper }}</span>
+                    </div>
+                    {% endif %}
+                    {% if is_own_profile %}
+                    <label for="avatarInput" class="d-inline-flex align-items-center justify-content-center"
+                           title="Change photo"
+                           style="position:absolute; bottom:-2px; right:-2px; width:28px; height:28px; border-radius:50%;
+                                  background:#667eea; cursor:pointer; border:2px solid var(--bs-body-bg, #1a1a2e);">
+                        <i class="bi bi-camera-fill" style="font-size:.8rem; color:#fff;"></i>
+                    </label>
+                    <form id="avatarForm" method="post" enctype="multipart/form-data"
+                          action="{% url 'perfil_avatar_upload' perfil_email %}">
+                        {% csrf_token %}
+                        <input type="file" id="avatarInput" name="avatar" accept="image/png,image/jpeg,image/webp,image/gif"
+                               class="d-none" onchange="document.getElementById('avatarForm').submit();">
+                    </form>
+                    {% endif %}
                 </div>
             </div>
             <div class="flex-grow-1">

@@ -13,8 +13,8 @@
             <div class="card-body py-4">
                 <div class="d-flex align-items-center justify-content-center">
                     <div class="me-4">
-                        {% if ae_mes.avatar %}
-                        <img src="{{ ae_mes.avatar }}" class="rounded-circle" width="80" height="80">
+                        {% if destaque_mes.avatar %}
+                        <img src="{{ destaque_mes.avatar }}" class="rounded-circle" width="80" height="80" style="object-fit: cover;">
                         {% else %}
                         <div class="bg-white rounded-circle d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
                             <i class="bi bi-person-circle" style="font-size: 3rem; color: #667eea;"></i>
@@ -67,7 +67,7 @@
                         <td>
                             <div class="d-flex align-items-center">
                                 {% if item.avatar %}
-                                <img src="{{ item.avatar }}" class="rounded-circle me-2" width="40" height="40">
+                                <img src="{{ item.avatar }}" class="rounded-circle me-2" width="40" height="40" style="object-fit: cover;">
                                 {% else %}
                                 <div class="bg-secondary rounded-circle d-inline-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
                                     <i class="bi bi-person"></i>
