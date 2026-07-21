@@ -30,7 +30,7 @@
 <!-- Lista de ferramentas -->
 <div class="row">
     {% for ferramenta in ferramentas %}
-    <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+    <div class="col-lg-4 col-md-6 col-sm-12 mb-4" id="fav-ferramenta-{{ ferramenta.id }}">
         <div class="card h-100">
             <div class="card-body">
                 <h5 class="card-title">{{ ferramenta.nome }}</h5>

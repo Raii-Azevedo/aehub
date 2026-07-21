@@ -123,6 +123,19 @@
         const userRole = "{{ user.role|default:'viewer' }}";
         const canEdit = userRole === 'admin' || userRole === 'user';
     </script>
+    <script>
+    /* ── Scroll to and highlight a specific card when arriving via a #fav-... anchor (e.g. from Bookmarks) ── */
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!location.hash || !location.hash.startsWith('#fav-')) return;
+        var target = document.getElementById(location.hash.slice(1));
+        if (!target) return;
+        setTimeout(function() {
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            target.classList.add('bookmark-highlight');
+            setTimeout(function() { target.classList.remove('bookmark-highlight'); }, 2500);
+        }, 100);
+    });
+    </script>
     {% block extra_js %}{% endblock %}
     <script>
     /* ── Macrotopic description helper (shared across all content forms) ── */

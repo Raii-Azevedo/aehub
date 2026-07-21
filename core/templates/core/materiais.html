@@ -30,7 +30,7 @@
 <!-- Lista de materiais -->
 <div class="row">
     {% for material in materiais %}
-    <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+    <div class="col-lg-4 col-md-6 col-sm-12 mb-4" id="fav-material-{{ material.id }}">
         <div class="card h-100">
             <div class="card-body">
                 <h5 class="card-title">{{ material.titulo }}</h5>
