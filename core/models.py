@@ -270,9 +270,8 @@ class Certification(models.Model):
     ]
     NIVEL_CHOICES = [
         ('Beginner', 'Beginner'),
-        ('Junior', 'Junior'),
-        ('Mid-level', 'Mid-level'),
-        ('Senior', 'Senior'),
+        ('Intermediate', 'Intermediate'),
+        ('Advanced', 'Advanced'),
     ]
     PRIORIDADE_CHOICES = [
         ('must_have', '🔥 Must Have'),
@@ -280,12 +279,17 @@ class Certification(models.Model):
         ('complementary', '🧠 Complementary'),
         ('foundations', '📚 Foundations'),
     ]
+    TIPO_CHOICES = [
+        ('paid_exam', '💳 Paid Exam'),
+        ('free_course', '🆓 Free Course'),
+    ]
 
     titulo = models.CharField(max_length=200)
     fornecedor = models.CharField(max_length=100)
     categoria = models.CharField(max_length=100, choices=CATEGORIA_CHOICES)
     nivel = models.CharField(max_length=50, choices=NIVEL_CHOICES)
     prioridade = models.CharField(max_length=30, choices=PRIORIDADE_CHOICES, default='recommended')
+    tipo_certificacao = models.CharField(max_length=30, choices=TIPO_CHOICES, default='paid_exam')
     descricao = models.TextField()
     tags = models.CharField(max_length=500, blank=True, default='')
     link_oficial = models.URLField(max_length=500)

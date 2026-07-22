@@ -108,7 +108,12 @@
             </div>
 
             <h6 class="card-title mb-1">{{ cert.titulo }}</h6>
-            <small class="text-white-50 d-block mb-2">{{ cert.fornecedor }}</small>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <small class="text-white-50">{{ cert.fornecedor }}</small>
+                <span class="badge-type {{ cert.tipo_certificacao }}">
+                    {% if cert.tipo_certificacao == 'free_course' %}🆓 Free Course{% else %}💳 Paid Exam{% endif %}
+                </span>
+            </div>
             <p class="card-text small">{{ cert.descricao|truncatewords:28 }}</p>
 
             <!-- Tags -->
@@ -185,6 +190,7 @@
             <th>Category</th>
             <th>Level</th>
             <th>Priority</th>
+            <th>Type</th>
             <th>Progress</th>
             <th>Links</th>
             {% if user_role == 'admin' %}<th></th>{% endif %}
@@ -213,6 +219,11 @@
                 {% elif cert.prioridade == 'complementary' %}🧠 Complementary
                 {% else %}📚 Foundations
                 {% endif %}
+            </span>
+        </td>
+        <td>
+            <span class="badge-type {{ cert.tipo_certificacao }} small">
+                {% if cert.tipo_certificacao == 'free_course' %}🆓 Free{% else %}💳 Paid{% endif %}
             </span>
         </td>
         <td>
@@ -252,7 +263,7 @@
         {% endif %}
     </tr>
     {% empty %}
-    <tr><td colspan="8" class="text-center text-white-50 py-4">No certifications found.</td></tr>
+    <tr><td colspan="9" class="text-center text-white-50 py-4">No certifications found.</td></tr>
     {% endfor %}
     </tbody>
 </table>
@@ -296,9 +307,8 @@
                             <label class="form-label">Level *</label>
                             <select name="nivel" class="form-select" required>
                                 <option>Beginner</option>
-                                <option>Junior</option>
-                                <option selected>Mid-level</option>
-                                <option>Senior</option>
+                                <option selected>Intermediate</option>
+                                <option>Advanced</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -308,6 +318,13 @@
                                 <option value="recommended" selected>☁️ Recommended</option>
                                 <option value="complementary">🧠 Complementary</option>
                                 <option value="foundations">📚 Foundations</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Type *</label>
+                            <select name="tipo_certificacao" class="form-select" required>
+                                <option value="paid_exam" selected>💳 Paid Exam</option>
+                                <option value="free_course">🆓 Free Course</option>
                             </select>
                         </div>
                         <div class="col-12">
@@ -372,9 +389,8 @@
                             <label class="form-label">Level *</label>
                             <select name="nivel" id="ec_nivel" class="form-select" required>
                                 <option>Beginner</option>
-                                <option>Junior</option>
-                                <option>Mid-level</option>
-                                <option>Senior</option>
+                                <option>Intermediate</option>
+                                <option>Advanced</option>
                             </select>
                         </div>
                         <div class="col-md-4">
@@ -384,6 +400,13 @@
                                 <option value="recommended">☁️ Recommended</option>
                                 <option value="complementary">🧠 Complementary</option>
                                 <option value="foundations">📚 Foundations</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Type *</label>
+                            <select name="tipo_certificacao" id="ec_tipo_certificacao" class="form-select" required>
+                                <option value="paid_exam">💳 Paid Exam</option>
+                                <option value="free_course">🆓 Free Course</option>
                             </select>
                         </div>
                         <div class="col-12">
@@ -447,6 +470,17 @@
 .badge-priority.complementary   { background: rgba(160,80,255,.2); color: #c47dff; border: 1px solid rgba(160,80,255,.4); }
 .badge-priority.foundations     { background: rgba(80,200,120,.2); color: #7dda9e; border: 1px solid rgba(80,200,120,.35); }
 
+.badge-type {
+    display: inline-block;
+    padding: .2em .5em;
+    font-size: .7rem;
+    border-radius: .375rem;
+    font-weight: 500;
+    white-space: nowrap;
+}
+.badge-type.paid_exam   { background: rgba(255,255,255,.08); color: #cfd4da; border: 1px solid rgba(255,255,255,.2); }
+.badge-type.free_course { background: rgba(40,180,99,.18); color: #7dda9e; border: 1px solid rgba(40,180,99,.35); }
+
 .cert-card { border: 1px solid rgba(255,255,255,.1); transition: border-color .2s; }
 .cert-card:hover { border-color: rgba(255,255,255,.25); }
 .cert-must_have   { border-left: 3px solid rgba(255,80,0,.6) !important; }
@@ -506,6 +540,7 @@ function editarCert(id) {
             document.getElementById('ec_categoria').value = data.categoria;
             document.getElementById('ec_nivel').value = data.nivel;
             document.getElementById('ec_prioridade').value = data.prioridade;
+            document.getElementById('ec_tipo_certificacao').value = data.tipo_certificacao || 'paid_exam';
             document.getElementById('ec_descricao').value = data.descricao;
             document.getElementById('ec_tags').value = data.tags || '';
             document.getElementById('ec_link_oficial').value = data.link_oficial || '';

@@ -2074,6 +2074,9 @@ def certificacoes_lista(request):
 
     categorias = Certification.objects.filter(ativo=True).values_list('categoria', flat=True).distinct()
     niveis = Certification.objects.filter(ativo=True).values_list('nivel', flat=True).distinct()
+    NIVEL_ORDER = ['Beginner', 'Intermediate', 'Advanced']
+    niveis_ordenados = [n for n in NIVEL_ORDER if n in set(niveis)]
+    niveis_ordenados += sorted(n for n in set(niveis) if n not in NIVEL_ORDER)
 
     return render(request, 'core/certificacoes.html', {
         'certs': certs,
@@ -2084,7 +2087,7 @@ def certificacoes_lista(request):
         'nivel_filtro': nivel_filtro,
         'prioridade_filtro': prioridade_filtro,
         'categorias': sorted(set(categorias)),
-        'niveis': sorted(set(niveis)),
+        'niveis': niveis_ordenados,
         'user_role': user_role,
     })
 
@@ -2099,8 +2102,9 @@ def certificacao_nova(request):
             titulo=p.get('titulo', '').strip(),
             fornecedor=p.get('fornecedor', '').strip(),
             categoria=p.get('categoria', '').strip(),
-            nivel=p.get('nivel', 'Junior'),
+            nivel=p.get('nivel', 'Beginner'),
             prioridade=p.get('prioridade', 'recommended'),
+            tipo_certificacao=p.get('tipo_certificacao', 'paid_exam'),
             descricao=p.get('descricao', '').strip(),
             tags=p.get('tags', '').strip(),
             link_oficial=p.get('link_oficial', '').strip(),
@@ -2123,6 +2127,7 @@ def certificacao_editar(request, id):
         cert.categoria = p.get('categoria', cert.categoria).strip()
         cert.nivel = p.get('nivel', cert.nivel)
         cert.prioridade = p.get('prioridade', cert.prioridade)
+        cert.tipo_certificacao = p.get('tipo_certificacao', cert.tipo_certificacao)
         cert.descricao = p.get('descricao', cert.descricao).strip()
         cert.tags = p.get('tags', cert.tags).strip()
         cert.link_oficial = p.get('link_oficial', cert.link_oficial).strip()
@@ -2154,6 +2159,7 @@ def certificacao_dados(request, id):
         'categoria': cert.categoria,
         'nivel': cert.nivel,
         'prioridade': cert.prioridade,
+        'tipo_certificacao': cert.tipo_certificacao,
         'descricao': cert.descricao,
         'tags': cert.tags,
         'link_oficial': cert.link_oficial,
