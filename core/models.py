@@ -261,21 +261,22 @@ class Favorito(models.Model):
 # ============================================
 class Certification(models.Model):
     CATEGORIA_CHOICES = [
-        ('Cloud & Data Engineering', 'Cloud & Data Engineering'),
-        ('Analytics Engineering / Modern Data Stack', 'Analytics Engineering / Modern Data Stack'),
-        ('BI & Visualization', 'BI & Visualization'),
-        ('Data Modeling / SQL', 'Data Modeling / SQL'),
-        ('AI & Data Platform', 'AI & Data Platform'),
-        ('Beginner / Foundations', 'Beginner / Foundations'),
+        ('Analytics Engineering Roadmap', 'Analytics Engineering Roadmap'),
+        ('Data Pipelines & Engineering', 'Data Pipelines & Engineering'),
+        ('Cloud Architecture', 'Cloud Architecture'),
+        ('BI Tooling & DataViz', 'BI Tooling & DataViz'),
+        ('Machine Learning & Advanced Analytics', 'Machine Learning & Advanced Analytics'),
+        ('Gen AI Solutions', 'Gen AI Solutions'),
+        ('DevOps', 'DevOps'),
+        ('UI/UX Designer', 'UI/UX Designer'),
     ]
     NIVEL_CHOICES = [
         ('Beginner', 'Beginner'),
-        ('Intermediate', 'Intermediate'),
-        ('Advanced', 'Advanced'),
+        ('Mid-Level', 'Mid-Level'),
+        ('Senior', 'Senior'),
     ]
     PRIORIDADE_CHOICES = [
-        ('must_have', '🔥 Must Have'),
-        ('recommended', '☁️ Recommended'),
+        ('recommended', '⭐ Recommended'),
         ('complementary', '🧠 Complementary'),
         ('foundations', '📚 Foundations'),
     ]

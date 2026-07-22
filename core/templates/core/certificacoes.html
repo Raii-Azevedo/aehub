@@ -16,8 +16,7 @@
 
 <!-- Legend -->
 <div class="d-flex flex-wrap gap-2 mb-4 mt-3">
-    <span class="badge-priority must_have">🔥 Must Have</span>
-    <span class="badge-priority recommended">☁️ Recommended</span>
+    <span class="badge-priority recommended">⭐ Recommended</span>
     <span class="badge-priority complementary">🧠 Complementary</span>
     <span class="badge-priority foundations">📚 Foundations</span>
     <span class="ms-3 text-white-50 small align-self-center">Your progress:</span>
@@ -29,14 +28,14 @@
 <div class="card mb-4">
     <div class="card-body py-2">
         <form method="get" class="row g-2 align-items-center">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="input-group">
                     <span class="input-group-text bg-dark border-secondary text-white"><i class="bi bi-search"></i></span>
                     <input type="text" name="q" class="form-control bg-dark text-white border-secondary"
                            placeholder="Search certifications..." value="{{ query }}">
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <select name="categoria" class="form-select bg-dark text-white border-secondary">
                     <option value="">All categories</option>
                     {% for cat in categorias %}
@@ -52,16 +51,43 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-1">
+            <div class="col-md-2">
+                <select name="prioridade" class="form-select bg-dark text-white border-secondary">
+                    <option value="">All recommendations</option>
+                    {% for p in prioridades %}
+                    <option value="{{ p }}" {% if prioridade_filtro == p %}selected{% endif %}>
+                        {% if p == 'recommended' %}⭐ Recommended
+                        {% elif p == 'complementary' %}🧠 Complementary
+                        {% elif p == 'foundations' %}📚 Foundations
+                        {% else %}{{ p }}
+                        {% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="tipo" class="form-select bg-dark text-white border-secondary">
+                    <option value="">All types</option>
+                    {% for t in tipos %}
+                    <option value="{{ t }}" {% if tipo_filtro == t %}selected{% endif %}>
+                        {% if t == 'paid_exam' %}💳 Paid Exam
+                        {% elif t == 'free_course' %}🆓 Free Course
+                        {% else %}{{ t }}
+                        {% endif %}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-auto">
                 <button type="submit" class="btn btn-outline-light w-100">Filter</button>
             </div>
-            {% if query or categoria_filtro or nivel_filtro %}
-            <div class="col-md-1">
+            {% if query or categoria_filtro or nivel_filtro or prioridade_filtro or tipo_filtro %}
+            <div class="col-md-auto">
                 <a href="{% url 'certificacoes_lista' %}" class="btn btn-outline-secondary w-100">Clear</a>
             </div>
             {% endif %}
             <!-- View toggle -->
-            <div class="col-md-1 ms-auto">
+            <div class="col-md-auto ms-auto">
                 <div class="btn-group" role="group">
                     <button type="button" id="btnCards" class="btn btn-sm btn-outline-light active" onclick="setView('cards')" title="Card view">
                         <i class="bi bi-grid-3x3-gap"></i>
@@ -81,11 +107,14 @@
 <div id="viewCards">
 {% for category, cert_list in grouped.items %}
 <h5 class="text-white-50 mt-4 mb-3 border-bottom border-secondary pb-1">
-    {% if category == 'Analytics Engineering / Modern Data Stack' %}🔧
-    {% elif category == 'Cloud & Data Engineering' %}☁️
-    {% elif category == 'BI & Visualization' %}📊
-    {% elif category == 'Data Modeling / SQL' %}🗄️
-    {% elif category == 'AI & Data Platform' %}🤖
+    {% if category == 'Analytics Engineering Roadmap' %}🔧
+    {% elif category == 'Data Pipelines & Engineering' %}🗄️
+    {% elif category == 'Cloud Architecture' %}☁️
+    {% elif category == 'BI Tooling & DataViz' %}📊
+    {% elif category == 'Machine Learning & Advanced Analytics' %}🤖
+    {% elif category == 'Gen AI Solutions' %}✨
+    {% elif category == 'DevOps' %}⚙️
+    {% elif category == 'UI/UX Designer' %}🎨
     {% else %}📚
     {% endif %}
     {{ category }}
@@ -98,8 +127,7 @@
             <!-- Priority + provider -->
             <div class="d-flex justify-content-between align-items-start mb-2">
                 <span class="badge-priority {{ cert.prioridade }}">
-                    {% if cert.prioridade == 'must_have' %}🔥 Must Have
-                    {% elif cert.prioridade == 'recommended' %}☁️ Recommended
+                    {% if cert.prioridade == 'recommended' %}⭐ Recommended
                     {% elif cert.prioridade == 'complementary' %}🧠 Complementary
                     {% else %}📚 Foundations
                     {% endif %}
@@ -214,8 +242,7 @@
         <td><span class="badge bg-dark border border-secondary">{{ cert.nivel }}</span></td>
         <td>
             <span class="badge-priority {{ cert.prioridade }} small">
-                {% if cert.prioridade == 'must_have' %}🔥 Must Have
-                {% elif cert.prioridade == 'recommended' %}☁️ Recommended
+                {% if cert.prioridade == 'recommended' %}⭐ Recommended
                 {% elif cert.prioridade == 'complementary' %}🧠 Complementary
                 {% else %}📚 Foundations
                 {% endif %}
@@ -295,27 +322,28 @@
                         <div class="col-md-4">
                             <label class="form-label">Category *</label>
                             <select name="categoria" class="form-select" required>
-                                <option value="Analytics Engineering / Modern Data Stack">Analytics Engineering / Modern Data Stack</option>
-                                <option value="Cloud & Data Engineering">Cloud & Data Engineering</option>
-                                <option value="BI & Visualization">BI & Visualization</option>
-                                <option value="Data Modeling / SQL">Data Modeling / SQL</option>
-                                <option value="AI & Data Platform">AI & Data Platform</option>
-                                <option value="Beginner / Foundations">Beginner / Foundations</option>
+                                <option value="Analytics Engineering Roadmap">Analytics Engineering Roadmap</option>
+                                <option value="Data Pipelines & Engineering">Data Pipelines & Engineering</option>
+                                <option value="Cloud Architecture">Cloud Architecture</option>
+                                <option value="BI Tooling & DataViz">BI Tooling & DataViz</option>
+                                <option value="Machine Learning & Advanced Analytics">Machine Learning & Advanced Analytics</option>
+                                <option value="Gen AI Solutions">Gen AI Solutions</option>
+                                <option value="DevOps">DevOps</option>
+                                <option value="UI/UX Designer">UI/UX Designer</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Level *</label>
                             <select name="nivel" class="form-select" required>
                                 <option>Beginner</option>
-                                <option selected>Intermediate</option>
-                                <option>Advanced</option>
+                                <option selected>Mid-Level</option>
+                                <option>Senior</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Priority *</label>
+                            <label class="form-label">Recommendation *</label>
                             <select name="prioridade" class="form-select" required>
-                                <option value="must_have">🔥 Must Have</option>
-                                <option value="recommended" selected>☁️ Recommended</option>
+                                <option value="recommended" selected>⭐ Recommended</option>
                                 <option value="complementary">🧠 Complementary</option>
                                 <option value="foundations">📚 Foundations</option>
                             </select>
@@ -377,27 +405,28 @@
                         <div class="col-md-4">
                             <label class="form-label">Category *</label>
                             <select name="categoria" id="ec_categoria" class="form-select" required>
-                                <option value="Analytics Engineering / Modern Data Stack">Analytics Engineering / Modern Data Stack</option>
-                                <option value="Cloud & Data Engineering">Cloud & Data Engineering</option>
-                                <option value="BI & Visualization">BI & Visualization</option>
-                                <option value="Data Modeling / SQL">Data Modeling / SQL</option>
-                                <option value="AI & Data Platform">AI & Data Platform</option>
-                                <option value="Beginner / Foundations">Beginner / Foundations</option>
+                                <option value="Analytics Engineering Roadmap">Analytics Engineering Roadmap</option>
+                                <option value="Data Pipelines & Engineering">Data Pipelines & Engineering</option>
+                                <option value="Cloud Architecture">Cloud Architecture</option>
+                                <option value="BI Tooling & DataViz">BI Tooling & DataViz</option>
+                                <option value="Machine Learning & Advanced Analytics">Machine Learning & Advanced Analytics</option>
+                                <option value="Gen AI Solutions">Gen AI Solutions</option>
+                                <option value="DevOps">DevOps</option>
+                                <option value="UI/UX Designer">UI/UX Designer</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Level *</label>
                             <select name="nivel" id="ec_nivel" class="form-select" required>
                                 <option>Beginner</option>
-                                <option>Intermediate</option>
-                                <option>Advanced</option>
+                                <option>Mid-Level</option>
+                                <option>Senior</option>
                             </select>
                         </div>
                         <div class="col-md-4">
-                            <label class="form-label">Priority *</label>
+                            <label class="form-label">Recommendation *</label>
                             <select name="prioridade" id="ec_prioridade" class="form-select" required>
-                                <option value="must_have">🔥 Must Have</option>
-                                <option value="recommended">☁️ Recommended</option>
+                                <option value="recommended">⭐ Recommended</option>
                                 <option value="complementary">🧠 Complementary</option>
                                 <option value="foundations">📚 Foundations</option>
                             </select>
@@ -465,7 +494,6 @@
     border-radius: .375rem;
     font-weight: 500;
 }
-.badge-priority.must_have       { background: rgba(255,80,0,.25); color: #ff8c5a; border: 1px solid rgba(255,80,0,.4); }
 .badge-priority.recommended     { background: rgba(80,160,255,.2); color: #7dc4ff; border: 1px solid rgba(80,160,255,.4); }
 .badge-priority.complementary   { background: rgba(160,80,255,.2); color: #c47dff; border: 1px solid rgba(160,80,255,.4); }
 .badge-priority.foundations     { background: rgba(80,200,120,.2); color: #7dda9e; border: 1px solid rgba(80,200,120,.35); }
@@ -483,7 +511,6 @@
 
 .cert-card { border: 1px solid rgba(255,255,255,.1); transition: border-color .2s; }
 .cert-card:hover { border-color: rgba(255,255,255,.25); }
-.cert-must_have   { border-left: 3px solid rgba(255,80,0,.6) !important; }
 .cert-recommended { border-left: 3px solid rgba(80,160,255,.5) !important; }
 .cert-complementary { border-left: 3px solid rgba(160,80,255,.5) !important; }
 .cert-foundations { border-left: 3px solid rgba(80,200,120,.5) !important; }

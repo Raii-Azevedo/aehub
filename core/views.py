@@ -2025,6 +2025,7 @@ def certificacoes_lista(request):
     categoria_filtro = request.GET.get('categoria', '').strip()
     nivel_filtro = request.GET.get('nivel', '').strip()
     prioridade_filtro = request.GET.get('prioridade', '').strip()
+    tipo_filtro = request.GET.get('tipo', '').strip()
 
     certs = Certification.objects.filter(ativo=True)
     if query:
@@ -2040,6 +2041,8 @@ def certificacoes_lista(request):
         certs = certs.filter(nivel=nivel_filtro)
     if prioridade_filtro:
         certs = certs.filter(prioridade=prioridade_filtro)
+    if tipo_filtro:
+        certs = certs.filter(tipo_certificacao=tipo_filtro)
 
     certs = list(certs.order_by('categoria', 'nivel', 'titulo'))
 
@@ -2054,12 +2057,14 @@ def certificacoes_lista(request):
     # Group by category for card view
     from collections import OrderedDict
     CATEGORY_ORDER = [
-        'Analytics Engineering / Modern Data Stack',
-        'Cloud & Data Engineering',
-        'BI & Visualization',
-        'Data Modeling / SQL',
-        'AI & Data Platform',
-        'Beginner / Foundations',
+        'Analytics Engineering Roadmap',
+        'Data Pipelines & Engineering',
+        'Cloud Architecture',
+        'BI Tooling & DataViz',
+        'Machine Learning & Advanced Analytics',
+        'Gen AI Solutions',
+        'DevOps',
+        'UI/UX Designer',
     ]
     grouped = OrderedDict()
     for cat in CATEGORY_ORDER:
@@ -2074,9 +2079,16 @@ def certificacoes_lista(request):
 
     categorias = Certification.objects.filter(ativo=True).values_list('categoria', flat=True).distinct()
     niveis = Certification.objects.filter(ativo=True).values_list('nivel', flat=True).distinct()
-    NIVEL_ORDER = ['Beginner', 'Intermediate', 'Advanced']
+    prioridades = Certification.objects.filter(ativo=True).values_list('prioridade', flat=True).distinct()
+    tipos = Certification.objects.filter(ativo=True).values_list('tipo_certificacao', flat=True).distinct()
+
+    NIVEL_ORDER = ['Beginner', 'Mid-Level', 'Senior']
     niveis_ordenados = [n for n in NIVEL_ORDER if n in set(niveis)]
     niveis_ordenados += sorted(n for n in set(niveis) if n not in NIVEL_ORDER)
+
+    PRIORIDADE_ORDER = ['recommended', 'complementary', 'foundations']
+    prioridades_ordenadas = [p for p in PRIORIDADE_ORDER if p in set(prioridades)]
+    prioridades_ordenadas += sorted(p for p in set(prioridades) if p not in PRIORIDADE_ORDER)
 
     return render(request, 'core/certificacoes.html', {
         'certs': certs,
@@ -2086,8 +2098,11 @@ def certificacoes_lista(request):
         'categoria_filtro': categoria_filtro,
         'nivel_filtro': nivel_filtro,
         'prioridade_filtro': prioridade_filtro,
+        'tipo_filtro': tipo_filtro,
         'categorias': sorted(set(categorias)),
         'niveis': niveis_ordenados,
+        'prioridades': prioridades_ordenadas,
+        'tipos': sorted(set(tipos)),
         'user_role': user_role,
     })
 
