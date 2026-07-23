@@ -10,12 +10,15 @@ from django.db import connection
 from django.utils import timezone
 from django.urls import reverse
 from datetime import datetime
+import base64
 import json
 import os
 import re
 import secrets
 import traceback
+from io import BytesIO
 from urllib import error, parse, request as urllib_request
+from PIL import Image
 from core.models import AllowedEmail
 from django.http import HttpResponse
 
@@ -97,6 +100,26 @@ def get_user_role(user):
         return allowed.role
     except AllowedEmail.DoesNotExist:
         return 'viewer'
+
+
+def _nome_de_exibicao(email, allowed=None):
+    """
+    Melhor nome de exibição disponível para um usuário. Preferência:
+    1) AllowedEmail.nome, se estiver preenchido;
+    2) um "Nome Sobrenome" derivado do e-mail (ex.: 'raissa.azevedo' -> 'Raissa Azevedo'),
+       nunca o e-mail em si.
+    Isso evita que o endereço de e-mail apareça como "nome" de uma pessoa em
+    qualquer lugar do app (perfil, autor de conteúdo, ranking etc.).
+    """
+    if allowed is None:
+        allowed = AllowedEmail.objects.filter(email__iexact=email).first()
+    if allowed and allowed.nome:
+        return allowed.nome
+
+    local_part = (email or '').split('@')[0]
+    partes = re.split(r'[._\-+0-9]+', local_part)
+    nome_derivado = ' '.join(p.capitalize() for p in partes if p)
+    return nome_derivado or email
 
 
 def normalize_video_url(url_or_id):
@@ -484,6 +507,28 @@ def google_callback_view(request):
         return redirect('login')
 
     user = _get_or_create_local_user(email)
+
+    # Backfill the person's real name (from their Google account) the first
+    # time we see it missing, so "My Profile", author fields, and the ranking
+    # never have to fall back to showing the raw email as a "name".
+    given_name = (token_info.get('given_name') or '').strip()
+    family_name = (token_info.get('family_name') or '').strip()
+    nome_google = (token_info.get('name') or '').strip() or f'{given_name} {family_name}'.strip()
+
+    if nome_google and not user.first_name and not user.last_name:
+        user.first_name = given_name
+        user.last_name = family_name
+        user.save(update_fields=['first_name', 'last_name'])
+
+    if nome_google:
+        try:
+            allowed_email_obj = AllowedEmail.objects.get(email__iexact=email)
+            if not allowed_email_obj.nome:
+                allowed_email_obj.nome = nome_google
+                allowed_email_obj.save(update_fields=['nome'])
+        except AllowedEmail.DoesNotExist:
+            pass
+
     login(request, user)
     messages.success(request, f'Logged in as {email}.')
     return redirect('boas_vindas')
@@ -580,10 +625,10 @@ def _get_top_contribuidores():
                 continue
             try:
                 allowed = AllowedEmail.objects.get(email=email)
-                nome = allowed.nome or email
+                nome = _nome_de_exibicao(email, allowed)
                 role = allowed.role
             except AllowedEmail.DoesNotExist:
-                nome = email
+                nome = _nome_de_exibicao(email)
                 role = 'viewer'
             resultado.append({
                 'email': email,
@@ -653,12 +698,8 @@ def caso_novo(request):
         agora = timezone.now()
         
         # Buscar nome do autor na tabela AllowedEmail
-        try:
-            allowed = AllowedEmail.objects.get(email=request.user.email)
-            nome_autor = allowed.nome or request.user.email
-        except AllowedEmail.DoesNotExist:
-            nome_autor = request.user.email
-        
+        nome_autor = _nome_de_exibicao(request.user.email)
+
         caso = CasoUso.objects.create(
             titulo=request.POST.get('titulo'),
             contexto=request.POST.get('contexto'),
@@ -790,7 +831,8 @@ def materiais_lista(request):
         'ratings_count': ratings_count,
         'user_likes': list(user_likes),
         'user_ratings': user_ratings,
-        'user_role': get_user_role(request.user)
+        'user_role': get_user_role(request.user),
+        'nome_exibicao': _nome_de_exibicao(request.user.email),
     })
 
 
@@ -803,11 +845,7 @@ def material_novo(request):
 
     if request.method == 'POST':
         agora = timezone.now()
-        try:
-            allowed_mat = AllowedEmail.objects.get(email=request.user.email)
-            nome_autor_mat = allowed_mat.nome or request.user.email
-        except AllowedEmail.DoesNotExist:
-            nome_autor_mat = request.user.get_full_name() or request.user.email
+        nome_autor_mat = _nome_de_exibicao(request.user.email)
         material = Material.objects.create(
             titulo=request.POST.get('titulo'),
             tipo=request.POST.get('tipo'),
@@ -931,7 +969,8 @@ def videos_lista(request):
         'ratings_count': ratings_count,
         'user_likes': list(user_likes),
         'user_ratings': user_ratings,
-        'user_role': get_user_role(request.user)
+        'user_role': get_user_role(request.user),
+        'nome_exibicao': _nome_de_exibicao(request.user.email),
     })
 
 
@@ -943,7 +982,7 @@ def video_novo(request):
         return redirect('videos_lista')
 
     if request.method == 'POST':
-        autor = normalize_video_author(request.POST.get('autor') or request.user.username)
+        autor = normalize_video_author(request.POST.get('autor') or _nome_de_exibicao(request.user.email))
         youtube_id = normalize_video_url(request.POST.get('youtube_id', ''))
         
         agora_video = timezone.now()
@@ -1073,7 +1112,8 @@ def ferramentas_lista(request):
         'ratings_count': ratings_count,
         'user_likes': list(user_likes),
         'user_ratings': user_ratings,
-        'user_role': get_user_role(request.user)
+        'user_role': get_user_role(request.user),
+        'nome_exibicao': _nome_de_exibicao(request.user.email),
     })
 
 
@@ -1086,11 +1126,7 @@ def ferramenta_novo(request):
 
     if request.method == 'POST':
         agora_ferramenta = timezone.now()
-        try:
-            allowed_ferr = AllowedEmail.objects.get(email=request.user.email)
-            nome_autor_ferr = allowed_ferr.nome or request.user.email
-        except AllowedEmail.DoesNotExist:
-            nome_autor_ferr = request.user.email
+        nome_autor_ferr = _nome_de_exibicao(request.user.email)
 
         ferramenta = Ferramenta.objects.create(
             nome=request.POST.get('nome'),
@@ -1375,11 +1411,11 @@ def gamificacao_ranking(request):
             try:
                 allowed = AllowedEmail.objects.get(email=user.email)
                 role = allowed.role
-                nome_exibicao = user.get_full_name() or user.username
+                nome_exibicao = _nome_de_exibicao(user.email, allowed)
                 avatar = allowed.avatar or None
             except AllowedEmail.DoesNotExist:
                 role = 'viewer'
-                nome_exibicao = user.get_full_name() or user.username
+                nome_exibicao = _nome_de_exibicao(user.email)
                 avatar = None
 
             ranking.append({
@@ -1595,11 +1631,7 @@ def snippet_novo(request):
         return redirect('snippets_lista')
 
     if request.method == 'POST':
-        try:
-            allowed = AllowedEmail.objects.get(email=request.user.email)
-            nome_autor = allowed.nome or request.user.email
-        except AllowedEmail.DoesNotExist:
-            nome_autor = request.user.email
+        nome_autor = _nome_de_exibicao(request.user.email)
 
         Snippet.objects.create(
             titulo=request.POST.get('titulo'),
@@ -1924,7 +1956,7 @@ def perfil_usuario(request, email):
 
     return render(request, 'core/perfil_usuario.html', {
         'perfil_email': email,
-        'perfil_nome': allowed.nome or email,
+        'perfil_nome': _nome_de_exibicao(email, allowed),
         'perfil_avatar': allowed.avatar or None,
         'perfil_role': allowed.role,
         'perfil_tipo': perfil_tipo,
@@ -1970,28 +2002,24 @@ def perfil_avatar_upload(request, email):
         messages.error(request, 'Image too large (max 5MB).')
         return redirect('perfil_usuario', email=email)
 
-    avatar_dir = os.path.join(settings.MEDIA_ROOT, 'avatars')
-    os.makedirs(avatar_dir, exist_ok=True)
-
-    # Nome de arquivo estável por usuário (sobrescreve a foto anterior) e
-    # com um sufixo aleatório para evitar cache desatualizado no navegador.
-    safe_name = re.sub(r'[^a-zA-Z0-9_.-]', '_', email.lower())
-    filename = f'{safe_name}_{secrets.token_hex(4)}{ext}'
-
-    # Remove fotos antigas desse usuário antes de salvar a nova
+    # Stored as a base64 data URI directly in the `avatar` column instead of
+    # writing to disk: Railway's filesystem is ephemeral (no volume mounted
+    # at MEDIA_ROOT), so any file written here gets wiped on the next deploy
+    # or container restart, and the saved image silently 404s afterwards.
+    # A data URI has no filesystem dependency at all, so it survives deploys.
     try:
-        for f in os.listdir(avatar_dir):
-            if f.startswith(safe_name + '_'):
-                os.remove(os.path.join(avatar_dir, f))
-    except FileNotFoundError:
-        pass
+        imagem = Image.open(arquivo)
+        imagem = imagem.convert('RGB')
+        imagem.thumbnail((320, 320), Image.LANCZOS)
+        buffer = BytesIO()
+        imagem.save(buffer, format='JPEG', quality=85, optimize=True)
+        avatar_base64 = base64.b64encode(buffer.getvalue()).decode('ascii')
+        usuario.avatar = f'data:image/jpeg;base64,{avatar_base64}'
+    except Exception:
+        traceback.print_exc()
+        messages.error(request, 'Could not process this image. Please try a different file.')
+        return redirect('perfil_usuario', email=email)
 
-    filepath = os.path.join(avatar_dir, filename)
-    with open(filepath, 'wb+') as destino:
-        for chunk in arquivo.chunks():
-            destino.write(chunk)
-
-    usuario.avatar = f'{settings.MEDIA_URL}avatars/{filename}'
     usuario.save(update_fields=['avatar'])
 
     messages.success(request, '✅ Profile photo updated!')
