@@ -68,16 +68,10 @@
                         {% if ravg %}<small class="text-white-50 ms-1 avg-label" style="font-size:.75rem;">{{ravg}} ({{rcount}})</small>{% endif %}
                     </div>
                     <button class="btn btn-sm btn-outline-secondary comment-toggle-btn"
-                            data-type="ferramenta" data-id="{{ferramenta.id}}" onclick="toggleComments(this)">
+                            data-type="ferramenta" data-id="{{ferramenta.id}}"
+                            onclick="openComments('ferramenta', {{ ferramenta.id }}, '{{ ferramenta.nome|escapejs }}')">
                         💬 <span class="comment-count">{{ ccount|default:0 }}</span>
                     </button>
-                </div>
-                <div class="comments-panel d-none mt-1" id="comments-ferramenta-{{ ferramenta.id }}" data-type="ferramenta" data-id="{{ ferramenta.id }}">
-                    <div class="comments-list mb-2"></div>
-                    <div class="d-flex gap-2">
-                        <input type="text" class="form-control form-control-sm comment-input" placeholder="Write a comment…" maxlength="2000">
-                        <button type="button" class="btn btn-sm btn-gradient comment-post-btn" onclick="postComment(this)">Post</button>
-                    </div>
                 </div>
                 {% endwith %}
             </div>
@@ -307,6 +301,25 @@ function editarFerramenta(id) {
         .catch(error => console.error('Erro:', error));
 }
 </script>
+
+<!-- Modal: comments (shared — content swapped in via JS for whichever item was clicked) -->
+<div class="modal fade" id="modalComments" tabindex="-1">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title comments-modal-title">💬 Comments</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="comments-list mb-3"></div>
+                <div class="d-flex gap-2">
+                    <input type="text" class="form-control form-control-sm comment-input" placeholder="Write a comment…" maxlength="2000">
+                    <button type="button" class="btn btn-sm btn-gradient comment-post-btn" onclick="postComment(this)">Post</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 {% include 'core/_engagement_js.html' %}
 {% endblock %}

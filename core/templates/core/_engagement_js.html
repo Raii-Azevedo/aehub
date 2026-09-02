@@ -81,7 +81,7 @@ document.querySelectorAll('.star-row').forEach(row => {
     if (userR) renderStars(row, userR, userR);
 });
 
-// ── Comments ──
+// ── Comments (single shared modal, opt-in — never shown inline on the card) ──
 
 function escapeHtml(s) {
     const d = document.createElement('div');
@@ -89,31 +89,33 @@ function escapeHtml(s) {
     return d.innerHTML;
 }
 
-function toggleComments(btn) {
-    const type = btn.dataset.type, id = btn.dataset.id;
-    const panel = document.getElementById(`comments-${type}-${id}`);
-    if (!panel) return;
-    const wasHidden = panel.classList.contains('d-none');
-    panel.classList.toggle('d-none');
-    if (wasHidden && !panel.dataset.loaded) {
-        loadComments(type, id, panel);
-    }
+function openComments(type, id, titulo) {
+    const modalEl = document.getElementById('modalComments');
+    if (!modalEl) return;
+    modalEl.dataset.type = type;
+    modalEl.dataset.id = id;
+
+    const titleEl = modalEl.querySelector('.comments-modal-title');
+    if (titleEl) titleEl.textContent = titulo ? `💬 Comments — ${titulo}` : '💬 Comments';
+
+    modalEl.querySelector('.comment-input').value = '';
+    loadComments(type, id, modalEl);
+
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+    modal.show();
 }
 
-function loadComments(type, id, panel) {
-    const listEl = panel.querySelector('.comments-list');
+function loadComments(type, id, modalEl) {
+    const listEl = modalEl.querySelector('.comments-list');
     listEl.innerHTML = '<small class="text-white-50">Loading comments…</small>';
     fetch(`/api/comments/${type}/${id}/`)
         .then(r => r.json())
-        .then(data => {
-            renderComments(panel, data.comments || []);
-            panel.dataset.loaded = '1';
-        })
+        .then(data => renderComments(modalEl, data.comments || []))
         .catch(() => { listEl.innerHTML = '<small class="text-danger">Could not load comments.</small>'; });
 }
 
-function renderComments(panel, comments) {
-    const listEl = panel.querySelector('.comments-list');
+function renderComments(modalEl, comments) {
+    const listEl = modalEl.querySelector('.comments-list');
     if (!comments.length) {
         listEl.innerHTML = '<small class="text-white-50">No comments yet — be the first!</small>';
         return;
@@ -124,7 +126,7 @@ function renderComments(panel, comments) {
                 <strong class="small">${escapeHtml(c.nome)}</strong>
                 <small class="text-white-50" style="font-size:.7rem;white-space:nowrap;">${escapeHtml(c.data)}</small>
             </div>
-            <div class="small" style="white-space:pre-wrap;">${escapeHtml(c.texto)}</div>
+            <div class="small" style="white-space:pre-wrap;color:rgba(255,255,255,0.85);">${escapeHtml(c.texto)}</div>
             ${c.pode_excluir ? `<button type="button" class="btn btn-sm btn-link text-danger p-0" style="font-size:.7rem;" onclick="deleteComment(${c.id}, this)">Delete</button>` : ''}
         </div>
     `).join('');
@@ -139,9 +141,9 @@ function updateCommentBadge(type, id, count) {
 }
 
 function postComment(btn) {
-    const panel = btn.closest('.comments-panel');
-    const type = panel.dataset.type, id = panel.dataset.id;
-    const input = panel.querySelector('.comment-input');
+    const modalEl = document.getElementById('modalComments');
+    const type = modalEl.dataset.type, id = modalEl.dataset.id;
+    const input = modalEl.querySelector('.comment-input');
     const texto = input.value.trim();
     if (!texto) return;
     btn.disabled = true;
@@ -155,8 +157,7 @@ function postComment(btn) {
         btn.disabled = false;
         if (data.error) { alert(data.error); return; }
         input.value = '';
-        panel.dataset.loaded = '';
-        loadComments(type, id, panel);
+        loadComments(type, id, modalEl);
         updateCommentBadge(type, id, data.count);
     })
     .catch(err => { btn.disabled = false; console.error(err); });
@@ -164,8 +165,8 @@ function postComment(btn) {
 
 function deleteComment(commentId, linkEl) {
     if (!confirm('Delete this comment?')) return;
-    const panel = linkEl.closest('.comments-panel');
-    const type = panel.dataset.type, id = panel.dataset.id;
+    const modalEl = document.getElementById('modalComments');
+    const type = modalEl.dataset.type, id = modalEl.dataset.id;
     fetch(`/api/comments/excluir/${commentId}/`, {
         method: 'POST',
         headers: { 'X-CSRFToken': CSRF }
@@ -173,20 +174,21 @@ function deleteComment(commentId, linkEl) {
     .then(r => r.json())
     .then(data => {
         if (data.error) { alert(data.error); return; }
-        panel.dataset.loaded = '';
-        loadComments(type, id, panel);
+        loadComments(type, id, modalEl);
         updateCommentBadge(type, id, data.count);
     })
     .catch(console.error);
 }
 
-// Allow Enter (without Shift) to submit a comment from its input
-document.querySelectorAll('.comment-input').forEach(input => {
+// Allow Enter (without Shift) to submit a comment from the modal's input
+document.addEventListener('DOMContentLoaded', () => {
+    const modalEl = document.getElementById('modalComments');
+    const input = modalEl && modalEl.querySelector('.comment-input');
+    if (!input) return;
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
-            const btn = input.closest('.comments-panel').querySelector('.comment-post-btn');
-            if (btn) btn.click();
+            modalEl.querySelector('.comment-post-btn')?.click();
         }
     });
 });
