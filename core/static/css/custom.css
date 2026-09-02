@@ -623,9 +623,11 @@ body {
 }
 
 /* ============================================
-   PROFILES PAGE — LEGADO (hero / grid antigo)
+   DISCOVER / WHAT'S NEW HOME PAGE
+   (was an unused "Profiles" hero/grid experiment —
+   repurposed as the design language for the new HUB home)
 ============================================ */
-.profiles-page {
+.discover-page {
     --bg-deep: #0f0c29;
     --bg-mid: #302b63;
     --bg-soft: #24243e;
@@ -635,15 +637,18 @@ body {
     --accent: #667eea;
     --accent-2: #764ba2;
     --line: rgba(255, 255, 255, 0.14);
+    --new: #22c55e;
+    --updated: #f59e0b;
     max-width: 1120px;
     margin: 0 auto;
     font-family: "Space Grotesk", "Segoe UI", sans-serif;
     color: var(--ink);
 }
 
-.profiles-hero {
+/* ---------- Hero ---------- */
+.discover-hero {
     border-radius: 24px;
-    padding: 3rem 1.5rem;
+    padding: 3.2rem 2rem;
     background:
         radial-gradient(circle at 15% 25%, rgba(102, 126, 234, 0.34), transparent 32%),
         radial-gradient(circle at 82% 70%, rgba(118, 75, 162, 0.32), transparent 36%),
@@ -653,7 +658,7 @@ body {
     overflow: hidden;
 }
 
-.profiles-hero::after {
+.discover-hero::after {
     content: "";
     position: absolute;
     inset: auto -120px -120px auto;
@@ -664,16 +669,10 @@ body {
     transform: rotate(20deg);
 }
 
-@media (max-width: 767.98px) {
-    .profiles-hero::after {
-        inset: auto -80px -80px auto;
-        width: 240px;
-        height: 240px;
-    }
-}
-
-.profiles-label {
+.discover-label {
     display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
     padding: 0.3rem 0.75rem;
     border-radius: 999px;
     letter-spacing: 0.08em;
@@ -683,29 +682,31 @@ body {
     margin-bottom: 0.9rem;
 }
 
-.profiles-hero h1 {
+.discover-hero h1 {
     font-family: "Sora", "Segoe UI", sans-serif;
-    font-size: clamp(1.9rem, 4.2vw, 3rem);
+    font-size: clamp(2rem, 4.4vw, 3.1rem);
     margin-bottom: 0.9rem;
     line-height: 1.15;
     max-width: 760px;
 }
 
-.profiles-hero p {
-    max-width: 700px;
+.discover-hero p {
+    max-width: 640px;
     margin: 0;
     color: rgba(245, 250, 255, 0.9);
     font-size: 1.02rem;
+    line-height: 1.55;
 }
 
-.profiles-actions {
+.discover-actions {
     display: flex;
     flex-wrap: wrap;
+    align-items: center;
     gap: 0.9rem;
-    margin-top: 1.5rem;
+    margin-top: 1.75rem;
 }
 
-.profiles-page .cta-button {
+.discover-page .cta-button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -714,93 +715,279 @@ body {
     padding: 0.85rem 1.25rem;
     font-weight: 700;
     text-decoration: none;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.profiles-page .cta-primary {
+.discover-page .cta-primary {
     background: linear-gradient(110deg, var(--accent), var(--accent-2));
     color: #ffffff;
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.24);
 }
 
-.profiles-page .cta-secondary {
+.discover-page .cta-secondary {
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: #f8fbff;
     background: rgba(255, 255, 255, 0.1);
 }
 
-.profiles-page .cta-button:hover {
+.discover-page .cta-button:hover {
     transform: translateY(-2px);
+    color: #ffffff;
 }
 
-.profiles-grid {
+/* ---------- Section titles ---------- */
+.discover-section-title {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 2.6rem 0 1.1rem 0;
+}
+
+.discover-section-title h2 {
+    font-family: "Sora", "Segoe UI", sans-serif;
+    font-size: 1.3rem;
+    margin: 0;
+}
+
+.discover-section-title .discover-eyebrow {
+    display: block;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #a78bfa;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+}
+
+.discover-section-title .discover-sub {
+    color: var(--ink-soft);
+    font-size: 0.85rem;
+}
+
+/* ---------- Status pills ---------- */
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    padding: 0.22rem 0.55rem;
+    border-radius: 999px;
+    color: #0b0b17;
+    text-transform: uppercase;
+}
+
+.status-pill.is-new { background: var(--new); color: #06210f; }
+.status-pill.is-updated { background: var(--updated); color: #2a1a00; }
+
+/* ---------- Featured grid ---------- */
+.featured-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 0.9rem;
-    margin-top: 1.5rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
 }
 
-.profile-card {
+.featured-card {
     background: var(--card);
     border: 1px solid var(--line);
     backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 1.1rem;
+    border-radius: 18px;
+    padding: 1.4rem;
     color: var(--ink);
     text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
     transform: translateY(8px);
     opacity: 0;
     animation: cardReveal 0.45s ease forwards;
+    position: relative;
+    overflow: hidden;
 }
 
-.profile-card:nth-child(2) { animation-delay: 0.08s; }
-.profile-card:nth-child(3) { animation-delay: 0.16s; }
-.profile-card:nth-child(4) { animation-delay: 0.24s; }
-
-.profile-card:hover {
-    border-color: rgba(255, 255, 255, 0.26);
-    box-shadow: 0 16px 28px rgba(0, 0, 0, 0.32);
-    transform: translateY(-3px);
+.featured-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    opacity: 0;
+    transition: opacity 0.2s ease;
 }
 
-.profile-emoji {
-    font-size: 1.5rem;
-    margin-bottom: 0.45rem;
-    display: block;
+.featured-card:nth-child(1) { animation-delay: 0.03s; }
+.featured-card:nth-child(2) { animation-delay: 0.11s; }
+.featured-card:nth-child(3) { animation-delay: 0.19s; }
+
+.featured-card:hover {
+    border-color: rgba(255, 255, 255, 0.28);
+    box-shadow: 0 18px 32px rgba(0, 0, 0, 0.34);
+    transform: translateY(-4px);
+    color: var(--ink);
 }
 
-.profile-card h3 {
+.featured-card:hover::before { opacity: 1; }
+
+.featured-card .fc-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.featured-card .fc-cat {
+    font-size: 0.72rem;
+    color: #a78bfa;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.featured-card h3 {
     margin: 0;
-    font-size: 1.02rem;
+    font-size: 1.08rem;
     font-family: "Sora", "Segoe UI", sans-serif;
+    line-height: 1.35;
 }
 
-.profile-card p {
-    margin: 0.5rem 0 0;
+.featured-card p {
+    margin: 0;
     color: var(--ink-soft);
-    font-size: 0.9rem;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.featured-card .fc-meta {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.76rem;
+}
+
+.featured-card .fc-explore {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #c7c6ff;
+    margin-top: 0.2rem;
+}
+
+/* ---------- Recent updates ---------- */
+.update-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+}
+
+.update-card {
+    background: rgba(255, 255, 255, 0.045);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 1.1rem 1.2rem;
+    text-decoration: none;
+    color: var(--ink);
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.update-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--ink);
+}
+
+.update-card .uc-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.update-card h4 {
+    margin: 0;
+    font-size: 0.98rem;
+    font-family: "Sora", "Segoe UI", sans-serif;
+    line-height: 1.35;
+}
+
+.update-card p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 0.84rem;
     line-height: 1.45;
 }
 
-.profiles-notes {
-    margin-top: 1.4rem;
+.update-card .uc-meta {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.74rem;
+    margin-top: 0.1rem;
+}
+
+/* ---------- Contribute banner ---------- */
+.contribute-banner {
+    margin-top: 2.8rem;
+    border-radius: 22px;
+    padding: 2.6rem 2rem;
+    text-align: center;
+    background:
+        radial-gradient(circle at 20% 30%, rgba(102, 126, 234, 0.28), transparent 40%),
+        linear-gradient(135deg, #1a1a2e, #16213e);
     border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 1rem 1.1rem;
-    background: rgba(255, 255, 255, 0.08);
 }
 
-.profiles-notes h2 {
-    margin: 0 0 0.65rem;
+.contribute-banner .discover-label {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.contribute-banner h2 {
     font-family: "Sora", "Segoe UI", sans-serif;
-    font-size: 1.02rem;
+    font-size: 1.6rem;
+    margin: 0.4rem 0 0.6rem 0;
 }
 
-.profiles-notes ul {
-    margin: 0;
-    padding-left: 1.1rem;
+.contribute-banner p {
     color: var(--ink-soft);
+    max-width: 520px;
+    margin: 0 auto 1.6rem auto;
+    font-size: 0.96rem;
+    line-height: 1.55;
+}
+
+.contribute-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+/* ---------- Empty state ---------- */
+.discover-empty {
+    text-align: center;
+    padding: 3.5rem 1.5rem;
+}
+
+.discover-empty .discover-empty-emoji {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.discover-empty h2 {
+    font-family: "Sora", "Segoe UI", sans-serif;
+    font-size: 1.5rem;
+    margin-bottom: 0.7rem;
+}
+
+.discover-empty p {
+    color: var(--ink-soft);
+    max-width: 480px;
+    margin: 0 auto 1.6rem auto;
+    line-height: 1.55;
 }
 
 @keyframes cardReveal {
@@ -811,68 +998,46 @@ body {
 }
 
 @media (max-width: 991.98px) {
-    .profiles-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+    .featured-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .update-grid { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 767.98px) {
-    .profiles-grid {
-        grid-template-columns: 1fr;
-    }
-    .profiles-hero {
-        padding: 2rem 1rem;
+    .featured-grid { grid-template-columns: 1fr; }
+    .discover-hero {
+        padding: 2.2rem 1.25rem;
         border-radius: 16px;
     }
-    .profiles-hero h1 {
-        font-size: clamp(1.5rem, 3.5vw, 2rem);
+    .discover-hero h1 {
+        font-size: clamp(1.6rem, 3.5vw, 2rem);
     }
-    .profiles-actions {
+    .discover-actions {
         flex-direction: column;
+        align-items: stretch;
     }
-    .profiles-page .cta-button {
+    .discover-page .cta-button {
         width: 100%;
+    }
+    .discover-section-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.2rem;
+    }
+    .contribute-banner {
+        padding: 2rem 1.25rem;
+    }
+    .contribute-actions {
+        flex-direction: column;
     }
 }
 
 @media (max-width: 575.98px) {
-    .profiles-hero {
-        padding: 1.5rem 0.75rem;
+    .discover-hero {
+        padding: 1.6rem 1rem;
         border-radius: 12px;
     }
-    
-    .profiles-hero h1 {
-        font-size: clamp(1.3rem, 3vw, 1.8rem);
-        margin-bottom: 0.6rem;
-    }
-    
-    .profiles-hero p {
-        font-size: 0.9rem;
-    }
-    
-    .profiles-label {
-        font-size: 0.65rem;
-        padding: 0.25rem 0.6rem;
-    }
-    
-    .profile-card {
-        padding: 0.8rem;
-    }
-    
-    .profile-emoji {
-        font-size: 1.2rem;
-        margin-bottom: 0.3rem;
-    }
-    
-    .profile-card h3 {
-        font-size: 0.9rem;
-    }
-    
-    .profile-card p {
-        font-size: 0.8rem;
-    }
-    
-    .profiles-page .cta-button {
-        width: 100%;
-    }
+    .discover-hero p { font-size: 0.92rem; }
+    .discover-label { font-size: 0.65rem; padding: 0.25rem 0.6rem; }
+    .featured-card { padding: 1.1rem; }
+    .update-card { padding: 0.9rem 1rem; }
 }

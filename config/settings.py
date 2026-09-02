@@ -245,7 +245,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ========================
 
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/dashboard/'
+LOGIN_REDIRECT_URL = '/novidades/'  # What's New is the HUB's home/entry point
 LOGOUT_REDIRECT_URL = '/login/'
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -306,3 +306,44 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
+
+
+# ========================
+# EMAIL (Railway env vars — same convention as DATABASE_URL / GOOGLE_OAUTH_*)
+# ========================
+# In DEBUG with no SMTP host configured, fall back to the console backend so local
+# development/testing never needs real credentials — emails just print to stdout.
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '')
+
+if os.environ.get('EMAIL_BACKEND'):
+    EMAIL_BACKEND = os.environ['EMAIL_BACKEND']
+elif EMAIL_HOST:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True') == 'True'
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False') == 'True'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'AE Knowledge Hub <no-reply@artefact.com>')
+
+# Absolute base URL used to build links inside emails (relative URLs don't work in email clients).
+SITE_URL = os.environ.get('SITE_URL', 'https://aertefact.up.railway.app')
+
+
+# ========================
+# NEWSLETTER — "What's New" (see docs/newsletter_setup.md)
+# ========================
+NEWSLETTER_PERIOD_DAYS = int(os.environ.get('NEWSLETTER_PERIOD_DAYS', '15'))
+
+# Phase 1 safety switch. While True, the newsletter ONLY goes to NEWSLETTER_TEST_RECIPIENTS,
+# no matter how many people exist in AllowedEmail. Once Raissa approves the design, set
+# NEWSLETTER_TEST_MODE=False in Railway and it automatically switches to every email in
+# AllowedEmail — no code change needed.
+NEWSLETTER_TEST_MODE = os.environ.get('NEWSLETTER_TEST_MODE', 'True') == 'True'
+NEWSLETTER_TEST_RECIPIENTS = [
+    e.strip() for e in os.environ.get('NEWSLETTER_TEST_RECIPIENTS', 'raissa.azevedo@artefact.com').split(',')
+    if e.strip()
+]

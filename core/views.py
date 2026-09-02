@@ -42,6 +42,7 @@ from .models import (
     ContentRating,
     ContentComment,
 )
+from core import newsletter_utils
 
 def is_admin(user):
     try:
@@ -424,7 +425,7 @@ def boas_vindas(request):
     onboarding, _ = UserOnboarding.objects.get_or_create(user=request.user)
 
     if onboarding.onboarding_completo:
-        return redirect('dashboard')
+        return redirect('changelog')
 
     if request.method == 'POST':
         onboarding.onboarding_completo = True
@@ -434,7 +435,7 @@ def boas_vindas(request):
         if perfil_tipo in ['architect', 'gogetter', 'simplifier', 'systematic']:
             onboarding.perfil_tipo = perfil_tipo
         onboarding.save()
-        return redirect('dashboard')
+        return redirect('changelog')
 
     return render(request, 'core/boas_vindas.html')
 
@@ -1473,134 +1474,6 @@ def roadmap_entrega_excluir(request, id):
     return JsonResponse({'success': True})
 
 
-# ================== GAMIFICAÇÃO ==================
-
-@login_required
-def gamificacao_ranking(request):
-    """Ranking de gamificação com pontuação detalhada"""
-    
-    # Buscar todos os usuários com email autorizado
-    allowed_emails = AllowedEmail.objects.values_list('email', flat=True)
-    usuarios = User.objects.filter(email__in=allowed_emails)
-
-    hoje = timezone.now()
-    ano_atual, mes_atual = hoje.year, hoje.month
-
-    ranking = []
-    ranking_mes = []
-
-    for user in usuarios:
-        # Contar contribuições usando email (mais confiável)
-        try:
-            casos_qs = CasoUso.objects.filter(autor_email=user.email, ativo=True)
-            casos = casos_qs.count()
-            casos_mes = casos_qs.filter(data_criacao__year=ano_atual, data_criacao__month=mes_atual).count()
-        except Exception:
-            casos = casos_mes = 0
-
-        try:
-            videos_qs = Video.objects.filter(autor_email=user.email)
-            videos = videos_qs.count()
-            videos_mes = videos_qs.filter(data_criacao__year=ano_atual, data_criacao__month=mes_atual).count()
-        except Exception:
-            videos = videos_mes = 0
-
-        try:
-            materiais_qs = Material.objects.filter(autor_email=user.email)
-            materiais = materiais_qs.count()
-            materiais_mes = materiais_qs.filter(data_criacao__year=ano_atual, data_criacao__month=mes_atual).count()
-        except Exception:
-            materiais = materiais_mes = 0
-
-        try:
-            ferramentas_qs = Ferramenta.objects.filter(autor_email=user.email)
-            ferramentas = ferramentas_qs.count()
-            ferramentas_mes = ferramentas_qs.filter(data_criacao__year=ano_atual, data_criacao__month=mes_atual).count()
-        except Exception:
-            ferramentas = ferramentas_mes = 0
-
-        try:
-            snippets_qs = Snippet.objects.filter(autor_email=user.email)
-            snippets = snippets_qs.count()
-            snippets_mes = snippets_qs.filter(data_criacao__year=ano_atual, data_criacao__month=mes_atual).count()
-        except Exception:
-            snippets = snippets_mes = 0
-
-        # Calcular pontuação (total, all-time)
-        pontuacao_total = casos * 10 + videos * 12 + materiais * 6 + ferramentas * 8 + snippets * 7
-        total_contribuicoes = casos + videos + materiais + ferramentas + snippets
-
-        # Calcular pontuação (somente contribuições do mês corrente)
-        pontuacao_mes = casos_mes * 10 + videos_mes * 12 + materiais_mes * 6 + ferramentas_mes * 8 + snippets_mes * 7
-        total_contribuicoes_mes = casos_mes + videos_mes + materiais_mes + ferramentas_mes + snippets_mes
-
-        if pontuacao_total > 0 or total_contribuicoes > 0:
-            # Buscar role do usuário
-            try:
-                allowed = AllowedEmail.objects.get(email=user.email)
-                role = allowed.role
-                nome_exibicao = _nome_de_exibicao(user.email, allowed)
-                avatar = allowed.avatar or None
-            except AllowedEmail.DoesNotExist:
-                role = 'viewer'
-                nome_exibicao = _nome_de_exibicao(user.email)
-                avatar = None
-
-            ranking.append({
-                'id': user.id,
-                'email': user.email,
-                'nome': nome_exibicao,
-                'role': role,
-                'avatar': avatar,
-                'pontuacao': pontuacao_total,
-                'total_contribuicoes': total_contribuicoes,
-                'detalhes': {
-                    'casos': casos,
-                    'videos': videos,
-                    'materiais': materiais,
-                    'ferramentas': ferramentas,
-                    'snippets': snippets,
-                }
-            })
-
-            if pontuacao_mes > 0 or total_contribuicoes_mes > 0:
-                ranking_mes.append({
-                    'id': user.id,
-                    'email': user.email,
-                    'nome': nome_exibicao,
-                    'role': role,
-                    'avatar': avatar,
-                    'pontuacao': pontuacao_mes,
-                    'total_contribuicoes': total_contribuicoes_mes,
-                    'detalhes': {
-                        'casos': casos_mes,
-                        'videos': videos_mes,
-                        'materiais': materiais_mes,
-                        'ferramentas': ferramentas_mes,
-                        'snippets': snippets_mes,
-                    }
-                })
-
-    # Ordenar por pontuação
-    ranking.sort(key=lambda x: x['pontuacao'], reverse=True)
-    ranking_mes.sort(key=lambda x: x['pontuacao'], reverse=True)
-
-    # Calcular percentual para barra de progresso
-    max_pontos = ranking[0]['pontuacao'] if ranking else 1
-    for item in ranking:
-        item['percentual'] = (item['pontuacao'] / max_pontos) * 100
-
-    # Destaque do mês: melhor pontuação entre quem contribuiu no mês corrente (não o 1º geral)
-    destaque_mes = ranking_mes[0] if ranking_mes else None
-
-    context = {
-        'ranking': ranking,
-        'destaque_mes': destaque_mes,
-        'user_role': get_user_role(request.user),
-    }
-    return render(request, 'core/ranking.html', context)
-
-
 # ================== GERENCIAMENTO DE USUÁRIOS ==================
 
 @login_required
@@ -2017,35 +1890,50 @@ def favorito_toggle(request, content_type, object_id):
 
 @login_required
 def changelog(request):
-    from datetime import timedelta
-    periodo = request.GET.get('periodo', '7')
+    """
+    What's New — the HUB's home page. Reuses core.newsletter_utils exactly like the
+    "What's New" email newsletter does, so the page and the email are always in sync:
+    same window, same New/Updated logic, same items, same links.
+    """
+    periodo = request.GET.get('periodo', '').strip()
     try:
-        dias = int(periodo)
+        dias = int(periodo) if periodo else None
     except ValueError:
-        dias = 7
+        dias = None
 
-    desde = timezone.now() - timedelta(days=dias)
+    novidades = newsletter_utils.coletar_novidades(dias)
+    secoes = novidades['secoes']
 
-    novos_casos = CasoUso.objects.filter(ativo=True, data_criacao__gte=desde).order_by('-data_criacao')
-    novos_materiais = Material.objects.filter(data_criacao__gte=desde).order_by('-data_criacao')
-    novos_videos = Video.objects.filter(data_criacao__gte=desde).order_by('-data_criacao')
-    novas_ferramentas = Ferramenta.objects.filter(data_criacao__gte=desde).order_by('-data_criacao')
-    novos_snippets = Snippet.objects.filter(data_criacao__gte=desde).order_by('-data_criacao')
+    # Featured = the most recent items overall (across all sections), shown with extra
+    # weight up top. Everything else is grouped by section below as "Recent updates".
+    destaques = newsletter_utils.selecionar_destaques(secoes, limite=3)
+    destaque_keys = {(d['chave'], d['id']) for d in destaques}
 
-    total_novidades = (
-        novos_casos.count() + novos_materiais.count() + novos_videos.count() +
-        novas_ferramentas.count() + novos_snippets.count()
-    )
+    secoes_recentes = []
+    for secao in secoes:
+        restantes = [item for item in secao['itens'] if (item['chave'], item['id']) not in destaque_keys]
+        if restantes:
+            secoes_recentes.append({**secao, 'itens': restantes})
+
+    total_itens = novidades['total_itens']
+    if total_itens >= 8:
+        hero_mensagem = "It's been a busy stretch on the Hub — plenty to explore below."
+    elif total_itens >= 3:
+        hero_mensagem = "A handful of fresh additions since last time — take a look."
+    elif total_itens > 0:
+        hero_mensagem = "A couple of new things landed on the Hub — check them out."
+    else:
+        hero_mensagem = ''
 
     return render(request, 'core/changelog.html', {
-        'novos_casos': novos_casos,
-        'novos_materiais': novos_materiais,
-        'novos_videos': novos_videos,
-        'novas_ferramentas': novas_ferramentas,
-        'novos_snippets': novos_snippets,
-        'total_novidades': total_novidades,
-        'periodo': dias,
+        'destaques': destaques,
+        'secoes': secoes_recentes,
+        'total_itens': total_itens,
+        'dias': novidades['dias'],
+        'periodo_label': newsletter_utils.periodo_label(novidades['desde'], novidades['ate']),
+        'hero_mensagem': hero_mensagem,
         'user_role': get_user_role(request.user),
+        'nome_exibicao': _nome_de_exibicao(request.user.email),
     })
 
 

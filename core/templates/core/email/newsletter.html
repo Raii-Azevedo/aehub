@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>What's New — AE Knowledge Hub</title>
+<style>
+  body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+  body { margin:0; padding:0; width:100% !important; background-color:#eef0f7; font-family:'Segoe UI', Helvetica, Arial, sans-serif; }
+  table { border-collapse:collapse; }
+  img { border:0; line-height:100%; }
+  a.cta {
+    display:inline-block; background:linear-gradient(135deg,#667eea,#764ba2); color:#ffffff !important;
+    text-decoration:none; font-size:13px; font-weight:600; padding:11px 22px; border-radius:8px;
+  }
+  .badge { display:inline-block; font-size:10px; font-weight:700; letter-spacing:.5px; padding:4px 10px; border-radius:999px; color:#ffffff; }
+  .badge-new { background:#22c55e; }
+  .badge-updated { background:#f59e0b; }
+  @media only screen and (max-width:600px) {
+    .container { width:100% !important; border-radius:0 !important; }
+    .px { padding-left:20px !important; padding-right:20px !important; }
+    .header-px { padding-left:24px !important; padding-right:24px !important; }
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background-color:#eef0f7;">
+<!-- Preheader (hidden preview text) -->
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;">
+  {% if total_itens > 0 %}{{ total_itens }} update{{ total_itens|pluralize }} on the AE Hub — {{ periodo_label }}.{% else %}The Hub's been quiet this round — let's change that?{% endif %}
+</div>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#eef0f7;">
+<tr>
+<td align="center" style="padding:28px 12px;">
+
+  <table role="presentation" class="container" width="600" cellpadding="0" cellspacing="0" align="center"
+         style="width:600px;max-width:600px;background:#ffffff;border-radius:18px;overflow:hidden;box-shadow:0 12px 32px rgba(15,12,41,0.14);">
+
+    <!-- HEADER -->
+    <tr>
+      <td class="header-px" style="background:linear-gradient(135deg,#0f0c29 0%,#302b63 50%,#24243e 100%);padding:44px 40px;text-align:center;">
+        <div style="font-size:11px;letter-spacing:3px;text-transform:uppercase;color:#a99dfc;font-weight:700;margin-bottom:10px;">
+          AE Knowledge Hub
+        </div>
+        <div style="font-size:30px;line-height:1.2;font-weight:800;color:#ffffff;margin-bottom:10px;">
+          🚀 What's New
+        </div>
+        <div style="font-size:13px;color:#cfd0e6;">
+          {{ periodo_label }}
+        </div>
+      </td>
+    </tr>
+
+    <!-- INTRO -->
+    <tr>
+      <td class="px" style="padding:28px 40px 4px 40px;">
+        {% if total_itens > 0 %}
+        <p style="margin:0;font-size:15px;line-height:1.6;color:#3d3d55;">
+          Hi{% if nome %}, {{ nome }}{% endif %}! 👋 Here's what happened on the Hub this period —
+          <strong>{{ total_itens }} update{{ total_itens|pluralize }}</strong> for you to explore.
+        </p>
+        {% else %}
+        <p style="margin:0;font-size:15px;line-height:1.6;color:#3d3d55;">
+          Hi{% if nome %}, {{ nome }}{% endif %}! 👋
+        </p>
+        {% endif %}
+      </td>
+    </tr>
+
+    {% if total_itens == 0 %}
+    <!-- EMPTY STATE -->
+    <tr>
+      <td class="px" style="padding:20px 40px 8px 40px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+               style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:16px;">
+          <tr>
+            <td style="padding:36px 32px;text-align:center;">
+              <div style="font-size:38px;margin-bottom:10px;">🌱</div>
+              <div style="font-size:19px;font-weight:800;color:#ffffff;margin-bottom:10px;line-height:1.35;">
+                Nothing new this time?<br>Maybe it's your turn to contribute 💜
+              </div>
+              <p style="font-size:14px;line-height:1.6;color:#cfd0e6;max-width:420px;margin:0 auto 22px auto;">
+                The Hub's next stretch starts with someone deciding to share something —
+                a use case, a snippet, a tool, or that video that helped you out.
+                It could be exactly what another AE is looking for right now.
+              </p>
+              <a href="{{ hub_url_casos }}" class="cta" style="margin:4px;">📊 Share a use case</a>
+              <br><br>
+              <a href="{{ hub_url_snippets }}" class="cta" style="margin:4px;background:linear-gradient(135deg,#302b63,#667eea);">💻 Share a snippet</a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    {% else %}
+
+      {% if destaque %}
+      <!-- HIGHLIGHT -->
+      <tr>
+        <td class="px" style="padding:20px 40px 8px 40px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                 style="background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:16px;">
+            <tr>
+              <td style="padding:26px 28px;">
+                <div style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:#a99dfc;font-weight:700;margin-bottom:10px;">
+                  🌟 Highlight of the period
+                </div>
+                <div style="font-size:19px;font-weight:800;color:#ffffff;margin-bottom:8px;line-height:1.3;">
+                  {{ destaque.titulo }}
+                </div>
+                <div style="font-size:13px;color:#cfd0e6;line-height:1.55;margin-bottom:16px;">
+                  {{ destaque.descricao }}
+                </div>
+                <a href="{{ destaque.url }}" class="cta">View on the Hub →</a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      {% endif %}
+
+      {% for secao in secoes %}
+      <!-- SECTION: {{ secao.titulo }} -->
+      <tr>
+        <td class="px" style="padding:26px 40px 4px 40px;">
+          <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:#667eea;font-weight:800;">
+            {{ secao.titulo }} <span style="color:#a3a3c2;font-weight:600;">· {{ secao.itens|length }}</span>
+          </div>
+        </td>
+      </tr>
+      {% for item in secao.itens %}
+      <tr>
+        <td class="px" style="padding:8px 40px;">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
+                 style="background:#fafaff;border:1px solid #ececf5;border-radius:12px;">
+            <tr>
+              <td style="padding:18px 20px;">
+                <span class="badge {% if item.status == 'New' %}badge-new{% else %}badge-updated{% endif %}">
+                  {% if item.status == 'New' %}🆕 NEW{% else %}✏️ UPDATED{% endif %}
+                </span>
+                <div style="font-size:16px;font-weight:700;color:#1a1a2e;margin:10px 0 4px 0;line-height:1.3;">
+                  {{ item.titulo }}
+                </div>
+                {% if item.meta or item.autor %}
+                <div style="font-size:12px;color:#8b8ba7;margin-bottom:8px;">
+                  {{ item.meta }}{% if item.autor %} · by {{ item.autor }}{% endif %}
+                </div>
+                {% endif %}
+                {% if item.descricao %}
+                <div style="font-size:14px;color:#3d3d55;line-height:1.55;margin-bottom:10px;">
+                  {{ item.descricao }}
+                </div>
+                {% endif %}
+                <div style="font-size:13px;color:#764ba2;font-style:italic;margin-bottom:14px;">
+                  💡 {{ item.relevancia }}
+                </div>
+                <a href="{{ item.url }}" class="cta">View on the Hub →</a>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      {% endfor %}
+      {% endfor %}
+
+      <!-- MAIN CTA -->
+      <tr>
+        <td class="px" style="padding:28px 40px 8px 40px;text-align:center;">
+          <a href="{{ hub_url }}" class="cta" style="padding:13px 30px;font-size:14px;">Open the AE Hub →</a>
+        </td>
+      </tr>
+    {% endif %}
+
+    <!-- FOOTER -->
+    <tr>
+      <td class="px" style="padding:32px 40px;text-align:center;border-top:1px solid #ececf5;margin-top:12px;">
+        <p style="font-size:12px;color:#9a9ab0;line-height:1.6;margin:0;">
+          You're receiving this email because you have access to the AE Knowledge Hub.<br>
+          Made with 💜 by Artefact's Analytics Engineering team.
+        </p>
+      </td>
+    </tr>
+
+  </table>
+
+</td>
+</tr>
+</table>
+</body>
+</html>

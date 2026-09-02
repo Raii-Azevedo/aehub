@@ -57,9 +57,6 @@ urlpatterns = [
     path('roadmap/entrega/status/<int:id>/', views.roadmap_entrega_status, name='roadmap_entrega_status'),
     path('roadmap/entrega/excluir/<int:id>/', views.roadmap_entrega_excluir, name='roadmap_entrega_excluir'),
     
-    # Gamificação
-    path('ranking/', views.gamificacao_ranking, name='ranking'),
-
     # Admin Usuários
     path('admin/usuarios/', views.admin_usuarios, name='admin_usuarios'),
     path('admin/usuarios/novo/', views.admin_usuario_novo, name='admin_usuario_novo'),
