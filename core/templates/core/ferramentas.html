@@ -53,7 +53,7 @@
 
             <!-- Engagement row -->
             <div class="card-footer bg-transparent border-0 pb-0 pt-2 px-3">
-                {% with lcount=likes_map|get_item:ferramenta.id ravg=ratings_avg|get_item:ferramenta.id rcount=ratings_count|get_item:ferramenta.id urating=user_ratings|get_item:ferramenta.id %}
+                {% with lcount=likes_map|get_item:ferramenta.id ravg=ratings_avg|get_item:ferramenta.id rcount=ratings_count|get_item:ferramenta.id urating=user_ratings|get_item:ferramenta.id ccount=comments_count|get_item:ferramenta.id %}
                 <div class="d-flex align-items-center gap-2 flex-wrap">
                     <button class="btn btn-sm engagement-like-btn {% if ferramenta.id in user_likes %}btn-warning{% else %}btn-outline-secondary{% endif %}"
                             data-type="ferramenta" data-id="{{ferramenta.id}}" onclick="toggleLike(this)">
@@ -66,6 +66,17 @@
                            onclick="submitRating('ferramenta', {{ferramenta.id}}, {{forloop.counter}}, this.closest('.star-row'))"></i>
                         {% endfor %}
                         {% if ravg %}<small class="text-white-50 ms-1 avg-label" style="font-size:.75rem;">{{ravg}} ({{rcount}})</small>{% endif %}
+                    </div>
+                    <button class="btn btn-sm btn-outline-secondary comment-toggle-btn"
+                            data-type="ferramenta" data-id="{{ferramenta.id}}" onclick="toggleComments(this)">
+                        💬 <span class="comment-count">{{ ccount|default:0 }}</span>
+                    </button>
+                </div>
+                <div class="comments-panel d-none mt-1" id="comments-ferramenta-{{ ferramenta.id }}" data-type="ferramenta" data-id="{{ ferramenta.id }}">
+                    <div class="comments-list mb-2"></div>
+                    <div class="d-flex gap-2">
+                        <input type="text" class="form-control form-control-sm comment-input" placeholder="Write a comment…" maxlength="2000">
+                        <button type="button" class="btn btn-sm btn-gradient comment-post-btn" onclick="postComment(this)">Post</button>
                     </div>
                 </div>
                 {% endwith %}

@@ -14,7 +14,7 @@
 <form method="get" class="mb-4">
     <div class="input-group">
         <input type="text" name="q" class="form-control form-control-lg bg-dark text-white border-secondary"
-               placeholder="Search cases, materials, videos, tools, snippets..."
+               placeholder="Search cases, materials, videos, tools, snippets, certifications..."
                value="{{ query }}" autofocus>
         <button class="btn btn-gradient btn-lg" type="submit"><i class="bi bi-search me-1"></i> Search</button>
     </div>
@@ -143,6 +143,31 @@
     </div>
     <div class="card-footer bg-transparent border-light text-end">
         <a href="{% url 'snippets_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">View all in Snippets →</a>
+    </div>
+</div>
+{% endif %}
+
+{% if resultados.certificacoes %}
+<div class="card mb-4">
+    <div class="card-header bg-transparent border-light">
+        <h5 class="mb-0"><i class="bi bi-patch-check me-2"></i>Certifications <span class="badge bg-secondary">{{ resultados.certificacoes.count }}</span></h5>
+    </div>
+    <div class="card-body p-0">
+        {% for cert in resultados.certificacoes %}
+        <div class="p-3 border-bottom border-light">
+            <div class="d-flex justify-content-between">
+                <strong>{{ cert.titulo }}</strong>
+                <span class="badge bg-secondary">{{ cert.get_nivel_display }}</span>
+            </div>
+            <p class="small text-white-50 mb-1">{{ cert.descricao|truncatewords:20 }}</p>
+            <span class="badge bg-info text-dark me-1">{{ cert.fornecedor }}</span>
+            <span class="badge bg-secondary me-1">{{ cert.categoria }}</span>
+            <span class="badge bg-secondary">{{ cert.get_tipo_certificacao_display }}</span>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="card-footer bg-transparent border-light text-end">
+        <a href="{% url 'certificacoes_lista' %}?q={{ query }}" class="btn btn-sm btn-outline-light">View all in Certifications →</a>
     </div>
 </div>
 {% endif %}

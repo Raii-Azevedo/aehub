@@ -105,4 +105,8 @@ urlpatterns = [
     # Engagement (likes + ratings)
     path('api/like/<str:content_type>/<int:object_id>/', views.like_toggle, name='like_toggle'),
     path('api/rate/<str:content_type>/<int:object_id>/', views.rating_submit, name='rating_submit'),
+
+    # Comments (GET lists, POST adds)
+    path('api/comments/<str:content_type>/<int:object_id>/', views.comments_view, name='comments_view'),
+    path('api/comments/excluir/<int:comment_id>/', views.comment_delete, name='comment_delete'),
 ]

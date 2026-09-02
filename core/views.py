@@ -40,6 +40,7 @@ from .models import (
     CertificationProgress,
     ContentLike,
     ContentRating,
+    ContentComment,
 )
 
 def is_admin(user):
@@ -195,6 +196,23 @@ def _popularity_score(obj_id, likes_map, ratings_avg):
     return likes * 2 + avg
 
 
+def _get_comments_count_map(content_type, object_ids):
+    """Returns {object_id: comment_count} for a list of object_ids."""
+    if not object_ids:
+        return {}
+    try:
+        from django.db.models import Count as DCount
+        rows = (
+            ContentComment.objects
+            .filter(content_type=content_type, object_id__in=object_ids)
+            .values('object_id')
+            .annotate(n=DCount('id'))
+        )
+        return {row['object_id']: row['n'] for row in rows}
+    except Exception:
+        return {}
+
+
 @login_required
 def like_toggle(request, content_type, object_id):
     if request.method != 'POST':
@@ -249,6 +267,98 @@ def rating_submit(request, content_type, object_id):
         })
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+
+VALID_COMMENT_TYPES = {'caso', 'material', 'video', 'ferramenta', 'snippet'}
+
+
+@login_required
+def comments_view(request, content_type, object_id):
+    """GET: list comments for an item. POST: add a new comment."""
+    if content_type not in VALID_COMMENT_TYPES:
+        return JsonResponse({'error': 'Invalid content_type'}, status=400)
+
+    if request.method == 'POST':
+        try:
+            body = json.loads(request.body or '{}')
+        except Exception:
+            body = {}
+        texto = (body.get('texto') or request.POST.get('texto') or '').strip()
+        if not texto:
+            return JsonResponse({'error': 'Comment cannot be empty'}, status=400)
+        if len(texto) > 2000:
+            texto = texto[:2000]
+        try:
+            comentario = ContentComment.objects.create(
+                usuario_email=request.user.email,
+                content_type=content_type,
+                object_id=object_id,
+                texto=texto,
+            )
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+
+        allowed = AllowedEmail.objects.filter(email__iexact=request.user.email).first()
+        nome = _nome_de_exibicao(request.user.email, allowed)
+        count = ContentComment.objects.filter(content_type=content_type, object_id=object_id).count()
+        return JsonResponse({
+            'comment': {
+                'id': comentario.id,
+                'nome': nome,
+                'email': request.user.email,
+                'texto': comentario.texto,
+                'data': comentario.data_criacao.strftime('%d/%m/%Y %H:%M'),
+                'pode_excluir': True,
+            },
+            'count': count,
+        })
+
+    # GET — list comments
+    try:
+        comentarios = ContentComment.objects.filter(
+            content_type=content_type, object_id=object_id
+        ).order_by('data_criacao')
+    except Exception:
+        comentarios = []
+
+    emails = {c.usuario_email for c in comentarios}
+    nomes_map = {
+        a.email.lower(): a for a in AllowedEmail.objects.filter(email__in=emails)
+    }
+    is_admin_user = get_user_role(request.user) == 'admin'
+
+    lista = []
+    for c in comentarios:
+        allowed = nomes_map.get(c.usuario_email.lower())
+        lista.append({
+            'id': c.id,
+            'nome': _nome_de_exibicao(c.usuario_email, allowed),
+            'email': c.usuario_email,
+            'texto': c.texto,
+            'data': c.data_criacao.strftime('%d/%m/%Y %H:%M'),
+            'pode_excluir': is_admin_user or c.usuario_email.lower() == request.user.email.lower(),
+        })
+
+    return JsonResponse({'comments': lista, 'count': len(lista)})
+
+
+@login_required
+def comment_delete(request, comment_id):
+    if request.method != 'POST':
+        return JsonResponse({'error': 'POST required'}, status=405)
+    try:
+        comentario = ContentComment.objects.get(id=comment_id)
+    except ContentComment.DoesNotExist:
+        return JsonResponse({'error': 'Not found'}, status=404)
+
+    is_owner = comentario.usuario_email.lower() == request.user.email.lower()
+    if not (is_owner or get_user_role(request.user) == 'admin'):
+        return JsonResponse({'error': 'Not allowed'}, status=403)
+
+    content_type, object_id = comentario.content_type, comentario.object_id
+    comentario.delete()
+    count = ContentComment.objects.filter(content_type=content_type, object_id=object_id).count()
+    return JsonResponse({'deleted': True, 'count': count})
 
 
 def criar_admin_se_nao_existir():
@@ -668,6 +778,7 @@ def casos_lista(request):
     favoritos_ids = _get_favoritos_ids(request.user.email, 'caso')
     ids = [c.id for c in casos]
     likes_map, ratings_avg, ratings_count, user_likes, user_ratings = _get_engagement_data('caso', ids, request.user.email)
+    comments_count = _get_comments_count_map('caso', ids)
 
     if sort == 'popular':
         casos = sorted(casos, key=lambda c: _popularity_score(c.id, likes_map, ratings_avg), reverse=True)
@@ -681,6 +792,7 @@ def casos_lista(request):
         'likes_map': likes_map,
         'ratings_avg': ratings_avg,
         'ratings_count': ratings_count,
+        'comments_count': comments_count,
         'user_likes': list(user_likes),
         'user_ratings': user_ratings,
         'user_role': get_user_role(request.user)
@@ -816,6 +928,7 @@ def materiais_lista(request):
     favoritos_ids = _get_favoritos_ids(request.user.email, 'material')
     ids = [m.id for m in materiais]
     likes_map, ratings_avg, ratings_count, user_likes, user_ratings = _get_engagement_data('material', ids, request.user.email)
+    comments_count = _get_comments_count_map('material', ids)
 
     if sort == 'popular':
         materiais = sorted(materiais, key=lambda m: _popularity_score(m.id, likes_map, ratings_avg), reverse=True)
@@ -829,6 +942,7 @@ def materiais_lista(request):
         'likes_map': likes_map,
         'ratings_avg': ratings_avg,
         'ratings_count': ratings_count,
+        'comments_count': comments_count,
         'user_likes': list(user_likes),
         'user_ratings': user_ratings,
         'user_role': get_user_role(request.user),
@@ -955,6 +1069,7 @@ def videos_lista(request):
     favoritos_ids = _get_favoritos_ids(request.user.email, 'video')
     ids = [v.id for v in videos]
     likes_map, ratings_avg, ratings_count, user_likes, user_ratings = _get_engagement_data('video', ids, request.user.email)
+    comments_count = _get_comments_count_map('video', ids)
 
     if sort == 'popular':
         videos = sorted(videos, key=lambda v: _popularity_score(v.id, likes_map, ratings_avg), reverse=True)
@@ -967,6 +1082,7 @@ def videos_lista(request):
         'likes_map': likes_map,
         'ratings_avg': ratings_avg,
         'ratings_count': ratings_count,
+        'comments_count': comments_count,
         'user_likes': list(user_likes),
         'user_ratings': user_ratings,
         'user_role': get_user_role(request.user),
@@ -1098,6 +1214,7 @@ def ferramentas_lista(request):
     favoritos_ids = _get_favoritos_ids(request.user.email, 'ferramenta')
     ids = [f.id for f in ferramentas]
     likes_map, ratings_avg, ratings_count, user_likes, user_ratings = _get_engagement_data('ferramenta', ids, request.user.email)
+    comments_count = _get_comments_count_map('ferramenta', ids)
 
     if sort == 'popular':
         ferramentas = sorted(ferramentas, key=lambda f: _popularity_score(f.id, likes_map, ratings_avg), reverse=True)
@@ -1110,6 +1227,7 @@ def ferramentas_lista(request):
         'likes_map': likes_map,
         'ratings_avg': ratings_avg,
         'ratings_count': ratings_count,
+        'comments_count': comments_count,
         'user_likes': list(user_likes),
         'user_ratings': user_ratings,
         'user_role': get_user_role(request.user),
@@ -1364,48 +1482,58 @@ def gamificacao_ranking(request):
     # Buscar todos os usuários com email autorizado
     allowed_emails = AllowedEmail.objects.values_list('email', flat=True)
     usuarios = User.objects.filter(email__in=allowed_emails)
-    
+
+    hoje = timezone.now()
+    ano_atual, mes_atual = hoje.year, hoje.month
+
     ranking = []
-    
+    ranking_mes = []
+
     for user in usuarios:
         # Contar contribuições usando email (mais confiável)
         try:
-            casos = CasoUso.objects.filter(
-                autor_email=user.email,
-                ativo=True
-            ).count()
+            casos_qs = CasoUso.objects.filter(autor_email=user.email, ativo=True)
+            casos = casos_qs.count()
+            casos_mes = casos_qs.filter(data_criacao__year=ano_atual, data_criacao__month=mes_atual).count()
         except Exception:
-            casos = 0
+            casos = casos_mes = 0
 
         try:
-            videos = Video.objects.filter(autor_email=user.email).count()
+            videos_qs = Video.objects.filter(autor_email=user.email)
+            videos = videos_qs.count()
+            videos_mes = videos_qs.filter(data_criacao__year=ano_atual, data_criacao__month=mes_atual).count()
         except Exception:
-            videos = 0
+            videos = videos_mes = 0
 
         try:
-            materiais = Material.objects.filter(autor_email=user.email).count()
+            materiais_qs = Material.objects.filter(autor_email=user.email)
+            materiais = materiais_qs.count()
+            materiais_mes = materiais_qs.filter(data_criacao__year=ano_atual, data_criacao__month=mes_atual).count()
         except Exception:
-            materiais = 0
+            materiais = materiais_mes = 0
 
         try:
-            ferramentas = Ferramenta.objects.filter(autor_email=user.email).count()
+            ferramentas_qs = Ferramenta.objects.filter(autor_email=user.email)
+            ferramentas = ferramentas_qs.count()
+            ferramentas_mes = ferramentas_qs.filter(data_criacao__year=ano_atual, data_criacao__month=mes_atual).count()
         except Exception:
-            ferramentas = 0
+            ferramentas = ferramentas_mes = 0
+
         try:
-            snippets = Snippet.objects.filter(autor_email=user.email).count()
+            snippets_qs = Snippet.objects.filter(autor_email=user.email)
+            snippets = snippets_qs.count()
+            snippets_mes = snippets_qs.filter(data_criacao__year=ano_atual, data_criacao__month=mes_atual).count()
         except Exception:
-            snippets = 0
+            snippets = snippets_mes = 0
 
-        # Calcular pontuação
-        pontos_casos = casos * 10
-        pontos_videos = videos * 12
-        pontos_materiais = materiais * 6
-        pontos_ferramentas = ferramentas * 8
-        pontos_snippets = snippets * 7
-
-        pontuacao_total = pontos_casos + pontos_videos + pontos_materiais + pontos_ferramentas + pontos_snippets
+        # Calcular pontuação (total, all-time)
+        pontuacao_total = casos * 10 + videos * 12 + materiais * 6 + ferramentas * 8 + snippets * 7
         total_contribuicoes = casos + videos + materiais + ferramentas + snippets
-        
+
+        # Calcular pontuação (somente contribuições do mês corrente)
+        pontuacao_mes = casos_mes * 10 + videos_mes * 12 + materiais_mes * 6 + ferramentas_mes * 8 + snippets_mes * 7
+        total_contribuicoes_mes = casos_mes + videos_mes + materiais_mes + ferramentas_mes + snippets_mes
+
         if pontuacao_total > 0 or total_contribuicoes > 0:
             # Buscar role do usuário
             try:
@@ -1434,18 +1562,37 @@ def gamificacao_ranking(request):
                     'snippets': snippets,
                 }
             })
-    
+
+            if pontuacao_mes > 0 or total_contribuicoes_mes > 0:
+                ranking_mes.append({
+                    'id': user.id,
+                    'email': user.email,
+                    'nome': nome_exibicao,
+                    'role': role,
+                    'avatar': avatar,
+                    'pontuacao': pontuacao_mes,
+                    'total_contribuicoes': total_contribuicoes_mes,
+                    'detalhes': {
+                        'casos': casos_mes,
+                        'videos': videos_mes,
+                        'materiais': materiais_mes,
+                        'ferramentas': ferramentas_mes,
+                        'snippets': snippets_mes,
+                    }
+                })
+
     # Ordenar por pontuação
     ranking.sort(key=lambda x: x['pontuacao'], reverse=True)
-    
+    ranking_mes.sort(key=lambda x: x['pontuacao'], reverse=True)
+
     # Calcular percentual para barra de progresso
     max_pontos = ranking[0]['pontuacao'] if ranking else 1
     for item in ranking:
         item['percentual'] = (item['pontuacao'] / max_pontos) * 100
-    
-    # Destaque do mês (primeiro do ranking)
-    destaque_mes = ranking[0] if ranking else None
-    
+
+    # Destaque do mês: melhor pontuação entre quem contribuiu no mês corrente (não o 1º geral)
+    destaque_mes = ranking_mes[0] if ranking_mes else None
+
     context = {
         'ranking': ranking,
         'destaque_mes': destaque_mes,
@@ -1603,6 +1750,7 @@ def snippets_lista(request):
     favoritos_ids = _get_favoritos_ids(request.user.email, 'snippet')
     ids = [s.id for s in snippets]
     likes_map, ratings_avg, ratings_count, user_likes, user_ratings = _get_engagement_data('snippet', ids, request.user.email)
+    comments_count = _get_comments_count_map('snippet', ids)
 
     if sort == 'popular':
         snippets = sorted(snippets, key=lambda s: _popularity_score(s.id, likes_map, ratings_avg), reverse=True)
@@ -1618,6 +1766,7 @@ def snippets_lista(request):
         'likes_map': likes_map,
         'ratings_avg': ratings_avg,
         'ratings_count': ratings_count,
+        'comments_count': comments_count,
         'user_likes': list(user_likes),
         'user_ratings': user_ratings,
         'user_role': get_user_role(request.user),
@@ -1741,14 +1890,28 @@ def busca_global(request):
             snippets = []
             snippets_count = 0
 
+        try:
+            certificacoes = Certification.objects.filter(ativo=True).filter(
+                Q(titulo__icontains=query) | Q(fornecedor__icontains=query) |
+                Q(descricao__icontains=query) | Q(tags__icontains=query)
+            )[:10]
+            certificacoes_count = certificacoes.count()
+        except Exception:
+            certificacoes = []
+            certificacoes_count = 0
+
         resultados = {
             'casos': casos,
             'materiais': materiais,
             'videos': videos,
             'ferramentas': ferramentas,
             'snippets': snippets,
+            'certificacoes': certificacoes,
         }
-        total = casos.count() + materiais.count() + videos.count() + ferramentas.count() + snippets_count
+        total = (
+            casos.count() + materiais.count() + videos.count() + ferramentas.count()
+            + snippets_count + certificacoes_count
+        )
 
     return render(request, 'core/busca_global.html', {
         'query': query,

@@ -373,3 +373,26 @@ class ContentRating(models.Model):
 
     def __str__(self):
         return f"{self.usuario_email} rated {self.content_type}:{self.object_id} → {self.rating}"
+
+
+class ContentComment(models.Model):
+    CONTENT_TYPES = [
+        ('caso', 'Caso de Uso'),
+        ('material', 'Material'),
+        ('video', 'Vídeo'),
+        ('ferramenta', 'Ferramenta'),
+        ('snippet', 'Snippet'),
+    ]
+    usuario_email = models.EmailField()
+    content_type = models.CharField(max_length=20, choices=CONTENT_TYPES)
+    object_id = models.IntegerField()
+    texto = models.TextField()
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'content_comments'
+        managed = False
+        ordering = ['data_criacao']
+
+    def __str__(self):
+        return f"{self.usuario_email} commented on {self.content_type}:{self.object_id}"

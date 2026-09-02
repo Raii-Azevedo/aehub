@@ -80,4 +80,114 @@ document.querySelectorAll('.star-row').forEach(row => {
     const userR = parseInt(row.dataset.userRating || 0);
     if (userR) renderStars(row, userR, userR);
 });
+
+// ── Comments ──
+
+function escapeHtml(s) {
+    const d = document.createElement('div');
+    d.textContent = s == null ? '' : s;
+    return d.innerHTML;
+}
+
+function toggleComments(btn) {
+    const type = btn.dataset.type, id = btn.dataset.id;
+    const panel = document.getElementById(`comments-${type}-${id}`);
+    if (!panel) return;
+    const wasHidden = panel.classList.contains('d-none');
+    panel.classList.toggle('d-none');
+    if (wasHidden && !panel.dataset.loaded) {
+        loadComments(type, id, panel);
+    }
+}
+
+function loadComments(type, id, panel) {
+    const listEl = panel.querySelector('.comments-list');
+    listEl.innerHTML = '<small class="text-white-50">Loading comments…</small>';
+    fetch(`/api/comments/${type}/${id}/`)
+        .then(r => r.json())
+        .then(data => {
+            renderComments(panel, data.comments || []);
+            panel.dataset.loaded = '1';
+        })
+        .catch(() => { listEl.innerHTML = '<small class="text-danger">Could not load comments.</small>'; });
+}
+
+function renderComments(panel, comments) {
+    const listEl = panel.querySelector('.comments-list');
+    if (!comments.length) {
+        listEl.innerHTML = '<small class="text-white-50">No comments yet — be the first!</small>';
+        return;
+    }
+    listEl.innerHTML = comments.map(c => `
+        <div class="comment-item mb-2 pb-2 border-bottom border-secondary">
+            <div class="d-flex justify-content-between align-items-start">
+                <strong class="small">${escapeHtml(c.nome)}</strong>
+                <small class="text-white-50" style="font-size:.7rem;white-space:nowrap;">${escapeHtml(c.data)}</small>
+            </div>
+            <div class="small" style="white-space:pre-wrap;">${escapeHtml(c.texto)}</div>
+            ${c.pode_excluir ? `<button type="button" class="btn btn-sm btn-link text-danger p-0" style="font-size:.7rem;" onclick="deleteComment(${c.id}, this)">Delete</button>` : ''}
+        </div>
+    `).join('');
+}
+
+function updateCommentBadge(type, id, count) {
+    const toggleBtn = document.querySelector(`.comment-toggle-btn[data-type="${type}"][data-id="${id}"]`);
+    if (toggleBtn) {
+        const badge = toggleBtn.querySelector('.comment-count');
+        if (badge) badge.textContent = count;
+    }
+}
+
+function postComment(btn) {
+    const panel = btn.closest('.comments-panel');
+    const type = panel.dataset.type, id = panel.dataset.id;
+    const input = panel.querySelector('.comment-input');
+    const texto = input.value.trim();
+    if (!texto) return;
+    btn.disabled = true;
+    fetch(`/api/comments/${type}/${id}/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto })
+    })
+    .then(r => r.json())
+    .then(data => {
+        btn.disabled = false;
+        if (data.error) { alert(data.error); return; }
+        input.value = '';
+        panel.dataset.loaded = '';
+        loadComments(type, id, panel);
+        updateCommentBadge(type, id, data.count);
+    })
+    .catch(err => { btn.disabled = false; console.error(err); });
+}
+
+function deleteComment(commentId, linkEl) {
+    if (!confirm('Delete this comment?')) return;
+    const panel = linkEl.closest('.comments-panel');
+    const type = panel.dataset.type, id = panel.dataset.id;
+    fetch(`/api/comments/excluir/${commentId}/`, {
+        method: 'POST',
+        headers: { 'X-CSRFToken': CSRF }
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.error) { alert(data.error); return; }
+        panel.dataset.loaded = '';
+        loadComments(type, id, panel);
+        updateCommentBadge(type, id, data.count);
+    })
+    .catch(console.error);
+}
+
+// Allow Enter (without Shift) to submit a comment from its input
+document.querySelectorAll('.comment-input').forEach(input => {
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            const btn = input.closest('.comments-panel').querySelector('.comment-post-btn');
+            if (btn) btn.click();
+        }
+    });
+});
 </script>
