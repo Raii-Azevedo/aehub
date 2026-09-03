@@ -24,6 +24,37 @@ Railway logs instead of sending it), so nothing breaks — it just won't deliver
 | `DEFAULT_FROM_EMAIL` | `AE Knowledge Hub <hub@artefact.com>` | What recipients see as the sender. |
 | `SITE_URL` | `https://aertefact.up.railway.app` | Already defaults to the current Railway domain — only override if the domain changes. |
 
+### 1.1 Step-by-step using raissa.azevedo@artefact.com as the sender
+
+1. **Enable 2-Step Verification** (skip if already on): go to
+   [myaccount.google.com/security](https://myaccount.google.com/security), signed in as
+   `raissa.azevedo@artefact.com` → "2-Step Verification" → follow the setup. Google requires
+   this before it will let the account generate an App Password.
+2. **Generate an App Password**: still under Security →
+   [App passwords](https://myaccount.google.com/apppasswords) → name it something like
+   "AE Hub Newsletter" → Google shows a 16-character password once. Copy it — it won't be shown again.
+   - If the "App passwords" option doesn't appear at all, Artefact's Workspace admin has it
+     disabled org-wide for this account and needs to enable it (Admin console → Security →
+     Authentication → App passwords).
+3. **Add the variables in Railway**: open the HUB service → **Variables** tab → add:
+   - `EMAIL_HOST` = `smtp.gmail.com`
+   - `EMAIL_PORT` = `587`
+   - `EMAIL_USE_TLS` = `True`
+   - `EMAIL_HOST_USER` = `raissa.azevedo@artefact.com`
+   - `EMAIL_HOST_PASSWORD` = the 16-character app password from step 2
+   - `DEFAULT_FROM_EMAIL` = `AE Knowledge Hub <raissa.azevedo@artefact.com>`
+   Railway redeploys automatically when variables change.
+4. **Test it**: once redeployed, open a shell on the Railway service (Railway dashboard →
+   service → the "..." menu → shell, or `railway run` locally) and run:
+   ```
+   python manage.py send_newsletter --dry-run
+   ```
+   to confirm it collects data without erroring, then run without `--dry-run` to actually send —
+   with `NEWSLETTER_TEST_MODE` still at its default `True`, it only reaches
+   `raissa.azevedo@artefact.com`, so this is safe to run for real.
+5. **Go live**: once the email arrives and looks right, set `NEWSLETTER_TEST_MODE=False` in
+   Railway to switch to every email in `AllowedEmail`.
+
 If Artefact IT prefers a transactional provider (SendGrid, Mailgun, Postmark, Resend,
 Amazon SES) instead of raw SMTP, that's a one-line change: set `EMAIL_BACKEND` to the
 provider's Django backend (usually via the `anymail` package) and its own API-key
