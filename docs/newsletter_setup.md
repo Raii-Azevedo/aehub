@@ -14,6 +14,12 @@ None of these exist yet in the project — you need to add them under the servic
 `EMAIL_BACKEND` falls back to Django's console backend (prints the email to the
 Railway logs instead of sending it), so nothing breaks — it just won't deliver.
 
+**Important — Railway plan requirement:** Railway blocks outbound SMTP (ports
+25/465/587) on the Free/Trial/Hobby plans to prevent abuse. Gmail SMTP (below) only
+works if the "AEHUB - NewsLetter" service is on Railway's **Pro plan or above**. If it
+fails with `OSError: [Errno 101] Network is unreachable`, that's this restriction —
+not a credentials problem — and the service needs to be upgraded to Pro first.
+
 | Variable | Example | Notes |
 |---|---|---|
 | `EMAIL_HOST` | `smtp.gmail.com` | SMTP server. If using Google Workspace, this is usually `smtp.gmail.com` with an **app password**, or your workspace's relay host if IT has one set up. |
@@ -54,12 +60,6 @@ Railway logs instead of sending it), so nothing breaks — it just won't deliver
    `raissa.azevedo@artefact.com`, so this is safe to run for real.
 5. **Go live**: once the email arrives and looks right, set `NEWSLETTER_TEST_MODE=False` in
    Railway to switch to every email in `AllowedEmail`.
-
-If Artefact IT prefers a transactional provider (SendGrid, Mailgun, Postmark, Resend,
-Amazon SES) instead of raw SMTP, that's a one-line change: set `EMAIL_BACKEND` to the
-provider's Django backend (usually via the `anymail` package) and its own API-key
-variable — the rest of this feature (`newsletter_utils.py`, the template, the command)
-doesn't change at all.
 
 ## 2. Phase 1 (current state) — test mode
 
