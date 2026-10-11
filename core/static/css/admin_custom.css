@@ -1,0 +1,25 @@
+/* ============================================
+   FIX: lista de permissões (filter_horizontal)
+   Tema "darkly" do Jazzmin deixa o texto das
+   opções em branco sobre fundo claro, tornando
+   a lista de permissões (ex: "core | snippet |
+   can add snippet") ilegível. Força texto preto
+   e fundo claro nos dois seletores (Disponíveis /
+   Escolhidas).
+============================================ */
+.selector select,
+.selector select option,
+.selector select optgroup,
+.selector-available select,
+.selector-chosen select,
+select.filtered,
+select.filtered option,
+select.filtered optgroup {
+    color: #000 !important;
+    background-color: #fff !important;
+}
+
+.selector-available input[type="text"] {
+    color: #000 !important;
+    background-color: #fff !important;
+}
